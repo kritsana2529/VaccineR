@@ -17,20 +17,50 @@
         }
         * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Intro Animation Overlay */
+        #introOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--apricot); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; transition: opacity 1s ease-in-out;
+        }
+        #targetTextPlaceholder { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; width: 90%; max-width: 600px; opacity: 0; }
+        .word-group { display: flex; gap: 2px; }
+        .placeholder-char { font-size: clamp(28px, 8vw, 42px); font-weight: 900; line-height: 1; text-align: center; }
+        .random-letter { position: absolute; color: rgba(26, 26, 26, 0.15); font-size: clamp(16px, 5vw, 28px); font-weight: bold; transition: opacity 1.5s ease-in-out; user-select: none; pointer-events: none; }
+        .flying-letter { position: absolute; color: var(--text-color); font-size: clamp(28px, 8vw, 42px); font-weight: 900; line-height: 1; transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1); user-select: none; pointer-events: none; text-shadow: 2px 2px 0px #fff; }
+
+        /* Main Elements */
         .container { width: 100%; max-width: 600px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; position: relative; }
-        h1 { font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 24px; background: var(--apricot); padding: 12px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); line-height: 1.5; }
+        h1, h2.neo-title { font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 24px; background: var(--apricot); padding: 12px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); line-height: 1.5; }
+        
         .form-group { margin-bottom: 20px; }
         label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 15px; }
         input[type="text"], input[type="tel"], input[type="datetime-local"], select { width: 100%; padding: 14px; font-size: 16px; border: 3px solid var(--border-color); border-radius: 8px; background: #fff; transition: all 0.2s ease; }
         input:focus { outline: none; background: #fffbf0; box-shadow: 4px 4px 0px var(--border-color); }
         
+        /* Campaign List Cards (หน้าแรก) */
+        .user-camp-card {
+            background: #fff; border: 3px solid var(--border-color); border-radius: 8px;
+            padding: 16px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s;
+            box-shadow: 4px 4px 0px var(--border-color); display: flex; flex-direction: column; gap: 8px;
+        }
+        .user-camp-card:hover { transform: translateY(-2px); background: #fffbf0; }
+        .user-camp-card.camp-closed { background: #f9f9f9; opacity: 0.8; }
+        .user-camp-card.camp-closed:hover { transform: none; background: #f9f9f9; cursor: not-allowed; }
+        .camp-title { font-size: 18px; font-weight: bold; color: #d35400; }
+        .camp-status-open { align-self: flex-start; color: #155724; background: #d4edda; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #155724; }
+        .camp-status-closed { align-self: flex-start; color: #721c24; background: #f8d7da; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #721c24; }
+        .camp-status-full { align-self: flex-start; color: #856404; background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #856404; }
+
+        /* Session Cards (หน้าฟอร์ม) */
         .session-card { display: flex; align-items: flex-start; padding: 16px; margin-bottom: 12px; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s; background: #fff; position: relative; }
         .session-card:hover:not(.disabled) { background: #fffbf0; transform: translateY(-2px); box-shadow: 4px 4px 0px var(--border-color); }
         .session-card.disabled { background: var(--disabled-bg); cursor: not-allowed; opacity: 0.7; }
         .session-card input[type="radio"] { appearance: none; width: 24px; height: 24px; border: 3px solid var(--border-color); border-radius: 50%; margin-right: 16px; margin-top: 2px; display: grid; place-content: center; flex-shrink: 0; }
         .session-card input[type="radio"]::before { content: ""; width: 12px; height: 12px; border-radius: 50%; transform: scale(0); transition: 120ms transform ease-in-out; background-color: var(--border-color); }
         .session-card input[type="radio"]:checked::before { transform: scale(1); }
-        
         .session-info { flex-grow: 1; }
         .session-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; display: block; color: #d35400; }
         .session-vaccines { font-size: 14px; margin-bottom: 6px; display: block; line-height: 1.4; }
@@ -44,12 +74,12 @@
         .btn-export { background: #ff8b94; padding: 10px; font-size: 14px; }
         .btn-admin { background: var(--apricot); }
         .btn-cancel { background: #e0e0e0; margin-top: 10px; }
+        .btn-back { background: #e0e0e0; padding: 10px; font-size: 16px; margin-bottom: 20px; box-shadow: 2px 2px 0px var(--border-color); }
         .btn-add { background: #ffd3b6; padding: 10px; font-size: 16px; margin-bottom: 15px;}
         .btn-remove { background: #ff6b6b; padding: 8px; width: auto; font-size: 14px; margin-top: 10px; color: white;}
         .btn-small { padding: 8px; font-size: 14px; width: auto; margin-top: 5px; }
 
-        .alert { display: none; background: #d4edda; color: #155724; padding: 14px; border: 3px solid #155724; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center; box-shadow: 4px 4px 0px #155724; }
-        .alert-closed { background: #f8d7da; color: #721c24; border-color: #721c24; box-shadow: 4px 4px 0px #721c24; }
+        .alert-closed { display: none; background: #f8d7da; color: #721c24; padding: 14px; border: 3px solid #721c24; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center; box-shadow: 4px 4px 0px #721c24; }
         .admin-icon { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; background: #fff; border: 2px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px var(--border-color); z-index: 10; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
@@ -64,53 +94,71 @@
 </head>
 <body>
 
+    <div id="introOverlay">
+        <div id="targetTextPlaceholder"></div>
+        <div id="randomLettersContainer"></div>
+        <div id="flyingLettersContainer"></div>
+    </div>
+
+    <div class="modal-overlay" id="successPopupOverlay" style="z-index: 10001;">
+        <div class="modal-content" style="text-align: center; max-width: 400px; padding: 40px 20px;">
+            <div style="font-size: 70px; margin-bottom: 10px;">✅</div>
+            <h2 style="margin-top: 0; color: #155724;">บันทึกข้อมูลสำเร็จ!</h2>
+            <p style="color: #555; font-size: 16px; line-height: 1.5;">ระบบได้รับข้อมูลการจองคิวฉีดวัคซีน<br>ของคุณเรียบร้อยแล้ว</p>
+            <button onclick="closeSuccessPopup()" style="background: #a8e6cf; margin-top: 20px; font-size: 16px; padding: 12px;">ตกลง</button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="admin-icon" onclick="openAdminModal()">⚙️</div>
         
-        <h1 id="pageTitle">💉 แบบฟอร์มจองคิวฉีดวัคซีน</h1>
-        
-        <div class="alert" id="successAlert">✅ บันทึกข้อมูลสำเร็จ!</div>
-        <div class="alert alert-closed" id="closedAlert" style="display:none;">⛔️ ขณะนี้ยังไม่มีโครงการที่เปิดรับลงทะเบียน</div>
+        <div id="userCampaignListView">
+            <h2 class="neo-title">📋 โครงการที่เปิดรับลงทะเบียน</h2>
+            <p id="loadingText" style="text-align:center; font-weight:bold;">⏳ กำลังโหลดข้อมูล...</p>
+            <div id="campaignListContainer"></div>
+        </div>
 
-        <form id="vaccineForm" style="display:none;">
-            <div class="form-group">
-                <label for="studentId">รหัสนักศึกษา / รหัสพนักงาน</label>
-                <input type="text" id="studentId" required placeholder="ระบุรหัส">
-            </div>
-            <div class="form-group">
-                <label for="fullName">ชื่อ - สกุล</label>
-                <input type="text" id="fullName" required placeholder="ระบุชื่อ-สกุล">
-            </div>
-            <div class="form-group">
-                <label for="phone">เบอร์โทรศัพท์ที่ติดต่อได้</label>
-                <input type="tel" id="phone" required placeholder="08X-XXX-XXXX">
-            </div>
+        <div id="userFormView" style="display:none;">
+            <button class="btn-back" onclick="showCampaignList()">⬅️ ย้อนกลับไปหน้ารวมโครงการ</button>
+            <h1 id="pageTitle">💉 แบบฟอร์มจองคิวฉีดวัคซีน</h1>
+            
+            <div class="alert-closed" id="closedAlert">⛔️ โครงการนี้ปิดรับการลงข้อมูลแล้ว</div>
 
-            <div class="form-group">
-                <label>เลือกรอบที่ต้องการฉีดวัคซีน</label>
-                <div id="sessionsContainer"></div>
-            </div>
+            <form id="vaccineForm" style="display:none;">
+                <div class="form-group">
+                    <label for="studentId">รหัสนักศึกษา / รหัสพนักงาน</label>
+                    <input type="text" id="studentId" required placeholder="ระบุรหัส">
+                </div>
+                <div class="form-group">
+                    <label for="fullName">ชื่อ - สกุล</label>
+                    <input type="text" id="fullName" required placeholder="ระบุชื่อ-สกุล">
+                </div>
+                <div class="form-group">
+                    <label for="phone">เบอร์โทรศัพท์ที่ติดต่อได้</label>
+                    <input type="tel" id="phone" required placeholder="08X-XXX-XXXX">
+                </div>
 
-            <button type="submit" id="submitBtn">💾 บันทึกการจอง</button>
-        </form>
-        <p id="loadingText" style="text-align:center; font-weight:bold;">⏳ กำลังโหลดข้อมูล...</p>
+                <div class="form-group">
+                    <label>เลือกรอบที่ต้องการฉีดวัคซีน</label>
+                    <div id="sessionsContainer"></div>
+                </div>
+
+                <button type="submit" id="submitBtn">💾 บันทึกการจอง</button>
+            </form>
+        </div>
     </div>
 
     <div class="modal-overlay" id="adminModal">
         <div class="modal-content" id="adminViewMain">
             <h2 style="margin-top:0; border-bottom:3px solid var(--border-color); padding-bottom:10px;">⚙️ จัดการโครงการฉีดวัคซีน</h2>
-            
             <button class="btn-admin" onclick="showCreateCampaignView()" style="margin-bottom: 20px;">➕ สร้างโครงการใหม่</button>
-            
             <h3>ประวัติโครงการทั้งหมด</h3>
             <div id="campaignHistoryList"></div>
-
             <button class="btn-cancel" onclick="closeAdminModal()">❌ ปิดหน้าต่าง</button>
         </div>
-
+        
         <div class="modal-content" id="adminViewEdit" style="display:none;">
             <h2 id="editViewTitle" style="margin-top:0; border-bottom:3px solid var(--border-color); padding-bottom:10px;">สร้างโครงการใหม่</h2>
-            
             <input type="hidden" id="editCampId">
             <div class="form-group">
                 <label>ชื่อโครงการ (เช่น นศ.ปี 1 เทอม 1/2569)</label>
@@ -121,11 +169,9 @@
                 <input type="datetime-local" id="editCampDeadline">
                 <span style="font-size:12px; color:#555;">*หากเว้นว่างไว้ ฟอร์มจะเปิดรับตลอดเวลา</span>
             </div>
-
             <h3 style="margin-bottom: 10px; border-top: 2px solid #eee; padding-top:15px;">รายการรอบการฉีดในโครงการนี้</h3>
             <div id="adminSessionsList"></div>
             <button type="button" class="btn-add" onclick="addNewAdminSessionRow()">➕ เพิ่มรอบวัน/เวลาใหม่</button>
-
             <div style="display:flex; gap:10px; margin-top:20px;">
                 <button class="btn-admin" onclick="saveCampaign()">💾 บันทึกโครงการ</button>
                 <button class="btn-cancel" style="margin-top:0;" onclick="showMainAdminView()">❌ ยกเลิก</button>
@@ -134,7 +180,76 @@
     </div>
 
     <script>
-        // 1. นำ Firebase Config ของคุณมาใส่ตรงนี้
+        // --- 1. ระบบ Animation เปิดตัว ---
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!sessionStorage.getItem('introPlayed')) {
+                runIntroAnimation();
+            } else {
+                document.getElementById('introOverlay').style.display = 'none';
+            }
+        });
+
+        function runIntroAnimation() {
+            const overlay = document.getElementById('introOverlay');
+            const targetContainer = document.getElementById('targetTextPlaceholder');
+            const randomContainer = document.getElementById('randomLettersContainer');
+            const flyingContainer = document.getElementById('flyingLettersContainer');
+            const phrase = "VACCINE RESERVATION";
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            
+            for(let i = 0; i < 150; i++) {
+                let span = document.createElement('span');
+                span.className = 'random-letter';
+                span.innerText = chars.charAt(Math.floor(Math.random() * chars.length));
+                span.style.left = Math.random() * 100 + 'vw';
+                span.style.top = Math.random() * 100 + 'vh';
+                span.style.transform = `rotate(${Math.random() * 360}deg) scale(${Math.random() + 0.5})`;
+                randomContainer.appendChild(span);
+            }
+
+            let flyingObjects = [];
+            phrase.split(' ').forEach((word, wIdx) => {
+                let wordDiv = document.createElement('div');
+                wordDiv.className = 'word-group';
+                word.split('').forEach(char => {
+                    let pSpan = document.createElement('span');
+                    pSpan.className = 'placeholder-char'; pSpan.innerText = char;
+                    wordDiv.appendChild(pSpan);
+                    
+                    let fSpan = document.createElement('span');
+                    fSpan.className = 'flying-letter'; fSpan.innerText = char;
+                    fSpan.style.left = Math.random() * 100 + 'vw';
+                    fSpan.style.top = Math.random() * 100 + 'vh';
+                    fSpan.style.transform = `rotate(${Math.random() * 90 - 45}deg) scale(0.5)`;
+                    flyingContainer.appendChild(fSpan);
+                    flyingObjects.push({ flying: fSpan, placeholder: pSpan });
+                });
+                targetContainer.appendChild(wordDiv);
+                if (wIdx < phrase.split(' ').length - 1) {
+                    let space = document.createElement('div'); space.style.width = '15px'; targetContainer.appendChild(space);
+                }
+            });
+
+            setTimeout(() => {
+                document.querySelectorAll('.random-letter').forEach(el => el.style.opacity = '0');
+                flyingObjects.forEach(obj => {
+                    const rect = obj.placeholder.getBoundingClientRect();
+                    obj.flying.style.left = rect.left + 'px';
+                    obj.flying.style.top = rect.top + 'px';
+                    obj.flying.style.transform = 'rotate(0deg) scale(1)';
+                });
+            }, 800);
+
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    sessionStorage.setItem('introPlayed', 'true');
+                }, 1000);
+            }, 3000); 
+        }
+
+        // --- 2. การเชื่อมต่อ Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
             authDomain: "vacciner-a3b0f.firebaseapp.com",
@@ -155,62 +270,117 @@
         
         let allCampaigns = [];
         let activeCampaign = null;
+        let successPopupTimer;
 
-        window.onload = async () => { loadActiveForm(); };
+        window.onload = async () => { loadUserCampaignList(); };
 
-        // --- ฝั่งผู้ใช้ (นักศึกษา) ---
-        async function loadActiveForm() {
+        // --- 3. ระบบหน้าจอฝั่ง User (ดึงหน้ารวมโครงการ) ---
+        async function loadUserCampaignList() {
+            document.getElementById('userCampaignListView').style.display = 'block';
+            document.getElementById('userFormView').style.display = 'none';
             document.getElementById('loadingText').style.display = 'block';
-            document.getElementById('vaccineForm').style.display = 'none';
-            document.getElementById('closedAlert').style.display = 'none';
+            const container = document.getElementById('campaignListContainer');
+            container.innerHTML = '';
 
             try {
-                // ดึงข้อมูลโครงการทั้งหมด
                 const configDoc = await db.collection('app_settings').doc('vaccine_campaigns').get();
-                if (configDoc.exists) { 
-                    allCampaigns = configDoc.data().campaigns || []; 
-                }
+                if (configDoc.exists) { allCampaigns = configDoc.data().campaigns || []; }
 
-                // หาโครงการที่ถูกตั้งเป็นสถานะ 'เปิดใช้งาน' (isActive: true)
-                activeCampaign = allCampaigns.find(c => c.isActive === true);
+                const respSnap = await db.collection('vaccine_responses').get();
+                let campBookedCounts = {};
+                respSnap.forEach(doc => {
+                    let d = doc.data();
+                    if(d.campaignId) campBookedCounts[d.campaignId] = (campBookedCounts[d.campaignId] || 0) + 1;
+                });
 
-                if (!activeCampaign) {
-                    showClosedMessage("⛔️ ขณะนี้ยังไม่มีโครงการที่เปิดรับลงทะเบียน");
+                const now = new Date();
+                
+                let visibleCampaigns = allCampaigns.filter(camp => {
+                    if (!camp.isActive) return false;
+                    if (camp.deadline) {
+                        const deadlineDate = new Date(camp.deadline);
+                        const hideDate = new Date(deadlineDate.getTime() + (24 * 60 * 60 * 1000));
+                        return now <= hideDate;
+                    }
+                    return true;
+                });
+
+                document.getElementById('loadingText').style.display = 'none';
+
+                if (visibleCampaigns.length === 0) {
+                    container.innerHTML = '<div class="alert-closed" style="display:block;">⛔️ ขณะนี้ยังไม่มีโครงการที่เปิดรับลงทะเบียน</div>';
                     return;
                 }
 
-                // เปลี่ยนชื่อหัวเว็ปให้ตรงกับชื่อโครงการ
-                document.getElementById('pageTitle').innerText = "💉 " + activeCampaign.name;
-
-                // เช็ค Deadline
-                if (activeCampaign.deadline) {
-                    const now = new Date();
-                    if (now > new Date(activeCampaign.deadline)) {
-                        showClosedMessage("⛔️ โครงการนี้ปิดรับการลงข้อมูลแล้ว"); return;
+                visibleCampaigns.forEach(camp => {
+                    let isClosed = false;
+                    if (camp.deadline && now > new Date(camp.deadline)) {
+                        isClosed = true;
                     }
-                }
 
-                // นับยอดโควตาจากฐานข้อมูล
-                const snapshot = await db.collection('vaccine_responses')
-                                         .where('campaignId', '==', activeCampaign.id).get();
+                    let totalQuota = camp.sessions ? camp.sessions.reduce((sum, s) => sum + parseInt(s.quota), 0) : 0;
+                    let currentBooked = campBookedCounts[camp.id] || 0;
+                    let isCampFull = (totalQuota > 0 && currentBooked >= totalQuota);
+
+                    const card = document.createElement('div');
+                    card.className = `user-camp-card ${isClosed ? 'camp-closed' : ''}`;
+                    card.onclick = () => openCampaignForm(camp.id, isClosed);
+                    
+                    let statusBadge = '';
+                    if (isClosed) {
+                        statusBadge = `<div class="camp-status-closed">หมดเขตลงทะเบียนแล้ว</div>`;
+                    } else if (isCampFull) {
+                        statusBadge = `<div class="camp-status-full">เต็มแล้ว</div>`;
+                    } else {
+                        statusBadge = `<div class="camp-status-open">เปิดรับลงทะเบียน</div>`;
+                    }
+                    
+                    let dateInfo = camp.deadline ? 
+                        `<div style="font-size:13px; color:#555;">⏳ ปิดรับข้อมูล: ${new Date(camp.deadline).toLocaleString('th-TH')}</div>` : 
+                        '';
+
+                    card.innerHTML = `
+                        ${statusBadge}
+                        <div class="camp-title">${camp.name}</div>
+                        ${dateInfo}
+                        <div style="font-size:14px; color:#666;">คลิกเพื่อดูรายละเอียดและจองคิว ➔</div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                document.getElementById('loadingText').innerText = "❌ เกิดข้อผิดพลาดในการโหลดข้อมูลระบบ";
+            }
+        }
+
+        function showCampaignList() {
+            document.getElementById('userFormView').style.display = 'none';
+            document.getElementById('userCampaignListView').style.display = 'block';
+            document.getElementById('vaccineForm').reset();
+            loadUserCampaignList(); // รีโหลดข้อมูลโควตากลับมาด้วย
+        }
+
+        async function openCampaignForm(campId, isClosed) {
+            activeCampaign = allCampaigns.find(c => c.id === campId);
+            
+            document.getElementById('userCampaignListView').style.display = 'none';
+            document.getElementById('userFormView').style.display = 'block';
+            document.getElementById('pageTitle').innerText = "💉 " + activeCampaign.name;
+            
+            if (isClosed) {
+                document.getElementById('closedAlert').style.display = 'block';
+                document.getElementById('vaccineForm').style.display = 'none';
+            } else {
+                document.getElementById('closedAlert').style.display = 'none';
+                
+                const snapshot = await db.collection('vaccine_responses').where('campaignId', '==', activeCampaign.id).get();
                 let bookedCounts = {};
                 snapshot.forEach(doc => {
                     const sid = doc.data().sessionId;
                     bookedCounts[sid] = (bookedCounts[sid] || 0) + 1;
                 });
-
                 renderSessions(activeCampaign.sessions, bookedCounts);
-
-            } catch (error) {
-                console.error("Error loading:", error);
-                document.getElementById('loadingText').innerText = "❌ เกิดข้อผิดพลาดในการโหลดข้อมูล";
             }
-        }
-
-        function showClosedMessage(msg) {
-            document.getElementById('loadingText').style.display = 'none';
-            const alert = document.getElementById('closedAlert');
-            alert.innerText = msg; alert.style.display = 'block';
         }
 
         function renderSessions(sessions, bookedCounts) {
@@ -231,9 +401,11 @@
                 
                 let inputHtml = `<input type="radio" name="selectedSession" value="${session.id}" required ${isFull ? 'disabled' : ''}>`;
                 let vaccinesHtml = session.vaccines.map(v => `• ${v}`).join('<br>');
+                let titleAddon = isFull ? '<span style="color:#ff6b6b; margin-left:8px;">(เต็มแล้ว)</span>' : '';
+
                 let infoHtml = `
                     <div class="session-info">
-                        <span class="session-title">📅 ${session.datetime}</span>
+                        <span class="session-title">📅 ${session.datetime} ${titleAddon}</span>
                         <span class="session-vaccines"><strong>💉 วัคซีนในรอบนี้:</strong><br>${vaccinesHtml || '- ไม่ระบุ -'}</span>
                         <span class="session-quota">👥 จองแล้ว ${booked} / ${session.quota} คน</span>
                     </div>
@@ -244,10 +416,10 @@
                 container.appendChild(label);
             });
 
-            document.getElementById('loadingText').style.display = 'none';
             document.getElementById('vaccineForm').style.display = 'block';
         }
 
+        // กด Submit ฟอร์ม
         document.getElementById('vaccineForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const selectedRadio = document.querySelector('input[name="selectedSession"]:checked');
@@ -271,15 +443,28 @@
 
             try {
                 await db.collection('vaccine_responses').add(data);
-                document.getElementById('successAlert').style.display = 'block';
                 document.getElementById('vaccineForm').reset();
-                setTimeout(() => document.getElementById('successAlert').style.display = 'none', 3000);
-                loadActiveForm(); // โหลดใหม่เพื่ออัปเดตโควตา
+                
+                // แสดงป็อปอัปสำเร็จ
+                document.getElementById('successPopupOverlay').style.display = 'flex';
+                
+                // ปิดป็อปอัปและกลับหน้ารวมอัตโนมัติใน 3 วินาที (หากไม่ได้กดปุ่มตกลง)
+                successPopupTimer = setTimeout(() => {
+                    closeSuccessPopup();
+                }, 3000);
+
             } catch (error) { alert("❌ เกิดข้อผิดพลาด"); } 
             finally { submitBtn.innerText = "💾 บันทึกการจอง"; submitBtn.disabled = false; }
         });
 
-        // --- ฝั่งจัดการของ Admin ---
+        // ฟังก์ชันปิดป็อปอัปสำเร็จ
+        function closeSuccessPopup() {
+            clearTimeout(successPopupTimer);
+            document.getElementById('successPopupOverlay').style.display = 'none';
+            showCampaignList();
+        }
+
+        // --- 4. ระบบจัดการ Admin ---
         function openAdminModal() {
             const pin = prompt("🔐 กรุณากรอกรหัสผ่าน Admin:");
             if (pin === ADMIN_PIN) {
@@ -294,7 +479,6 @@
             document.getElementById('adminViewEdit').style.display = 'none';
         }
 
-        // แสดงประวัติโครงการทั้งหมด
         function renderCampaignHistory() {
             const container = document.getElementById('campaignHistoryList');
             container.innerHTML = '';
@@ -307,13 +491,15 @@
                 const div = document.createElement('div');
                 div.className = `campaign-item ${camp.isActive ? 'active' : ''}`;
                 
-                let statusBadge = camp.isActive ? '<strong style="color:green;">[เปิดใช้งานอยู่บนหน้าเว็บ]</strong>' : '<span style="color:#666;">[ปิดแล้ว]</span>';
+                let statusBadge = camp.isActive ? '<strong style="color:green;">[เปิดแสดงผลบนเว็บ]</strong>' : '<span style="color:#666;">[ซ่อนจากหน้าเว็บ]</span>';
                 
                 div.innerHTML = `
                     <div style="font-weight:bold; font-size:18px;">${camp.name} ${statusBadge}</div>
-                    <div style="font-size:14px; color:#555; margin-bottom:10px;">รอบการฉีด: ${camp.sessions.length} รอบ</div>
+                    <div style="font-size:14px; color:#555; margin-bottom:10px;">รอบการฉีด: ${camp.sessions.length} รอบ | หมดเขต: ${camp.deadline ? new Date(camp.deadline).toLocaleString('th-TH') : 'ไม่มี'}</div>
                     
-                    ${!camp.isActive ? `<button class="btn-small" style="background:#a8e6cf; border:2px solid #000;" onclick="setActiveCampaign('${camp.id}')">🟢 นำโครงการนี้ขึ้นหน้าเว็บ</button>` : ''}
+                    <button class="btn-small" style="background:${camp.isActive ? '#ffcccb' : '#a8e6cf'}; border:2px solid #000;" onclick="toggleCampaignStatus('${camp.id}')">
+                        ${camp.isActive ? '🔴 ปิดซ่อนจากหน้าเว็บ' : '🟢 นำขึ้นแสดงหน้าเว็บ'}
+                    </button>
                     <button class="btn-small btn-export" onclick="exportCampaignData('${camp.id}', '${camp.name}')">📊 ดึงข้อมูล Excel</button>
                     <button class="btn-small" style="background:#ddd; border:2px solid #000;" onclick="editCampaign('${camp.id}')">✏️ แก้ไขโครงสร้าง</button>
                 `;
@@ -321,23 +507,24 @@
             });
         }
 
-        // ตั้งค่าให้โครงการนี้แสดงบนหน้าเว็บ
-        async function setActiveCampaign(targetId) {
-            allCampaigns.forEach(c => c.isActive = (c.id === targetId));
-            await db.collection('app_settings').doc('vaccine_campaigns').set({ campaigns: allCampaigns });
-            alert('✅ เปลี่ยนโครงการที่แสดงบนหน้าเว็บแล้ว');
-            renderCampaignHistory();
-            loadActiveForm(); // รีเฟรชหน้าผู้ใช้ด้านหลัง
+        async function toggleCampaignStatus(targetId) {
+            let camp = allCampaigns.find(c => c.id === targetId);
+            camp.isActive = !camp.isActive; 
+            
+            try {
+                await db.collection('app_settings').doc('vaccine_campaigns').set({ campaigns: allCampaigns });
+                renderCampaignHistory();
+                loadUserCampaignList(); 
+            } catch(e) { alert("❌ เกิดข้อผิดพลาด"); }
         }
 
-        // --- ส่วนของการสร้าง/แก้ไขโครงการ ---
         function showCreateCampaignView() {
             document.getElementById('editViewTitle').innerText = "✨ สร้างโครงการใหม่";
             document.getElementById('editCampId').value = "camp_" + Date.now();
             document.getElementById('editCampName').value = "";
             document.getElementById('editCampDeadline').value = "";
             document.getElementById('adminSessionsList').innerHTML = "";
-            addNewAdminSessionRow(); // เพิ่มแถวว่าง 1 แถว
+            addNewAdminSessionRow(); 
             
             document.getElementById('adminViewMain').style.display = 'none';
             document.getElementById('adminViewEdit').style.display = 'block';
@@ -407,11 +594,8 @@
                 }
             });
 
-            // ตรวจสอบว่าแก้ไขหรือสร้างใหม่
             let existingIndex = allCampaigns.findIndex(c => c.id === campId);
             let isActiveStatus = existingIndex >= 0 ? allCampaigns[existingIndex].isActive : false;
-            
-            // ถ้าสร้างใหม่และยังไม่มีโครงการไหนเลย ให้ Active อัตโนมัติ
             if (existingIndex < 0 && allCampaigns.length === 0) isActiveStatus = true;
 
             const newCampData = { id: campId, name: campName, deadline: deadline, isActive: isActiveStatus, sessions: sessions };
@@ -424,11 +608,10 @@
                 alert("✅ บันทึกโครงการเรียบร้อย");
                 renderCampaignHistory();
                 showMainAdminView();
-                loadActiveForm();
+                loadUserCampaignList();
             } catch (error) { alert("❌ เกิดข้อผิดพลาดในการบันทึก"); }
         }
 
-        // --- Export ดึงข้อมูลเฉพาะโครงการ ---
         async function exportCampaignData(targetCampaignId, campaignName) {
             try {
                 const snapshot = await db.collection('vaccine_responses')
@@ -452,7 +635,6 @@
                 XLSX.writeFile(workbook, `Export_${campaignName}.xlsx`);
             } catch (error) { 
                 console.error(error);
-                // แจ้งเตือนเรื่อง Index ใน Firebase
                 alert("❌ เกิดข้อผิดพลาด กรุณาตรวจสอบ Console (F12) และคลิกลิงก์เพื่อสร้าง Index ของ Firebase ก่อนครับ"); 
             }
         }
