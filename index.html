@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ระบบจองคิวฉีดวัคซีน นศ.</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        /* Neo-Brutalism & Mobile-First Design (Apricot Theme) */
+        :root {
+            --bg-color: #f4f4f5;
+            --apricot: #FFB347; 
+            --text-color: #1a1a1a;
+            --border-color: #1a1a1a;
+            --disabled-bg: #e0e0e0;
+        }
+
+        * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg-color); color: var(--text-color); margin: 0;
+            padding: 20px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        .container {
+            width: 100%; max-width: 600px; background: #ffffff; border: 3px solid var(--border-color);
+            border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 24px;
+            background: var(--apricot); padding: 12px; border: 3px solid var(--border-color);
+            border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); line-height: 1.5;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 15px; }
+
+        input[type="text"], input[type="tel"], input[type="datetime-local"], select {
+            width: 100%; padding: 14px; font-size: 16px; border: 3px solid var(--border-color);
+            border-radius: 8px; background: #fff; transition: all 0.2s ease;
+        }
+        input:focus { outline: none; background: #fffbf0; box-shadow: 4px 4px 0px var(--border-color); }
+
+        /* Style สำหรับ Session (User View) */
+        .session-card {
+            display: flex; align-items: flex-start; padding: 16px; margin-bottom: 12px;
+            border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; background: #fff; position: relative;
+        }
+        .session-card:hover:not(.disabled) { background: #fffbf0; transform: translateY(-2px); box-shadow: 4px 4px 0px var(--border-color); }
+        .session-card.disabled { background: var(--disabled-bg); cursor: not-allowed; opacity: 0.7; }
+        
+        .session-card input[type="radio"] {
+            appearance: none; width: 24px; height: 24px; border: 3px solid var(--border-color);
+            border-radius: 50%; margin-right: 16px; margin-top: 2px; display: grid; place-content: center; flex-shrink: 0;
+        }
+        .session-card input[type="radio"]::before {
+            content: ""; width: 12px; height: 12px; border-radius: 50%; transform: scale(0);
+            transition: 120ms transform ease-in-out; background-color: var(--border-color);
+        }
+        .session-card input[type="radio"]:checked::before { transform: scale(1); }
+        
+        .session-info { flex-grow: 1; }
+        .session-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; display: block; color: #d35400; }
+        .session-vaccines { font-size: 14px; margin-bottom: 6px; display: block; line-height: 1.4; }
+        .session-quota { font-size: 14px; color: #555; font-weight: bold; }
+        .badge-status {
+            background: #ff6b6b; color: white; padding: 4px 8px; border-radius: 4px;
+            font-size: 12px; font-weight: bold; border: 2px solid var(--border-color); float: right;
+        }
+
+        button {
+            width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: var(--text-color);
+            background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px;
+            cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease;
+        }
+        button:active:not(:disabled) { box-shadow: 0px 0px 0px var(--border-color); transform: translate(4px, 4px); }
+        button:disabled { background: #ccc; cursor: not-allowed; color: #666; }
+        
+        .btn-export { background: #ff8b94; }
+        .btn-admin { background: var(--apricot); }
+        .btn-cancel { background: #e0e0e0; margin-top: 10px; }
+        .btn-add { background: #ffd3b6; padding: 10px; font-size: 16px; margin-bottom: 15px;}
+        .btn-remove { background: #ff6b6b; padding: 8px; width: auto; font-size: 14px; margin-top: 10px; color: white;}
+
+        .alert {
+            display: none; background: #d4edda; color: #155724; padding: 14px; border: 3px solid #155724;
+            border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center; box-shadow: 4px 4px 0px #155724;
+        }
+        .alert-closed { background: #f8d7da; color: #721c24; border-color: #721c24; box-shadow: 4px 4px 0px #721c24; }
+
+        .admin-icon {
+            position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer;
+            background: #fff; border: 2px solid var(--border-color); border-radius: 50%;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 2px 2px 0px var(--border-color); z-index: 10;
+        }
+
+        /* Modal Admin */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content {
+            background: #fff; width: 100%; max-width: 600px; padding: 24px; border: 3px solid var(--border-color);
+            border-radius: 12px; box-shadow: 8px 8px 0px var(--border-color); max-height: 90vh; overflow-y: auto;
+        }
+
+        .admin-session-row {
+            background: #f9f9f9; padding: 15px; border: 2px dashed #ccc; border-radius: 8px; margin-bottom: 15px;
+        }
+        .adm-header { display: flex; gap: 10px; margin-bottom: 10px; }
+        .adm-header input { padding: 10px; font-size: 14px; }
+        .col-dt { flex: 2; }
+        .col-quota { flex: 1; min-width: 80px; }
+        
+        .vaccine-checkbox-list {
+            display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 10px;
+            background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 6px;
+        }
+        .vaccine-checkbox-list label { font-size: 13px; font-weight: normal; margin: 0; display: flex; align-items: center;}
+        .vaccine-checkbox-list input[type="checkbox"] { margin-right: 8px; width: 16px; height: 16px;}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="admin-icon" onclick="openAdminModal()">⚙️</div>
+
+        <h1>💉 แบบฟอร์มจองคิวฉีดวัคซีน</h1>
+        
+        <div class="alert" id="successAlert">✅ บันทึกข้อมูลสำเร็จ!</div>
+        <div class="alert alert-closed" id="closedAlert" style="display:none;">⛔️ ฟอร์มนี้ปิดรับการลงข้อมูลแล้ว</div>
+
+        <form id="vaccineForm" style="display:none;">
+            <div class="form-group">
+                <label for="studentId">รหัสนักศึกษา / รหัสพนักงาน</label>
+                <input type="text" id="studentId" required placeholder="ระบุรหัส">
+            </div>
+            <div class="form-group">
+                <label for="fullName">ชื่อ - สกุล</label>
+                <input type="text" id="fullName" required placeholder="ระบุชื่อ-สกุล">
+            </div>
+            <div class="form-group">
+                <label for="phone">เบอร์โทรศัพท์ที่ติดต่อได้</label>
+                <input type="tel" id="phone" required placeholder="08X-XXX-XXXX">
+            </div>
+
+            <div class="form-group">
+                <label>เลือกรอบที่ต้องการฉีดวัคซีน</label>
+                <div id="sessionsContainer"></div>
+            </div>
+
+            <button type="submit" id="submitBtn">💾 บันทึกการจอง</button>
+        </form>
+        <p id="loadingText" style="text-align:center; font-weight:bold;">⏳ กำลังโหลดข้อมูลรอบการฉีด...</p>
+    </div>
+
+    <div class="container">
+        <button class="btn-export" onclick="exportToExcel()" id="exportBtn">📊 ดึงข้อมูลเป็นไฟล์ Excel</button>
+    </div>
+
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-content">
+            <h2 style="margin-top:0; border-bottom:3px solid var(--border-color); padding-bottom:10px;">⚙️ จัดการระบบ (Admin)</h2>
+            
+            <div class="form-group" style="background:#fff3cd; padding:15px; border:2px solid #ffeeba; border-radius:8px;">
+                <label style="color:#856404;">⏳ วันที่และเวลาปิดรับข้อมูล (Deadline)</label>
+                <input type="datetime-local" id="adminDeadline">
+                <span style="font-size:12px; color:#856404;">*หากเว้นว่างไว้ ฟอร์มจะเปิดรับตลอดเวลา</span>
+            </div>
+
+            <h3 style="margin-bottom: 10px;">รายการรอบการฉีด</h3>
+            <div id="adminSessionsList"></div>
+            
+            <button type="button" class="btn-add" onclick="addNewAdminSessionRow()">➕ เพิ่มรอบการฉีดใหม่</button>
+            <button class="btn-admin" onclick="saveAdminSettings()">💾 บันทึกและเปิดระบบ</button>
+            <button class="btn-cancel" onclick="closeAdminModal()">❌ ยกเลิก</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. นำ Firebase Config ของคุณมาใส่ตรงนี้
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
+            authDomain: "vacciner-a3b0f.firebaseapp.com",
+            projectId: "vacciner-a3b0f",
+            storageBucket: "vacciner-a3b0f.firebasestorage.app",
+            messagingSenderId: "322679198332",
+            appId: "1:322679198332:web:01e4174c3f30845d576ff9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const ADMIN_PIN = "1234";
+
+        // รายการวัคซีนคงที่ (Master List)
+        const MASTER_VACCINES = [
+            "ตรวจหาภูมิคุ้มกันไวรัสตับอักเสบบี",
+            "ตรวจหาภูมิคุ้มกันอีสุกอีใส",
+            "วัคซีน HBV (วัคซีนป้องกันตับอักเสบบี)",
+            "วัคซีน VAR (วัคซีนป้องกันสุกใส)",
+            "วัคซีน MMR (วัคซีนป้องกันหัด-หัดเยอรมัน-คางทูม)",
+            "วัคซีน TdaP (วัคซีนป้องกัน คอตีบ-บาดทะยัก-ไอกรน)",
+            "วัคซีน (ป้องกันไขหวัดใหญ่ 4 สายพันธุ์)",
+            "เอกซเรย์ปอด-หัวใจ"
+        ];
+        
+        let appConfig = { deadline: "", sessions: [] };
+
+        window.onload = async () => { loadFormSessions(); };
+
+        // --- ส่วนผู้ใช้ทั่วไป ---
+        async function loadFormSessions() {
+            document.getElementById('loadingText').style.display = 'block';
+            document.getElementById('vaccineForm').style.display = 'none';
+
+            try {
+                const configDoc = await db.collection('app_settings').doc('vaccine_config').get();
+                if (configDoc.exists) { appConfig = configDoc.data(); }
+
+                // ตรวจสอบ Deadline
+                if (appConfig.deadline) {
+                    const now = new Date();
+                    const deadlineDate = new Date(appConfig.deadline);
+                    if (now > deadlineDate) {
+                        document.getElementById('loadingText').style.display = 'none';
+                        document.getElementById('closedAlert').style.display = 'block';
+                        return; // หยุดทำงาน ปิดฟอร์ม
+                    }
+                }
+
+                // ดึงยอดจองปัจจุบัน
+                const snapshot = await db.collection('vaccine_responses').get();
+                let bookedCounts = {};
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.sessionId) bookedCounts[data.sessionId] = (bookedCounts[data.sessionId] || 0) + 1;
+                });
+
+                renderSessions(bookedCounts);
+
+            } catch (error) {
+                console.error("Error loading sessions:", error);
+                document.getElementById('loadingText').innerText = "❌ เกิดข้อผิดพลาดในการโหลดข้อมูล";
+            }
+        }
+
+        function renderSessions(bookedCounts) {
+            const container = document.getElementById('sessionsContainer');
+            container.innerHTML = '';
+
+            if (!appConfig.sessions || appConfig.sessions.length === 0) {
+                container.innerHTML = '<p style="color:red; font-weight:bold;">ขณะนี้ยังไม่มีการเปิดรับจองคิว</p>';
+                document.getElementById('submitBtn').disabled = true;
+            } else {
+                document.getElementById('submitBtn').disabled = false;
+            }
+
+            appConfig.sessions.forEach(session => {
+                const booked = bookedCounts[session.id] || 0;
+                const quota = parseInt(session.quota);
+                const isFull = booked >= quota;
+
+                const label = document.createElement('label');
+                label.className = `session-card ${isFull ? 'disabled' : ''}`;
+                
+                let inputHtml = `<input type="radio" name="selectedSession" value="${session.id}" required ${isFull ? 'disabled' : ''}>`;
+                
+                // สร้างรายการวัคซีนที่ให้แสดง
+                let vaccinesHtml = session.vaccines.map(v => `• ${v}`).join('<br>');
+                
+                let infoHtml = `
+                    <div class="session-info">
+                        <span class="session-title">📅 ${session.datetime}</span>
+                        <span class="session-vaccines"><strong>💉 รายการที่ได้รับ:</strong><br>${vaccinesHtml || '- ไม่ระบุ -'}</span>
+                        <span class="session-quota">👥 จองแล้ว ${booked} / ${quota} คน</span>
+                    </div>
+                `;
+                let badgeHtml = isFull ? `<div class="badge-status">เต็มแล้ว</div>` : '';
+
+                label.innerHTML = inputHtml + infoHtml + badgeHtml;
+                container.appendChild(label);
+            });
+
+            document.getElementById('loadingText').style.display = 'none';
+            document.getElementById('vaccineForm').style.display = 'block';
+        }
+
+        // --- ส่วนบันทึกข้อมูลจอง ---
+        document.getElementById('vaccineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const selectedRadio = document.querySelector('input[name="selectedSession"]:checked');
+            if (!selectedRadio) { alert('กรุณาเลือกรอบที่ต้องการจอง'); return; }
+            
+            const sessionId = selectedRadio.value;
+            const sessionObj = appConfig.sessions.find(s => s.id === sessionId);
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = "⏳ กำลังบันทึก..."; submitBtn.disabled = true;
+
+            const data = {
+                studentId: document.getElementById('studentId').value,
+                fullName: document.getElementById('fullName').value,
+                phone: document.getElementById('phone').value,
+                sessionId: sessionId,
+                sessionDatetime: sessionObj.datetime,
+                sessionVaccines: sessionObj.vaccines.join(", "),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection('vaccine_responses').add(data);
+                document.getElementById('successAlert').style.display = 'block';
+                document.getElementById('vaccineForm').reset();
+                setTimeout(() => document.getElementById('successAlert').style.display = 'none', 3000);
+                loadFormSessions(); // โหลดใหม่เพื่ออัปเดตยอด
+            } catch (error) {
+                alert("❌ เกิดข้อผิดพลาด กรุณาลองใหม่");
+            } finally {
+                submitBtn.innerText = "💾 บันทึกการจอง"; submitBtn.disabled = false;
+            }
+        });
+
+        // --- ระบบ Admin Panel ---
+        function openAdminModal() {
+            const pin = prompt("🔐 กรุณากรอกรหัสผ่าน Admin:");
+            if (pin === ADMIN_PIN) {
+                document.getElementById('adminDeadline').value = appConfig.deadline || '';
+                renderAdminSessionInputs();
+                document.getElementById('adminModal').style.display = 'flex';
+            } else if (pin !== null) {
+                alert("❌ รหัสผ่านไม่ถูกต้อง");
+            }
+        }
+
+        function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+        function renderAdminSessionInputs() {
+            const container = document.getElementById('adminSessionsList');
+            container.innerHTML = '';
+            
+            if(!appConfig.sessions || appConfig.sessions.length === 0) {
+                addNewAdminSessionRow(); 
+            } else {
+                appConfig.sessions.forEach((session) => {
+                    addSessionRowToDOM(session.id, session.datetime, session.quota, session.vaccines);
+                });
+            }
+        }
+
+        function addNewAdminSessionRow() {
+            const newId = 'session_' + Math.random().toString(36).substr(2, 9);
+            addSessionRowToDOM(newId, '', '', []);
+        }
+
+        function addSessionRowToDOM(id, datetime, quota, selectedVaccines) {
+            const container = document.getElementById('adminSessionsList');
+            const row = document.createElement('div');
+            row.className = 'admin-session-row';
+            
+            // สร้าง Checkbox List จาก Master Data
+            let checkboxesHtml = MASTER_VACCINES.map(v => {
+                const isChecked = selectedVaccines.includes(v) ? 'checked' : '';
+                return `<label><input type="checkbox" class="adm-vac-cb" value="${v}" ${isChecked}> ${v}</label>`;
+            }).join('');
+
+            row.innerHTML = `
+                <input type="hidden" class="adm-id" value="${id}">
+                <div class="adm-header">
+                    <input type="text" class="adm-dt col-dt" placeholder="ระบุวัน/เวลา (เช่น 28 ก.พ. 69 เวลา 09.00น.)" value="${datetime}">
+                    <input type="number" class="adm-quota col-quota" placeholder="จำกัดจำนวน (คน)" value="${quota}">
+                </div>
+                <div class="vaccine-checkbox-list">
+                    <strong style="font-size:14px;">รายการวัคซีนประจำรอบนี้:</strong>
+                    ${checkboxesHtml}
+                </div>
+                <button type="button" class="btn-remove" onclick="this.parentElement.remove()">🗑️ ลบรอบนี้ทิ้ง</button>
+            `;
+            container.appendChild(row);
+        }
+
+        async function saveAdminSettings() {
+            const deadline = document.getElementById('adminDeadline').value;
+            const rows = document.querySelectorAll('.admin-session-row');
+            let newSessions = [];
+            
+            rows.forEach(row => {
+                const id = row.querySelector('.adm-id').value;
+                const datetime = row.querySelector('.adm-dt').value.trim();
+                const quota = parseInt(row.querySelector('.adm-quota').value);
+                
+                // ดึงวัคซีนที่แอดมินติ๊กเลือกในรอบนี้
+                const checkedBoxes = row.querySelectorAll('.adm-vac-cb:checked');
+                let sessionVaccines = Array.from(checkedBoxes).map(cb => cb.value);
+                
+                if (datetime && !isNaN(quota) && quota > 0) {
+                    newSessions.push({ id, datetime, quota, vaccines: sessionVaccines });
+                }
+            });
+
+            try {
+                await db.collection('app_settings').doc('vaccine_config').set({ 
+                    deadline: deadline,
+                    sessions: newSessions 
+                });
+                alert("✅ บันทึกตั้งค่าระบบเรียบร้อยแล้ว");
+                closeAdminModal();
+                loadFormSessions(); // รีเฟรชหน้าผู้ใช้
+            } catch (error) {
+                console.error("Error saving config:", error);
+                alert("❌ เกิดข้อผิดพลาดในการบันทึก");
+            }
+        }
+
+        // --- ส่วน Export เป็น Excel ---
+        async function exportToExcel() {
+            const exportBtn = document.getElementById('exportBtn');
+            exportBtn.innerText = "⏳ กำลังประมวลผล...";
+            try {
+                const snapshot = await db.collection('vaccine_responses').orderBy('timestamp', 'desc').get();
+                if (snapshot.empty) { alert('ไม่พบข้อมูล'); return; }
+
+                const dataArray = [];
+                snapshot.forEach(doc => {
+                    const row = doc.data();
+                    dataArray.push({
+                        "วันที่ทำรายการ (Timestamp)": row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "",
+                        "รหัส": row.studentId, 
+                        "ชื่อ-สกุล": row.fullName, 
+                        "เบอร์โทรศัพท์": row.phone,
+                        "วันที่และเวลาฉีด": row.sessionDatetime,
+                        "รายการวัคซีนที่ได้รับในรอบ": row.sessionVaccines
+                    });
+                });
+                const worksheet = XLSX.utils.json_to_sheet(dataArray);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Responses");
+                XLSX.writeFile(workbook, "SLC_Vaccine_Export.xlsx");
+            } catch (error) { 
+                alert("❌ เกิดข้อผิดพลาดในการดึงข้อมูล"); 
+            } finally { 
+                exportBtn.innerText = "📊 ดึงข้อมูลเป็นไฟล์ Excel"; 
+            }
+        }
+    </script>
+</body>
+</html>
