@@ -10,27 +10,20 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
     
     <style>
-        :root {
-            --bg-color: #f4f4f5; 
-            --apricot: #FFB347; 
-            --text-color: #1a1a1a; 
-            --border-color: #1a1a1a;
-        }
+        :root { --bg-color: #f4f4f5; --apricot: #FFB347; --text-color: #1a1a1a; --border-color: #1a1a1a; }
         * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
         .container { width: 100%; max-width: 700px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; }
-        
         h1, h2 { font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 20px; background: var(--apricot); padding: 12px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); line-height: 1.5; }
         
         .btn-home { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #000; font-weight: bold; background: #eee; padding: 10px 15px; border: 3px solid #000; border-radius: 8px; margin-bottom: 20px; box-shadow: 2px 2px 0px #000; transition: all 0.1s; align-self: flex-start; }
         .btn-home:active { box-shadow: 0px 0px 0px #000; transform: translate(2px, 2px); }
 
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 15px; }
-        input[type="text"], select, input[type="file"] { width: 100%; padding: 12px; font-size: 16px; border: 3px solid var(--border-color); border-radius: 8px; background: #fff; transition: all 0.2s ease; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 15px; }
+        input[type="text"], input[type="date"], select, input[type="file"] { width: 100%; padding: 12px; font-size: 15px; border: 3px solid var(--border-color); border-radius: 8px; background: #fff; transition: all 0.2s ease; }
         
-        /* สไตล์สำหรับ Tabs */
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; }
         .tab-btn { padding: 10px 14px; font-size: 14px; font-weight: bold; background: #eee; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.1s; flex-grow: 1; text-align: center;}
         .tab-btn.active { background: #a8e6cf; box-shadow: 3px 3px 0px var(--border-color); transform: translateY(-2px); }
@@ -39,14 +32,14 @@
         .tab-content.active { display: block; }
 
         .disease-title { font-size: 18px; font-weight: bold; color: #d35400; margin-bottom: 12px; border-bottom: 2px dashed #ccc; padding-bottom: 5px; }
-        
-        /* กล่องคำแนะนำ */
         .guideline-box { background: #fff3cd; border: 2px solid #856404; color: #856404; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; line-height: 1.5; }
         .guideline-box strong { display: block; margin-bottom: 4px; color: #533f03; }
 
+        /* กล่องสำหรับใส่วันที่ จะซ่อนไว้จนกว่าจะเลือกสถานะที่ต้องใช้วันที่ */
+        .date-section { background: #eef2f5; border: 2px dashed #8ba4b4; padding: 15px; border-radius: 8px; margin-top: 10px; display: none; }
+
         button.btn-save { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: var(--text-color); background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease; margin-top: 10px;}
         button.btn-save:active { box-shadow: 0px 0px 0px; transform: translate(4px, 4px); }
-        
         .current-file-link { display: inline-block; margin-top: 10px; font-size: 14px; color: #0066cc; text-decoration: none; font-weight: bold; background: #e6f2ff; padding: 6px 12px; border-radius: 4px; border: 1px solid #0066cc; }
     </style>
 </head>
@@ -85,22 +78,33 @@
                 <div id="tab-vzv" class="tab-content active">
                     <div class="disease-title">1. โรคสุกใส (Varicella)</div>
                     <div class="guideline-box">
-                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
-                        1. มีหลักฐานยืนยันว่าเคยป่วยเป็นสุกใส หรือ<br>
-                        2. มีผลตรวจเลือด Varicella IgG เป็น Positive (บวก) หรือ<br>
-                        3. กรณีไม่มีภูมิ: ต้องมีหลักฐานฉีดวัคซีนสุกใสครบ 2 โด๊ส (ห่างกัน 1-2 เดือน)
+                        <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
+                        ✅ 1. มีหลักฐานเคยป่วย หรือ 2. ผลเลือด IgG เป็นบวก (ไม่ต้องฉีดวัคซีน)<br>
+                        ⚠️ 3. กรณีไม่มีภูมิ: ต้องฉีดวัคซีนให้ครบ 2 โด๊ส (ห่างกัน 1 เดือน)
                     </div>
                     <div class="form-group">
-                        <label>อัปเดตสถานะของคุณ:</label>
-                        <select id="status_vzv">
+                        <label>เลือกสถานะภูมิคุ้มกัน:</label>
+                        <select id="status_vzv" onchange="toggleDates('vzv')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="มีหลักฐานเคยป่วยเป็นสุกใส">✅ มีหลักฐานว่าเคยป่วยเป็นสุกใส</option>
-                            <option value="ผลตรวจ Varicella IgG Positive">✅ ผลตรวจ Varicella IgG Positive</option>
-                            <option value="รับวัคซีนสุกใสครบ 2 โด๊ส">✅ รับวัคซีนสุกใสครบ 2 โด๊ส</option>
+                            <option value="มีหลักฐานเคยป่วย">✅ 1. มีหลักฐานยืนยันว่าเคยป่วยเป็นสุกใส</option>
+                            <option value="IgG Positive">✅ 2. ผลตรวจเลือด Varicella IgG Positive (+)</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 3. ไม่มีภูมิ ต้องดำเนินการฉีดวัคซีน 2 โด๊ส</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน (สมุดวัคซีน/ใบรับรองแพทย์/ผลแล็บ):</label>
+                    
+                    <div id="dates_vzv" class="date-section">
+                        <div class="form-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 1:</label>
+                            <input type="date" id="date_vzv_1" onchange="calcVZV()">
+                        </div>
+                        <div class="form-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 2 (นัดหมายอัตโนมัติ 1 เดือน):</label>
+                            <input type="date" id="date_vzv_2">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
                         <input type="file" id="file_vzv" accept="image/*">
                         <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
@@ -109,20 +113,36 @@
                 <div id="tab-hbv" class="tab-content">
                     <div class="disease-title">2. ไวรัสตับอักเสบบี (Hepatitis B)</div>
                     <div class="guideline-box">
-                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
-                        1. มีผลตรวจเลือด Anti-HBs IgG มากกว่า 10 unit หรือ<br>
-                        2. กรณีภูมิไม่ขึ้น: ต้องมีหลักฐานว่าเคยได้รับวัคซีนตับอักเสบบีครบ 3 โด๊ส (เดือนที่ 0, 1, 6)
+                        <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
+                        ✅ 1. ผลเลือด Anti-HBs IgG > 10 unit (ไม่ต้องฉีดวัคซีน)<br>
+                        ⚠️ 2. กรณีภูมิไม่ขึ้น: ต้องฉีดวัคซีนตับอักเสบบี 3 โด๊ส (เดือนที่ 0, 1, 6)
                     </div>
                     <div class="form-group">
-                        <label>อัปเดตสถานะของคุณ:</label>
-                        <select id="status_hbv">
+                        <label>เลือกสถานะภูมิคุ้มกัน:</label>
+                        <select id="status_hbv" onchange="toggleDates('hbv')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="ผลตรวจ Anti-HBs IgG > 10 unit">✅ ผลตรวจ Anti-HBs IgG > 10 unit</option>
-                            <option value="รับวัคซีนตับอักเสบบีครบ 3 โด๊ส">✅ รับวัคซีนตับอักเสบบีครบ 3 โด๊ส</option>
+                            <option value="IgG > 10">✅ 1. ผลตรวจ Anti-HBs IgG > 10 unit</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องดำเนินการฉีดวัคซีน 3 โด๊ส</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน:</label>
+                    
+                    <div id="dates_hbv" class="date-section">
+                        <div class="form-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 1:</label>
+                            <input type="date" id="date_hbv_1" onchange="calcHBV()">
+                        </div>
+                        <div class="form-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 2 (ห่างโด๊สแรก 1 เดือน):</label>
+                            <input type="date" id="date_hbv_2">
+                        </div>
+                        <div class="form-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 3 (ห่างโด๊สแรก 6 เดือน):</label>
+                            <input type="date" id="date_hbv_3">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
                         <input type="file" id="file_hbv" accept="image/*">
                         <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
@@ -131,20 +151,28 @@
                 <div id="tab-mmr" class="tab-content">
                     <div class="disease-title">3. หัด-คางทูม-หัดเยอรมัน (MMR)</div>
                     <div class="guideline-box">
-                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
-                        1. มีผลการตรวจเลือด Measles IgG หรือ IgM เป็น Positive (บวก) หรือ<br>
-                        2. มีหลักฐานว่าเคยได้รับวัคซีน MMR อย่างน้อย 1 โด๊ส (หลังอายุ 1 ปี)
+                        <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
+                        ✅ หากมีผลเลือด Positive หรือเคยฉีดครบ 2 โด๊สแล้ว (ไม่ต้องฉีดเพิ่ม)<br>
+                        ⚠️ กรณีไม่มีประวัติหรือไม่มีภูมิ: ให้ฉีดวัคซีนอย่างน้อย 1-2 โด๊ส
                     </div>
                     <div class="form-group">
-                        <label>อัปเดตสถานะของคุณ:</label>
-                        <select id="status_mmr">
+                        <label>เลือกสถานะภูมิคุ้มกัน:</label>
+                        <select id="status_mmr" onchange="toggleDates('mmr')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="ผลตรวจ Measles IgG/IgM Positive">✅ ผลตรวจ Measles IgG/IgM Positive</option>
-                            <option value="รับวัคซีน MMR อย่างน้อย 1 โด๊ส">✅ รับวัคซีน MMR อย่างน้อย 1 โด๊ส</option>
+                            <option value="มีภูมิหรือฉีดครบแล้ว">✅ 1. มีภูมิคุ้มกัน Positive หรือเคยฉีดครบแล้ว</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องดำเนินการฉีดวัคซีน</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน:</label>
+
+                    <div id="dates_mmr" class="date-section">
+                        <div class="form-group">
+                            <label>📅 วันที่ฉีด โด๊สล่าสุด:</label>
+                            <input type="date" id="date_mmr_1">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
                         <input type="file" id="file_mmr" accept="image/*">
                         <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
@@ -153,18 +181,27 @@
                 <div id="tab-tdap" class="tab-content">
                     <div class="disease-title">4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)</div>
                     <div class="guideline-box">
-                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
-                        มีหลักฐานยืนยันว่าเคยรับวัคซีน Tdap อย่างน้อย 1 โด๊ส ภายในระยะเวลา 10 ปีที่ผ่านมา
+                        <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
+                        หากเคยฉีด Tdap มาแล้ว ภายใน 10 ปี ไม่ต้องฉีดเพิ่ม หากเกิน 10 ปี หรือจำไม่ได้ให้ฉีดกระตุ้น 1 โด๊ส
                     </div>
                     <div class="form-group">
-                        <label>อัปเดตสถานะของคุณ:</label>
-                        <select id="status_tdap">
+                        <label>เลือกสถานะภูมิคุ้มกัน:</label>
+                        <select id="status_tdap" onchange="toggleDates('tdap')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)">✅ รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)</option>
+                            <option value="เคยฉีดภายใน10ปี">✅ 1. เคยฉีดมาแล้ว (ยังไม่เกิน 10 ปี)</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 2. หมดอายุ/ไม่มีข้อมูล (ต้องฉีดใหม่ 1 โด๊ส)</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน:</label>
+
+                    <div id="dates_tdap" class="date-section">
+                        <div class="form-group">
+                            <label>📅 วันที่ฉีด (กรอกวันที่ฉีดล่าสุด):</label>
+                            <input type="date" id="date_tdap_1">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
                         <input type="file" id="file_tdap" accept="image/*">
                         <a id="link_tdap" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
@@ -173,18 +210,26 @@
                 <div id="tab-flu" class="tab-content">
                     <div class="disease-title">5. ไข้หวัดใหญ่ (Influenza)</div>
                     <div class="guideline-box">
-                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
-                        มีหลักฐานยืนยันว่าได้รับวัคซีนป้องกันไข้หวัดใหญ่มาแล้ว ภายในระยะเวลา 1 ปี
+                        <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
+                        ต้องฉีดทุกปี (ยกเว้นขึ้นปี 4 ให้ฉีดครั้งสุดท้าย) กรุณาระบุวันที่ฉีดล่าสุดเพื่อให้ระบบตรวจสอบวันหมดอายุ
                     </div>
                     <div class="form-group">
                         <label>อัปเดตสถานะของคุณ:</label>
-                        <select id="status_flu">
+                        <select id="status_flu" onchange="toggleDates('flu')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)">✅ รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)</option>
+                            <option value="รับวัคซีนแล้ว">✅ รับวัคซีนไข้หวัดใหญ่สำหรับปีนี้แล้ว</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน:</label>
+
+                    <div id="dates_flu" class="date-section">
+                        <div class="form-group">
+                            <label>📅 วันที่ฉีดวัคซีนไข้หวัดใหญ่ (ล่าสุด):</label>
+                            <input type="date" id="date_flu_1">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
                         <input type="file" id="file_flu" accept="image/*">
                         <a id="link_flu" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
@@ -193,18 +238,26 @@
                 <div id="tab-tb" class="tab-content">
                     <div class="disease-title">6. วัณโรค (Tuberculosis)</div>
                     <div class="guideline-box">
-                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
-                        มีหลักฐานผลตรวจ X-ray ปอด (CXR) ที่ปกติ ซึ่งออกให้ไม่เกิน 6 เดือนก่อนเข้าฝึกปฏิบัติ
+                        <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
+                        ต้องมีใบรายงานผล X-ray ปอดที่ปกติ และ<strong>ต้องตรวจมาไม่เกิน 6 เดือนก่อนเข้าฝึกปฏิบัติ</strong>
                     </div>
                     <div class="form-group">
                         <label>อัปเดตสถานะของคุณ:</label>
-                        <select id="status_tb">
+                        <select id="status_tb" onchange="toggleDates('tb')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)">✅ ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)</option>
+                            <option value="X-ray ปกติ">✅ เข้ารับการ X-ray ปอดแล้ว (ผลปกติ)</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน (ใบผล X-ray):</label>
+
+                    <div id="dates_tb" class="date-section">
+                        <div class="form-group">
+                            <label>📅 วันที่เข้ารับการ X-ray (ต้องไม่เกิน 6 เดือน):</label>
+                            <input type="date" id="date_tb_1">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน (ใบผล X-ray):</label>
                         <input type="file" id="file_tb" accept="image/*">
                         <a id="link_tb" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
@@ -217,7 +270,7 @@
     </div>
 
     <script>
-        // --- 1. การเชื่อมต่อ Firebase (อัปเดต Config ของคุณแล้ว) ---
+        // --- 1. Firebase Config ของคุณ ---
         const firebaseConfig = {
             apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
             authDomain: "vacciner-a3b0f.firebaseapp.com",
@@ -230,11 +283,31 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // ตัวแปรเก็บรายการโรคทั้ง 6 หมวด
         const diseases = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
         let currentId = "";
 
-        // --- ระบบสลับ Tabs ---
+        // --- ฟังก์ชันคำนวณบวกเดือนอัตโนมัติ ---
+        function addMonths(dateStr, months) {
+            if(!dateStr) return "";
+            let d = new Date(dateStr);
+            d.setMonth(d.getMonth() + months);
+            return d.toISOString().split('T')[0]; // คืนค่า YYYY-MM-DD
+        }
+
+        function calcVZV() {
+            let dose1 = document.getElementById('date_vzv_1').value;
+            if(dose1) document.getElementById('date_vzv_2').value = addMonths(dose1, 1);
+        }
+
+        function calcHBV() {
+            let dose1 = document.getElementById('date_hbv_1').value;
+            if(dose1) {
+                document.getElementById('date_hbv_2').value = addMonths(dose1, 1);
+                document.getElementById('date_hbv_3').value = addMonths(dose1, 6);
+            }
+        }
+
+        // --- ฟังก์ชันสลับหน้าแท็บ ---
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -242,7 +315,28 @@
             btnElement.classList.add('active');
         }
 
-        // --- ฟังก์ชันเข้าสู่ระบบ ---
+        // --- ฟังก์ชันเปิด/ปิด กล่องใส่วันที่ตามสถานะที่เลือก ---
+        function toggleDates(disease) {
+            const status = document.getElementById(`status_${disease}`).value;
+            const dateBox = document.getElementById(`dates_${disease}`);
+            
+            // เงื่อนไขในการโชว์ช่องใส่วันที่
+            if(disease === 'vzv' || disease === 'hbv' || disease === 'mmr' || disease === 'tdap') {
+                if(status.includes("กำลังฉีดวัคซีน") || status.includes("เคยฉีดภายใน10ปี")) {
+                    dateBox.style.display = 'block';
+                } else {
+                    dateBox.style.display = 'none';
+                }
+            } else if (disease === 'flu' || disease === 'tb') {
+                if(status !== "ยังไม่ดำเนินการ") {
+                    dateBox.style.display = 'block';
+                } else {
+                    dateBox.style.display = 'none';
+                }
+            }
+        }
+
+        // --- เข้าสู่ระบบ และดึงข้อมูลเก่ามาใส่ฟอร์ม ---
         async function loginStudent() {
             const sid = document.getElementById('loginStudentId').value.trim();
             if(!sid) return alert("กรุณาระบุรหัสนักศึกษา");
@@ -251,10 +345,9 @@
             btn.innerText = "⏳ กำลังค้นหาข้อมูล..."; btn.disabled = true;
 
             try {
-                // 1. ดึงข้อมูลชื่อจาก Master Data (Excel ที่แอดมินอัปโหลด)
                 const masterDoc = await db.collection('students_master').doc(sid).get();
                 if(!masterDoc.exists) {
-                    alert("❌ ไม่พบรหัสนักศึกษานี้ในระบบ กรุณาตรวจสอบกับทางคณะฯ หรือแอดมินครับ");
+                    alert("❌ ไม่พบรหัสนักศึกษานี้ กรุณาติดต่อแอดมิน");
                     btn.innerText = "🔍 เข้าสู่ระบบ / ค้นหาข้อมูล"; btn.disabled = false;
                     return;
                 }
@@ -263,14 +356,22 @@
                 document.getElementById('studentName').value = data.fullName;
                 currentId = sid;
 
-                // 2. ดึงประวัติสุขภาพที่เด็กเคยอัปโหลดไว้ (ถ้ามี)
                 const recordDoc = await db.collection('student_health_records').doc(sid).get();
                 if(recordDoc.exists) {
                     const rec = recordDoc.data();
                     
-                    // นำข้อมูลกลับมาใส่ในฟอร์มของทั้ง 6 หมวด
                     diseases.forEach(d => {
-                        if(rec[`status_${d}`]) document.getElementById(`status_${d}`).value = rec[`status_${d}`];
+                        // โหลดสถานะ
+                        if(rec[`status_${d}`]) {
+                            document.getElementById(`status_${d}`).value = rec[`status_${d}`];
+                            toggleDates(d); // ทริกเกอร์โชว์กล่องวันที่ถ้าจำเป็น
+                        }
+                        // โหลดวันที่ต่างๆ
+                        if(rec[`date_${d}_1`]) document.getElementById(`date_${d}_1`).value = rec[`date_${d}_1`];
+                        if(rec[`date_${d}_2`]) document.getElementById(`date_${d}_2`).value = rec[`date_${d}_2`];
+                        if(rec[`date_${d}_3`]) document.getElementById(`date_${d}_3`).value = rec[`date_${d}_3`];
+                        
+                        // โหลดลิงก์รูปภาพ
                         if(rec[`fileUrl_${d}`]) {
                             const link = document.getElementById(`link_${d}`);
                             link.href = rec[`fileUrl_${d}`];
@@ -279,18 +380,16 @@
                     });
                 }
 
-                // สลับหน้าจอไปที่ฟอร์มบันทึกข้อมูล
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('recordSection').style.display = 'block';
 
             } catch (error) {
-                console.error(error);
-                alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+                alert("❌ เกิดข้อผิดพลาด");
                 btn.innerText = "🔍 เข้าสู่ระบบ / ค้นหาข้อมูล"; btn.disabled = false;
             }
         }
 
-        // --- ฟังก์ชันบีบอัดรูปภาพอัจฉริยะ ---
+        // --- ฟังก์ชันบีบอัดรูปภาพ ---
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -323,7 +422,7 @@
             });
         }
 
-        // --- ฟังก์ชันบันทึกข้อมูลทั้งหมด (ทำงานเมื่อกด Save) ---
+        // --- บันทึกข้อมูลและไฟล์ ---
         document.getElementById('vaccineRecordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
@@ -339,34 +438,32 @@
             };
 
             try {
-                // ลูปทำงานบันทึกข้อมูลและอัปโหลดไฟล์ของทั้ง 6 โรค
                 for (const d of diseases) {
                     payload[`status_${d}`] = document.getElementById(`status_${d}`).value;
                     
+                    // ดึงวันที่เซฟเก็บไว้ (ถ้ามีช่องให้กรอก)
+                    let date1 = document.getElementById(`date_${d}_1`);
+                    let date2 = document.getElementById(`date_${d}_2`);
+                    let date3 = document.getElementById(`date_${d}_3`);
+                    if(date1) payload[`date_${d}_1`] = date1.value;
+                    if(date2) payload[`date_${d}_2`] = date2.value;
+                    if(date3) payload[`date_${d}_3`] = date3.value;
+                    
+                    // จัดการไฟล์
                     const fileInput = document.getElementById(`file_${d}`);
                     if (fileInput.files.length > 0) {
                         const originalFile = fileInput.files[0];
-                        let finalFile = originalFile;
-
-                        // บีบอัดเฉพาะไฟล์รูปภาพ (ถ้าเด็กอัปโหลดเป็นไฟล์อื่นก็ปล่อยผ่านไปได้)
-                        if (originalFile.type.startsWith('image/')) {
-                            finalFile = await compressImage(originalFile);
-                        }
-
-                        // อัปโหลดไฟล์ไปที่ Firebase Storage
+                        let finalFile = originalFile.type.startsWith('image/') ? await compressImage(originalFile) : originalFile;
+                        
                         const ref = storage.ref(`vaccine_proofs/${currentId}_${d}_${Date.now()}.jpg`);
                         await ref.put(finalFile);
-                        
-                        // เก็บ URL ของไฟล์ที่อัปโหลดเสร็จแล้ว
                         payload[`fileUrl_${d}`] = await ref.getDownloadURL();
                     }
                 }
 
-                // บันทึกข้อมูลลง Firestore (ฐานข้อมูล)
                 await db.collection('student_health_records').doc(currentId).set(payload, { merge: true });
-                
                 alert("✅ บันทึกข้อมูลและอัปโหลดหลักฐานสำเร็จเรียบร้อยครับ!");
-                location.reload(); // รีเฟรชหน้าต่างเพื่อให้เริ่มใช้งานใหม่
+                location.reload();
 
             } catch (err) {
                 console.error(err);
