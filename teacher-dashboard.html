@@ -108,7 +108,7 @@
                 <button onclick="loadAllBookings()">🔄 โหลดประวัติการจองใหม่</button>
                 <button style="background: #ff8b94; margin-left: auto;" onclick="exportBookingsToExcel()">📊 Export ประวัติการจองทั้งหมด</button>
             </div>
-            <p id="loadingBookings" style="text-align:center; font-weight:bold;">⏳ กำลังดึงข้อมูลการจองคิว...</p>
+            <p id="loadingBookings" style="text-align:center; font-weight:bold;">⏳ กำลังดึงข้อมูลการจองคิว... (รวมของเก่า)</p>
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -308,7 +308,7 @@
         }
 
         // ==========================================
-        // ส่วนที่ 2: ระบบประวัติการจองคิวทั้งหมด (กู้ข้อมูลเก่า)
+        // ส่วนที่ 2: ระบบประวัติการจองคิวทั้งหมด (แก้ไขให้ดึงของเก่าได้ 100%)
         // ==========================================
         let allBookingsData = [];
 
@@ -319,21 +319,31 @@
             allBookingsData = [];
 
             try {
-                // ดึงข้อมูลการจองทั้งหมดโดยไม่สนว่าจะมี ID โครงการหรือไม่
-                const snapshot = await db.collection('vaccine_responses').orderBy('timestamp', 'desc').get();
+                // แก้ไข: กวาดข้อมูลออกมาทั้งหมดโดยไม่ต้องเรียงลำดับจาก Firebase 
+                // เพื่อป้องกันการถูกกรองทิ้งหากข้อมูลชุดเก่าไม่มีฟิลด์ timestamp
+                const snapshot = await db.collection('vaccine_responses').get();
                 
+                let tempArray = [];
                 snapshot.forEach(doc => {
-                    const row = doc.data();
-                    
-                    // รองรับฟิลด์เก่าและใหม่ให้อ่านได้หมด
-                    const timestampStr = row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "N/A";
+                    tempArray.push(doc.data());
+                });
+
+                // เรียงลำดับข้อมูลด้วย JavaScript แทน (เรียงจากใหม่ไปเก่า)
+                tempArray.sort((a, b) => {
+                    let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                    let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                    return timeB - timeA;
+                });
+
+                tempArray.forEach(row => {
+                    const timestampStr = row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "ไม่มีระบุเวลา (ข้อมูลเก่า)";
                     const campaignStr = row.campaignName || `<span class="badge badge-legacy">ข้อมูลเก่า (ไม่มีชื่อโครงการ)</span>`;
                     const dateStr = row.sessionDatetime || row.vaccineDate || row.sessionName || "ไม่ระบุ";
                     const vaccineStr = row.sessionVaccines || row.vaccines || row.testProgram || "ไม่ระบุ";
 
                     allBookingsData.push({
                         timestamp: timestampStr,
-                        campaignName: row.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)", // ใช้แบบข้อความล้วนสำหรับตอน Export
+                        campaignName: row.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)",
                         studentId: row.studentId || "-",
                         fullName: row.fullName || "-",
                         phone: row.phone || "-",
@@ -354,13 +364,13 @@
                     tbody.appendChild(tr);
                 });
 
-                if(snapshot.empty) {
+                if(tempArray.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">ไม่พบประวัติการจองคิว</td></tr>';
                 }
 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = '<tr><td colspan="7" style="color:red;">❌ เกิดข้อผิดพลาด/กรุณาสร้าง Index ก่อน</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="color:red;">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>';
             } finally {
                 document.getElementById('loadingBookings').style.display = 'none';
             }
