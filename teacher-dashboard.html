@@ -33,18 +33,16 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            /* ลายจุดพื้นหลังแบบ Brutalism */
             background-image: radial-gradient(#bbb 1px, transparent 0);
             background-size: 20px 20px;
         }
         
-        /* 📦 โครงสร้างหลัก */
         .container { 
             width: 100%; 
             max-width: 1350px; 
             background: #ffffff; 
             border: 4px solid var(--border-color); 
-            border-radius: 0px; /* ขอบเหลี่ยม ดิบๆ */
+            border-radius: 0px; 
             box-shadow: 12px 12px 0px var(--border-color); 
             padding: 30px; 
             margin-bottom: 30px; 
@@ -64,7 +62,6 @@
             letter-spacing: 1px;
         }
         
-        /* 🖱️ ปุ่มต่างๆ (Buttons) */
         button, .btn-home, .btn-main, .btn-small, .view-file-btn {
             font-family: 'Sarabun', sans-serif;
             font-weight: 800;
@@ -90,34 +87,18 @@
         .btn-small { background: var(--apricot); padding: 8px 15px; font-size: 14px; }
         .btn-tiny { padding: 4px 10px; font-size: 12px; background: #fff; white-space: nowrap; }
 
-        /* 🗂️ แท็บเมนู (Tabs) */
         .tabs { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
-        .tab-btn { 
-            flex-grow: 1; 
-            background: #f0f0f0; 
-            padding: 15px 20px; 
-            font-size: 18px; 
-        }
-        .tab-btn.active { 
-            background: var(--blue); 
-            color: #000;
-            transform: translate(4px, 4px);
-            box-shadow: 0px 0px 0px var(--border-color);
-        }
+        .tab-btn { flex-grow: 1; background: #f0f0f0; padding: 15px 20px; font-size: 18px; }
+        .tab-btn.active { background: var(--blue); color: #000; transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-color); }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 📋 ฟอร์ม & ตัวกรอง */
         .form-group { margin-bottom: 20px; }
         label { display: block; font-weight: 800; margin-bottom: 8px; font-size: 16px; }
         input[type="password"], select { 
-            width: 100%; 
-            padding: 12px; 
-            font-size: 16px; 
-            font-weight: 600;
-            border: var(--border-width) solid var(--border-color); 
-            background: #fff;
+            width: 100%; padding: 12px; font-size: 16px; font-weight: 600;
+            border: var(--border-width) solid var(--border-color); background: #fff;
             box-shadow: 4px 4px 0px var(--border-color);
         }
         input[type="password"]:focus, select:focus { outline: none; background: #fffbf0; }
@@ -126,14 +107,7 @@
         .filter-bar select { width: auto; box-shadow: none; }
         .filter-bar select:disabled { background: #ddd; }
 
-        /* 📊 ตาราง (Table) */
-        .table-wrapper { 
-            overflow-x: auto; 
-            border: var(--border-width) solid var(--border-color); 
-            box-shadow: 8px 8px 0px var(--border-color); 
-            max-height: 70vh;
-            background: #fff;
-        }
+        .table-wrapper { overflow-x: auto; border: var(--border-width) solid var(--border-color); box-shadow: 8px 8px 0px var(--border-color); max-height: 70vh; background: #fff;}
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th, td { border: 2px solid var(--border-color); padding: 12px 10px; text-align: center; font-size: 15px; font-weight: 600; vertical-align: middle;}
         th { background: var(--apricot); font-weight: 900; position: sticky; top: 0; z-index: 1; text-transform: uppercase; border-bottom: 4px solid var(--border-color); }
@@ -141,86 +115,27 @@
         tr:nth-child(even) { background-color: #f9f9fa; }
         tr:hover { background-color: #e6f7ff; }
         
-        /* 🏷️ ป้ายสถานะ (Badges) */
-        .badge { 
-            display: inline-block; 
-            padding: 6px 10px; 
-            font-weight: 900; 
-            font-size: 13px; 
-            border: 2px solid var(--border-color); 
-            box-shadow: 3px 3px 0px var(--border-color);
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
+        .badge { display: inline-block; padding: 6px 10px; font-weight: 900; font-size: 13px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px var(--border-color); margin-bottom: 5px; letter-spacing: 0.5px; white-space: nowrap;}
         .badge-green { background: var(--green); }
         .badge-red { background: var(--pink); }
         .badge-legacy { background: var(--gold); }
         
-        /* 🗃️ กล่องตรวจหลักฐาน (Proof Box) */
-        .proof-box { 
-            background: #fff; 
-            border: 2px solid var(--border-color); 
-            padding: 10px; 
-            margin-top: 8px; 
-            text-align: left; 
-            box-shadow: 3px 3px 0px var(--border-color); 
-        }
+        .proof-box { background: #fff; border: 2px solid var(--border-color); padding: 10px; margin-top: 8px; text-align: left; box-shadow: 3px 3px 0px var(--border-color); }
         .view-file-btn { font-size: 12px; background: #fff; padding: 4px 8px; box-shadow: 2px 2px 0px var(--border-color); border-width: 2px; }
         .view-file-btn:hover { background: var(--blue); }
         
         .btn-yes { background: var(--green); }
         .btn-no { background: var(--pink); }
 
-        /* 📤 โซนนำเข้าไฟล์ */
-        .upload-zone { 
-            border: 4px dashed var(--border-color); 
-            padding: 50px; 
-            text-align: center; 
-            background: #fafafa; 
-            cursor: pointer; 
-            transition: 0.2s;
-            font-weight: 900;
-        }
+        .upload-zone { border: 4px dashed var(--border-color); padding: 50px; text-align: center; background: #fafafa; cursor: pointer; transition: 0.2s; font-weight: 900;}
         .upload-zone:hover { background: var(--apricot); border-style: solid; }
         
-        /* 📑 โครงการจองคิว */
-        .camp-card { 
-            border: var(--border-width) solid var(--border-color); 
-            padding: 20px; 
-            background: #fff; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 6px 6px 0px var(--border-color); 
-            margin-bottom: 15px; 
-        }
-        .session-item { 
-            border: var(--border-width) solid var(--border-color); 
-            padding: 15px; 
-            background: #f0f0f0; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px;
-            box-shadow: 4px 4px 0px var(--border-color);
-        }
+        .camp-card { border: var(--border-width) solid var(--border-color); padding: 20px; background: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 15px; }
+        .session-item { border: var(--border-width) solid var(--border-color); padding: 15px; background: #f0f0f0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; box-shadow: 4px 4px 0px var(--border-color);}
 
-        /* 📱 Pop-up Modal */
-        #studentModal {
-            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-            background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;
-            backdrop-filter: blur(2px);
-        }
-        .modal-content-box {
-            background:#fff; width:95%; max-width:700px; max-height:85vh; overflow-y:auto; 
-            padding:30px; border: 4px solid var(--border-color); 
-            box-shadow: 16px 16px 0px var(--border-color); position:relative;
-        }
-        .modal-close-btn {
-            position:absolute; top:15px; right:15px; background:var(--pink); 
-            font-size: 16px; padding:8px 15px;
-        }
+        #studentModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(2px);}
+        .modal-content-box { background:#fff; width:95%; max-width:700px; max-height:85vh; overflow-y:auto; padding:30px; border: 4px solid var(--border-color); box-shadow: 16px 16px 0px var(--border-color); position:relative;}
+        .modal-close-btn { position:absolute; top:15px; right:15px; background:var(--pink); font-size: 16px; padding:8px 15px;}
     </style>
 </head>
 <body>
@@ -246,7 +161,7 @@
             </div>
         </div>
 
-        <h1 style="margin-bottom: 30px;">👩‍🏫 กระดานตรวจสอบข้อมูลสุขภาพ (ADMIN)</h1>
+        <h1 style="margin-bottom: 30px;">👩‍🏫 กระดานตรวจสอบข้อมูลสุขภาพ</h1>
         
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('dashboard', this)">📋 ตรวจสมุดพกวัคซีน</button>
@@ -342,6 +257,9 @@
 
         let currentAdminRole = null; 
 
+        // ลบฟังก์ชันโหลดอัตโนมัติตอนเปิดเว็บออก เพื่อป้องกันบั๊กโหลดก่อนล็อกอิน
+        // window.onload = () => { loadDashboardData(); };
+
         function loginAdmin() {
             const pwd = document.getElementById('adminPassword').value;
             let roleDisplay = ""; let targetYear = "";
@@ -361,12 +279,13 @@
             const importTabBtn = document.getElementById('btnTabImport');
 
             if (currentAdminRole === 'ALL') {
-                filterDropdown.value = 'all'; filterDropdown.disabled = false; importTabBtn.style.display = 'block'; 
+                filterDropdown.value = 'all'; filterDropdown.disabled = false; importTabBtn.style.display = ''; 
             } else {
                 filterDropdown.value = targetYear; filterDropdown.disabled = true; importTabBtn.style.display = 'none'; 
-                switchTab('dashboard', document.querySelector('.tab-btn'));
             }
-            loadDashboardData(); 
+            
+            // โหลดข้อมูล "หลังจาก" เลือกระดับสิทธิ์เสร็จแล้วเท่านั้น
+            switchTab('dashboard', document.querySelector('.tab-btn'));
         }
 
         function logoutAdmin() {
@@ -374,7 +293,7 @@
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('mainDashboard').style.display = 'none';
             document.getElementById('adminPassword').value = '';
-            switchTab('dashboard', document.querySelector('.tab-btn'));
+            document.getElementById('studentTableBody').innerHTML = '';
         }
 
         function switchTab(tabId, btnElement) {
@@ -397,6 +316,7 @@
         };
 
         async function loadDashboardData() {
+            if (!currentAdminRole) return; // หากยังไม่ล็อกอิน ให้ข้ามการโหลด
             document.getElementById('loadingDash').style.display = 'block';
             document.getElementById('studentTableBody').innerHTML = '';
             mergedDataList = [];
@@ -411,9 +331,14 @@
                     else studentsMap[r.studentId] = { studentId: r.studentId, fullName: r.fullName, year: 'ไม่ระบุ', records: r };
                 });
                 mergedDataList = Object.values(studentsMap);
-                mergedDataList.sort((a,b) => a.studentId.localeCompare(b.studentId));
+                
+                // ป้องกันบั๊กกรณีข้อมูลไม่มีรหัสนักศึกษา
+                mergedDataList.sort((a,b) => String(a.studentId || "").localeCompare(String(b.studentId || "")));
                 renderTable();
-            } catch (error) { console.error(error); }
+            } catch (error) { 
+                console.error(error); 
+                document.getElementById('loadingDash').innerText = "❌ เกิดข้อผิดพลาดในการโหลดข้อมูล";
+            }
         }
 
         function getShortBadge(diseaseCode, recordObj) {
@@ -429,10 +354,12 @@
             return `<span class="badge badge-red" style="font-size:14px;">🔴</span>`;
         }
 
+        // ตัวกรองชั้นปีแบบปลอดภัยต่อ Error
         function checkYearMatch(studentYear, filterYear) {
-            if (filterYear === 'all') return true;
+            if (!filterYear || filterYear === 'all') return true;
             let sYear = String(studentYear || "").trim();
-            let fNum = filterYear.match(/\d+/); let sNum = sYear.match(/\d+/);      
+            let fNum = filterYear.match(/\d+/); 
+            let sNum = sYear.match(/\d+/);      
             if (fNum && sNum) return fNum[0] === sNum[0]; 
             return sYear === filterYear; 
         }
@@ -455,11 +382,15 @@
                 if(hasRejectedFiles) { overallHtml = `<span class="badge badge-red">🔴 ต้องแก้ไข</span>`; student.overallPass = false; } 
                 else { overallHtml = allPassed ? `<span class="badge badge-green">🟢 สมบูรณ์</span>` : `<span class="badge badge-legacy">⏳ รอดำเนินการ</span>`; student.overallPass = allPassed; }
 
+                // แปลงชั้นปีให้แสดงแค่ตัวเลข
+                let yearMatch = student.year ? String(student.year).match(/\d+/) : null;
+                let displayYear = yearMatch ? yearMatch[0] : '-';
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${student.studentId}</strong></td>
-                    <td class="text-left">${student.fullName}</td>
-                    <td><strong style="font-size:16px;">${student.year ? student.year.match(/\d+/) : '-'}</strong></td>
+                    <td><strong>${student.studentId || '-'}</strong></td>
+                    <td class="text-left">${student.fullName || '-'}</td>
+                    <td><strong style="font-size:16px;">${displayYear}</strong></td>
                     <td>${getShortBadge('vzv', rec)}</td>
                     <td>${getShortBadge('hbv', rec)}</td>
                     <td>${getShortBadge('mmr', rec)}</td>
@@ -559,7 +490,6 @@
             return linksHtml;
         }
 
-        // Export, Bookings, Import ... (คงฟังก์ชันเดิมเพื่อการใช้งานที่สมบูรณ์)
         function getVerText(status) { if(status === 'approved') return ' (✅)'; if(status === 'rejected') return ' (❌)'; return ''; }
         function exportDashboardToExcel() {
             const filterYear = document.getElementById('filterYear').value; let exportData = [];
