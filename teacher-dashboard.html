@@ -76,9 +76,9 @@
         <h1>👩‍🏫 กระดานแอดมิน ศูนย์บริการสุขภาพ นศ.</h1>
         
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('dashboard')">📋 ตรวจสมุดพกวัคซีน</button>
-            <button class="tab-btn" onclick="switchTab('bookings')">📅 ประวัติจองคิว (แยกตามรอบ)</button>
-            <button class="tab-btn" onclick="switchTab('import')">📥 นำเข้า นศ. (Master Data)</button>
+            <button class="tab-btn active" onclick="switchTab('dashboard', this)">📋 ตรวจสมุดพกวัคซีน</button>
+            <button class="tab-btn" onclick="switchTab('bookings', this)">📅 ประวัติจองคิว (แยกตามรอบ)</button>
+            <button class="tab-btn" onclick="switchTab('import', this)">📥 นำเข้า นศ. (Master Data)</button>
         </div>
 
         <div id="tab-dashboard" class="tab-content active">
@@ -158,7 +158,7 @@
     </div>
 
     <script>
-        // --- 1. การเชื่อมต่อ Firebase (ใส่ Config ของคุณ) ---
+        // --- 1. การเชื่อมต่อ Firebase (อัปเดต Config ของคุณแล้ว) ---
         const firebaseConfig = {
             apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
             authDomain: "vacciner-a3b0f.firebaseapp.com",
@@ -170,11 +170,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function switchTab(tabId) {
+        function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
-            event.target.classList.add('active');
+            if(btnElement) btnElement.classList.add('active');
             
             if(tabId === 'dashboard') loadDashboardData();
             if(tabId === 'bookings') loadAllBookings();
@@ -224,6 +224,7 @@
 
             } catch (error) {
                 console.error(error);
+                document.getElementById('loadingDash').innerText = "❌ เกิดข้อผิดพลาดในการดึงข้อมูล";
             }
         }
 
@@ -239,6 +240,19 @@
             return { isPass, html, statusText: status };
         }
 
+        // 🌟 ฟังก์ชันตัวกรองอัจฉริยะ: ดึงตัวเลขจากชั้นปีมาเทียบกัน
+        function checkYearMatch(studentYear, filterYear) {
+            if (filterYear === 'all') return true;
+            let sYear = String(studentYear || "").trim();
+            let fNum = filterYear.match(/\d+/); 
+            let sNum = sYear.match(/\d+/);      
+            
+            if (fNum && sNum) {
+                return fNum[0] === sNum[0]; 
+            }
+            return sYear === filterYear; 
+        }
+
         function renderTable() {
             const filterYear = document.getElementById('filterYear').value;
             const tbody = document.getElementById('studentTableBody');
@@ -246,7 +260,8 @@
             document.getElementById('loadingDash').style.display = 'none';
 
             mergedDataList.forEach(student => {
-                if(filterYear !== 'all' && student.year !== filterYear) return;
+                if(!checkYearMatch(student.year, filterYear)) return;
+
                 const rec = student.records;
                 const vzv = evaluateDisease('vzv', rec);
                 const hbv = evaluateDisease('hbv', rec);
@@ -276,7 +291,8 @@
             const filterYear = document.getElementById('filterYear').value;
             let exportData = [];
             mergedDataList.forEach(student => {
-                if(filterYear !== 'all' && student.year !== filterYear) return;
+                if(!checkYearMatch(student.year, filterYear)) return;
+                
                 const rec = student.records;
                 exportData.push({
                     "รหัสนักศึกษา": student.studentId, "ชื่อ-นามสกุล": student.fullName, "ชั้นปี": student.year,
@@ -296,20 +312,19 @@
         // ==========================================
         // ส่วนที่ 2: ระบบประวัติการจองคิวแยกตามโครงการ
         // ==========================================
-        let allBookingsRaw = []; // เก็บข้อมูลดิบทั้งหมด
-        let currentViewingCampaign = ""; // เก็บชื่อแคมเปญที่กำลังดูอยู่
+        let allBookingsRaw = []; 
+        let currentViewingCampaign = ""; 
 
         async function loadAllBookings() {
             document.getElementById('loadingBookings').style.display = 'block';
             document.getElementById('campaignCardsContainer').innerHTML = '';
-            backToCampaignList(); // รีเซ็ตหน้ากลับมาเป็นหน้าแรกของแท็บ
+            backToCampaignList(); 
             allBookingsRaw = [];
 
             try {
                 const snapshot = await db.collection('vaccine_responses').get();
                 snapshot.forEach(doc => allBookingsRaw.push(doc.data()));
 
-                // เรียงเวลาจากใหม่ไปเก่า
                 allBookingsRaw.sort((a, b) => {
                     let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
                     let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
@@ -329,7 +344,6 @@
         function renderCampaignList() {
             let groupedByCamp = {};
             
-            // จัดกลุ่มตามชื่อโครงการ
             allBookingsRaw.forEach(row => {
                 let campName = row.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)";
                 if(!groupedByCamp[campName]) groupedByCamp[campName] = [];
@@ -366,10 +380,8 @@
             currentViewingCampaign = campName;
             document.getElementById('detailCampaignTitle').innerText = `📋 โครงการ: ${campName}`;
             
-            // กรองข้อมูลเฉพาะแคมเปญนี้
             let campData = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)") === campName);
 
-            // จัดกลุ่มตามรอบ (Session)
             let groupedBySession = {};
             campData.forEach(row => {
                 let sessionName = row.sessionDatetime || row.vaccineDate || row.sessionName || "ไม่ระบุรอบวัน/เวลา";
@@ -426,7 +438,6 @@
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
             
-            // ตั้งชื่อไฟล์ให้ไม่ให้มีอักขระพิเศษที่ห้ามตั้งเป็นชื่อไฟล์
             let safeSessionName = sessionName === 'all' ? 'รวมทุกรอบ' : sessionName.replace(/[<>:"/\\|?*]+/g, '_');
             let safeCampName = currentViewingCampaign.replace(/[<>:"/\\|?*]+/g, '_');
             XLSX.writeFile(workbook, `ข้อมูลจองคิว_${safeCampName}_${safeSessionName}.xlsx`);
