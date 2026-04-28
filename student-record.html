@@ -19,9 +19,9 @@
         * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        .container { width: 100%; max-width: 600px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; }
+        .container { width: 100%; max-width: 700px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; }
         
-        h1, h2 { font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 24px; background: var(--apricot); padding: 12px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); line-height: 1.5; }
+        h1, h2 { font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 20px; background: var(--apricot); padding: 12px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); line-height: 1.5; }
         
         .btn-home { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #000; font-weight: bold; background: #eee; padding: 10px 15px; border: 3px solid #000; border-radius: 8px; margin-bottom: 20px; box-shadow: 2px 2px 0px #000; transition: all 0.1s; align-self: flex-start; }
         .btn-home:active { box-shadow: 0px 0px 0px #000; transform: translate(2px, 2px); }
@@ -30,26 +30,37 @@
         label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 15px; }
         input[type="text"], select, input[type="file"] { width: 100%; padding: 12px; font-size: 16px; border: 3px solid var(--border-color); border-radius: 8px; background: #fff; transition: all 0.2s ease; }
         
-        .disease-card { background: #fff; border: 3px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-color); }
-        .disease-title { font-size: 17px; font-weight: bold; color: #d35400; margin-bottom: 12px; border-bottom: 2px dashed #ccc; padding-bottom: 5px; }
+        /* สไตล์สำหรับ Tabs */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; }
+        .tab-btn { padding: 10px 14px; font-size: 14px; font-weight: bold; background: #eee; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.1s; flex-grow: 1; text-align: center;}
+        .tab-btn.active { background: #a8e6cf; box-shadow: 3px 3px 0px var(--border-color); transform: translateY(-2px); }
         
-        button.btn-save { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: var(--text-color); background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease; }
+        .tab-content { display: none; background: #fff; border: 3px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-color); }
+        .tab-content.active { display: block; }
+
+        .disease-title { font-size: 18px; font-weight: bold; color: #d35400; margin-bottom: 12px; border-bottom: 2px dashed #ccc; padding-bottom: 5px; }
+        
+        /* กล่องคำแนะนำ */
+        .guideline-box { background: #fff3cd; border: 2px solid #856404; color: #856404; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; line-height: 1.5; }
+        .guideline-box strong { display: block; margin-bottom: 4px; color: #533f03; }
+
+        button.btn-save { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: var(--text-color); background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease; margin-top: 10px;}
         button.btn-save:active { box-shadow: 0px 0px 0px; transform: translate(4px, 4px); }
         
-        .current-file-link { display: inline-block; margin-top: 10px; font-size: 14px; color: #0066cc; text-decoration: none; font-weight: bold; background: #e6f2ff; padding: 5px 10px; border-radius: 4px; border: 1px solid #0066cc; }
+        .current-file-link { display: inline-block; margin-top: 10px; font-size: 14px; color: #0066cc; text-decoration: none; font-weight: bold; background: #e6f2ff; padding: 6px 12px; border-radius: 4px; border: 1px solid #0066cc; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="index.html" class="btn-home">🏠 กลับหน้าหลัก</a>
+        <a href="index.html" class="btn-home">🏠 กลับหน้าเมนูหลัก</a>
 
         <div id="loginSection">
             <h1>📑 บันทึกประวัติสุขภาพนักศึกษา</h1>
             <div class="form-group">
                 <label>รหัสนักศึกษา</label>
                 <input type="text" id="loginStudentId" placeholder="กรอกรหัสนักศึกษา">
-                <button class="btn-save" style="background: var(--apricot); margin-top: 15px;" onclick="loginStudent()">🔍 ค้นหาข้อมูล</button>
+                <button type="button" class="btn-save" style="background: var(--apricot); margin-top: 15px;" onclick="loginStudent()">🔍 เข้าสู่ระบบ / ค้นหาข้อมูล</button>
             </div>
         </div>
 
@@ -57,47 +68,156 @@
             <h2 style="background:#a8e6cf;">👤 ข้อมูลนักศึกษา</h2>
             <div class="form-group">
                 <label>ชื่อ-นามสกุล</label>
-                <input type="text" id="studentName" readonly style="background:#eee;">
+                <input type="text" id="studentName" readonly style="background:#eee; cursor:not-allowed;">
             </div>
 
             <form id="vaccineRecordForm">
-                <div class="disease-card">
+                
+                <div class="tabs">
+                    <button type="button" class="tab-btn active" onclick="switchTab('vzv', this)">1. สุกใส</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('hbv', this)">2. ตับอักเสบบี</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('mmr', this)">3. MMR</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('tdap', this)">4. Tdap</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('flu', this)">5. ไข้หวัดใหญ่</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('tb', this)">6. วัณโรค</button>
+                </div>
+
+                <div id="tab-vzv" class="tab-content active">
                     <div class="disease-title">1. โรคสุกใส (Varicella)</div>
-                    <select id="status_vzv">
-                        <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                        <option value="มีหลักฐานเคยป่วยเป็นสุกใส">✅ มีหลักฐานว่าเคยป่วย</option>
-                        <option value="ผลตรวจ Varicella IgG Positive">✅ ผลตรวจ IgG Positive</option>
-                        <option value="รับวัคซีนสุกใสครบ 2 โด๊ส">✅ รับวัคซีนครบ 2 โด๊ส</option>
-                    </select>
-                    <div style="margin-top:10px;">
-                        <label style="font-size:13px;">อัปโหลดหลักฐาน:</label>
+                    <div class="guideline-box">
+                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
+                        1. มีหลักฐานยืนยันว่าเคยป่วยเป็นสุกใส หรือ<br>
+                        2. มีผลตรวจเลือด Varicella IgG เป็น Positive (บวก) หรือ<br>
+                        3. กรณีไม่มีภูมิ: ต้องมีหลักฐานฉีดวัคซีนสุกใสครบ 2 โด๊ส (ห่างกัน 1-2 เดือน)
+                    </div>
+                    <div class="form-group">
+                        <label>อัปเดตสถานะของคุณ:</label>
+                        <select id="status_vzv">
+                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                            <option value="มีหลักฐานเคยป่วยเป็นสุกใส">✅ มีหลักฐานว่าเคยป่วยเป็นสุกใส</option>
+                            <option value="ผลตรวจ Varicella IgG Positive">✅ ผลตรวจ Varicella IgG Positive</option>
+                            <option value="รับวัคซีนสุกใสครบ 2 โด๊ส">✅ รับวัคซีนสุกใสครบ 2 โด๊ส</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน (สมุดวัคซีน/ใบรับรองแพทย์/ผลแล็บ):</label>
                         <input type="file" id="file_vzv" accept="image/*">
-                        <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                        <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
                 </div>
 
-                <div class="disease-card">
+                <div id="tab-hbv" class="tab-content">
                     <div class="disease-title">2. ไวรัสตับอักเสบบี (Hepatitis B)</div>
-                    <select id="status_hbv">
-                        <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                        <option value="ผลตรวจ Anti-HBs IgG > 10 unit">✅ ผลตรวจ IgG > 10 unit</option>
-                        <option value="รับวัคซีนตับอักเสบบีครบ 3 โด๊ส">✅ รับวัคซีนครบ 3 โด๊ส</option>
-                    </select>
-                    <div style="margin-top:10px;">
-                        <label style="font-size:13px;">อัปโหลดหลักฐาน:</label>
+                    <div class="guideline-box">
+                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
+                        1. มีผลตรวจเลือด Anti-HBs IgG มากกว่า 10 unit หรือ<br>
+                        2. กรณีภูมิไม่ขึ้น: ต้องมีหลักฐานว่าเคยได้รับวัคซีนตับอักเสบบีครบ 3 โด๊ส (เดือนที่ 0, 1, 6)
+                    </div>
+                    <div class="form-group">
+                        <label>อัปเดตสถานะของคุณ:</label>
+                        <select id="status_hbv">
+                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                            <option value="ผลตรวจ Anti-HBs IgG > 10 unit">✅ ผลตรวจ Anti-HBs IgG > 10 unit</option>
+                            <option value="รับวัคซีนตับอักเสบบีครบ 3 โด๊ส">✅ รับวัคซีนตับอักเสบบีครบ 3 โด๊ส</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน:</label>
                         <input type="file" id="file_hbv" accept="image/*">
-                        <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                        <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-save" id="saveBtn">💾 บันทึกข้อมูลทั้งหมด</button>
-                <p id="statusMsg" style="text-align:center; font-weight:bold; display:none; margin-top:15px;"></p>
+                <div id="tab-mmr" class="tab-content">
+                    <div class="disease-title">3. หัด-คางทูม-หัดเยอรมัน (MMR)</div>
+                    <div class="guideline-box">
+                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
+                        1. มีผลการตรวจเลือด Measles IgG หรือ IgM เป็น Positive (บวก) หรือ<br>
+                        2. มีหลักฐานว่าเคยได้รับวัคซีน MMR อย่างน้อย 1 โด๊ส (หลังอายุ 1 ปี)
+                    </div>
+                    <div class="form-group">
+                        <label>อัปเดตสถานะของคุณ:</label>
+                        <select id="status_mmr">
+                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                            <option value="ผลตรวจ Measles IgG/IgM Positive">✅ ผลตรวจ Measles IgG/IgM Positive</option>
+                            <option value="รับวัคซีน MMR อย่างน้อย 1 โด๊ส">✅ รับวัคซีน MMR อย่างน้อย 1 โด๊ส</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน:</label>
+                        <input type="file" id="file_mmr" accept="image/*">
+                        <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
+                    </div>
+                </div>
+
+                <div id="tab-tdap" class="tab-content">
+                    <div class="disease-title">4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)</div>
+                    <div class="guideline-box">
+                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
+                        มีหลักฐานยืนยันว่าเคยรับวัคซีน Tdap อย่างน้อย 1 โด๊ส ภายในระยะเวลา 10 ปีที่ผ่านมา
+                    </div>
+                    <div class="form-group">
+                        <label>อัปเดตสถานะของคุณ:</label>
+                        <select id="status_tdap">
+                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                            <option value="รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)">✅ รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน:</label>
+                        <input type="file" id="file_tdap" accept="image/*">
+                        <a id="link_tdap" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
+                    </div>
+                </div>
+
+                <div id="tab-flu" class="tab-content">
+                    <div class="disease-title">5. ไข้หวัดใหญ่ (Influenza)</div>
+                    <div class="guideline-box">
+                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
+                        มีหลักฐานยืนยันว่าได้รับวัคซีนป้องกันไข้หวัดใหญ่มาแล้ว ภายในระยะเวลา 1 ปี
+                    </div>
+                    <div class="form-group">
+                        <label>อัปเดตสถานะของคุณ:</label>
+                        <select id="status_flu">
+                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                            <option value="รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)">✅ รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน:</label>
+                        <input type="file" id="file_flu" accept="image/*">
+                        <a id="link_flu" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
+                    </div>
+                </div>
+
+                <div id="tab-tb" class="tab-content">
+                    <div class="disease-title">6. วัณโรค (Tuberculosis)</div>
+                    <div class="guideline-box">
+                        <strong>📌 แนวปฏิบัติ (เกณฑ์ผ่าน):</strong>
+                        มีหลักฐานผลตรวจ X-ray ปอด (CXR) ที่ปกติ ซึ่งออกให้ไม่เกิน 6 เดือนก่อนเข้าฝึกปฏิบัติ
+                    </div>
+                    <div class="form-group">
+                        <label>อัปเดตสถานะของคุณ:</label>
+                        <select id="status_tb">
+                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                            <option value="ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)">✅ ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:13px; color:#555;">แนบภาพหลักฐาน (ใบผล X-ray):</label>
+                        <input type="file" id="file_tb" accept="image/*">
+                        <a id="link_tb" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-save" id="saveBtn">💾 บันทึกการอัปเดตข้อมูลทั้งหมด</button>
+                <p id="statusMsg" style="text-align:center; font-weight:bold; display:none; margin-top:15px; color:#d35400;"></p>
             </form>
         </div>
     </div>
 
     <script>
-        // ใส่ Firebase Config ของโปรเจกต์คุณที่นี่
+        // --- 1. การเชื่อมต่อ Firebase (อัปเดต Config ของคุณแล้ว) ---
         const firebaseConfig = {
             apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
             authDomain: "vacciner-a3b0f.firebaseapp.com",
@@ -110,39 +230,67 @@
         const db = firebase.firestore();
         const storage = firebase.storage();
 
+        // ตัวแปรเก็บรายการโรคทั้ง 6 หมวด
+        const diseases = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
         let currentId = "";
 
-        async function loginStudent() {
-            const sid = document.getElementById('loginStudentId').value.trim();
-            if(!sid) return alert("กรุณาระบุรหัส");
-
-            // ดึงข้อมูลจาก Master Data
-            const masterDoc = await db.collection('students_master').doc(sid).get();
-            if(!masterDoc.exists) return alert("ไม่พบข้อมูลนักศึกษาในระบบกรุณาติดต่อคณะ");
-
-            const data = masterDoc.data();
-            document.getElementById('studentName').value = data.fullName;
-            currentId = sid;
-
-            // ดึงข้อมูลสุขภาพเดิม (ถ้ามี)
-            const recordDoc = await db.collection('student_health_records').doc(sid).get();
-            if(recordDoc.exists) {
-                const rec = recordDoc.data();
-                ['vzv', 'hbv'].forEach(d => {
-                    if(rec[`status_${d}`]) document.getElementById(`status_${d}`).value = rec[`status_${d}`];
-                    if(rec[`fileUrl_${d}`]) {
-                        const link = document.getElementById(`link_${d}`);
-                        link.href = rec[`fileUrl_${d}`];
-                        link.style.display = 'inline-block';
-                    }
-                });
-            }
-
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('recordSection').style.display = 'block';
+        // --- ระบบสลับ Tabs ---
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btnElement.classList.add('active');
         }
 
-        // ฟังก์ชันบีบอัดรูปภาพ
+        // --- ฟังก์ชันเข้าสู่ระบบ ---
+        async function loginStudent() {
+            const sid = document.getElementById('loginStudentId').value.trim();
+            if(!sid) return alert("กรุณาระบุรหัสนักศึกษา");
+
+            const btn = document.querySelector('#loginSection .btn-save');
+            btn.innerText = "⏳ กำลังค้นหาข้อมูล..."; btn.disabled = true;
+
+            try {
+                // 1. ดึงข้อมูลชื่อจาก Master Data (Excel ที่แอดมินอัปโหลด)
+                const masterDoc = await db.collection('students_master').doc(sid).get();
+                if(!masterDoc.exists) {
+                    alert("❌ ไม่พบรหัสนักศึกษานี้ในระบบ กรุณาตรวจสอบกับทางคณะฯ หรือแอดมินครับ");
+                    btn.innerText = "🔍 เข้าสู่ระบบ / ค้นหาข้อมูล"; btn.disabled = false;
+                    return;
+                }
+
+                const data = masterDoc.data();
+                document.getElementById('studentName').value = data.fullName;
+                currentId = sid;
+
+                // 2. ดึงประวัติสุขภาพที่เด็กเคยอัปโหลดไว้ (ถ้ามี)
+                const recordDoc = await db.collection('student_health_records').doc(sid).get();
+                if(recordDoc.exists) {
+                    const rec = recordDoc.data();
+                    
+                    // นำข้อมูลกลับมาใส่ในฟอร์มของทั้ง 6 หมวด
+                    diseases.forEach(d => {
+                        if(rec[`status_${d}`]) document.getElementById(`status_${d}`).value = rec[`status_${d}`];
+                        if(rec[`fileUrl_${d}`]) {
+                            const link = document.getElementById(`link_${d}`);
+                            link.href = rec[`fileUrl_${d}`];
+                            link.style.display = 'inline-block';
+                        }
+                    });
+                }
+
+                // สลับหน้าจอไปที่ฟอร์มบันทึกข้อมูล
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('recordSection').style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+                btn.innerText = "🔍 เข้าสู่ระบบ / ค้นหาข้อมูล"; btn.disabled = false;
+            }
+        }
+
+        // --- ฟังก์ชันบีบอัดรูปภาพอัจฉริยะ ---
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -153,7 +301,7 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        const maxWidth = 1000;
+                        const maxWidth = 1200;
                         let width = img.width;
                         let height = img.height;
 
@@ -168,19 +316,20 @@
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
                         canvas.toBlob((blob) => {
-                            resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                            resolve(new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' }));
                         }, 'image/jpeg', 0.7);
                     };
                 };
             });
         }
 
+        // --- ฟังก์ชันบันทึกข้อมูลทั้งหมด (ทำงานเมื่อกด Save) ---
         document.getElementById('vaccineRecordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
             const msg = document.getElementById('statusMsg');
             btn.disabled = true;
-            msg.innerText = "⏳ กำลังบีบอัดและอัปโหลดข้อมูล...";
+            msg.innerText = "⏳ กำลังบีบอัดรูปภาพและอัปโหลดข้อมูล (ห้ามปิดหน้าจอ)...";
             msg.style.display = 'block';
 
             const payload = {
@@ -190,22 +339,40 @@
             };
 
             try {
-                for (const d of ['vzv', 'hbv']) {
+                // ลูปทำงานบันทึกข้อมูลและอัปโหลดไฟล์ของทั้ง 6 โรค
+                for (const d of diseases) {
                     payload[`status_${d}`] = document.getElementById(`status_${d}`).value;
+                    
                     const fileInput = document.getElementById(`file_${d}`);
                     if (fileInput.files.length > 0) {
-                        const compressedFile = await compressImage(fileInput.files[0]);
+                        const originalFile = fileInput.files[0];
+                        let finalFile = originalFile;
+
+                        // บีบอัดเฉพาะไฟล์รูปภาพ (ถ้าเด็กอัปโหลดเป็นไฟล์อื่นก็ปล่อยผ่านไปได้)
+                        if (originalFile.type.startsWith('image/')) {
+                            finalFile = await compressImage(originalFile);
+                        }
+
+                        // อัปโหลดไฟล์ไปที่ Firebase Storage
                         const ref = storage.ref(`vaccine_proofs/${currentId}_${d}_${Date.now()}.jpg`);
-                        await ref.put(compressedFile);
+                        await ref.put(finalFile);
+                        
+                        // เก็บ URL ของไฟล์ที่อัปโหลดเสร็จแล้ว
                         payload[`fileUrl_${d}`] = await ref.getDownloadURL();
                     }
                 }
+
+                // บันทึกข้อมูลลง Firestore (ฐานข้อมูล)
                 await db.collection('student_health_records').doc(currentId).set(payload, { merge: true });
-                alert("✅ บันทึกข้อมูลสำเร็จ");
-                location.reload();
+                
+                alert("✅ บันทึกข้อมูลและอัปโหลดหลักฐานสำเร็จเรียบร้อยครับ!");
+                location.reload(); // รีเฟรชหน้าต่างเพื่อให้เริ่มใช้งานใหม่
+
             } catch (err) {
-                alert("❌ เกิดข้อผิดพลาด");
+                console.error(err);
+                alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
                 btn.disabled = false;
+                msg.style.display = 'none';
             }
         });
     </script>
