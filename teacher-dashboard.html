@@ -110,7 +110,7 @@
                 <button onclick="loadDashboardData()">🔄 โหลดข้อมูลใหม่</button>
                 <button style="background: #ff8b94; margin-left: auto;" onclick="exportDashboardToExcel()">📊 Export รายงานสมุดพก</button>
             </div>
-            <p id="loadingDash" style="text-align:center; font-weight:bold;">⏳ กำลังประมวลผลข้อมูล...</p>
+            <p id="loadingDash" style="text-align:center; font-weight:bold; display:none;">⏳ กำลังประมวลผลข้อมูล...</p>
             
             <div class="table-wrapper">
                 <table>
@@ -137,6 +137,7 @@
         <div id="tab-bookings" class="tab-content">
             <div id="campaignListView">
                 <div class="filter-bar"><button onclick="loadAllBookings()">🔄 รีเฟรชข้อมูลโครงการ</button></div>
+                <p id="loadingBookings" style="text-align:center; font-weight:bold; display:none;">⏳ กำลังดึงข้อมูลโครงการ...</p>
                 <div id="campaignCardsContainer"></div>
             </div>
             <div id="campaignDetailView" style="display:none;">
@@ -181,7 +182,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ตัวแปรเก็บสิทธิ์ที่ล็อกอินเข้ามา
         let currentAdminRole = null; 
 
         // --- 🌟 ระบบ Login แบ่งระดับสิทธิ์ ---
@@ -216,7 +216,6 @@
                 return;
             }
 
-            // จัดการ UI ตามสิทธิ์
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('mainDashboard').style.display = 'block';
             document.getElementById('adminRoleDisplay').innerText = roleDisplay;
@@ -226,14 +225,12 @@
 
             if (currentAdminRole === 'ALL') {
                 filterDropdown.value = 'all';
-                filterDropdown.disabled = false; // เลือกดูได้ทุกชั้นปี
-                importTabBtn.style.display = 'inline-block'; // เห็นปุ่มนำเข้า
+                filterDropdown.disabled = false; 
+                importTabBtn.style.display = 'inline-block'; 
             } else {
                 filterDropdown.value = targetYear;
-                filterDropdown.disabled = true; // ล็อกปุ่มเลือกชั้นปี
-                importTabBtn.style.display = 'none'; // ซ่อนปุ่มนำเข้า
-                
-                // ถ้ายืนอยู่หน้าแท็บนำเข้า ให้สลับกลับมาหน้า Dashboard อัตโนมัติ
+                filterDropdown.disabled = true; 
+                importTabBtn.style.display = 'none'; 
                 switchTab('dashboard', document.querySelector('.tab-btn'));
             }
 
@@ -245,8 +242,6 @@
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('mainDashboard').style.display = 'none';
             document.getElementById('adminPassword').value = '';
-            
-            // รีเซ็ตหน้าตากลับเป็นค่าเริ่มต้น
             switchTab('dashboard', document.querySelector('.tab-btn'));
         }
 
@@ -321,7 +316,6 @@
             tbody.innerHTML = ''; document.getElementById('loadingDash').style.display = 'none';
 
             mergedDataList.forEach(student => {
-                // เช็คทั้งจาก Dropdown และจากตัวแปรสิทธิ์ Admin เพื่อความปลอดภัยสองชั้น
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
 
@@ -479,7 +473,6 @@
             let exportData = [];
             mergedDataList.forEach(student => {
                 if(!checkYearMatch(student.year, filterYear)) return;
-                // เช็คสิทธิ์ก่อน Export เผื่อไว้
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
 
                 const rec = student.records;
@@ -517,16 +510,42 @@
         }
 
         let allBookingsRaw = []; let currentViewingCampaign = ""; 
+        
         async function loadAllBookings() {
-            document.getElementById('loadingBookings').style.display = 'block'; document.getElementById('campaignCardsContainer').innerHTML = '';
-            backToCampaignList(); allBookingsRaw = [];
+            const loadingEl = document.getElementById('loadingBookings');
+            if(loadingEl) loadingEl.style.display = 'block'; 
+            
+            document.getElementById('campaignCardsContainer').innerHTML = '';
+            backToCampaignList(); 
+            allBookingsRaw = [];
+            
             try {
                 const snapshot = await db.collection('vaccine_responses').get();
-                snapshot.forEach(doc => allBookingsRaw.push(doc.data()));
-                allBookingsRaw.sort((a, b) => { let timeA = a.timestamp ? a.timestamp.toMillis() : 0; let timeB = b.timestamp ? b.timestamp.toMillis() : 0; return timeB - timeA; });
+                let tempBookings = [];
+                snapshot.forEach(doc => tempBookings.push(doc.data()));
+                
+                // กรองข้อมูลจองคิวตามสิทธิ์แอดมิน (นับเฉพาะเด็กในปีของตัวเอง)
+                if (currentAdminRole !== 'ALL') {
+                    tempBookings = tempBookings.filter(booking => {
+                        const student = mergedDataList.find(s => s.studentId === booking.studentId);
+                        return student && checkYearMatch(student.year, currentAdminRole);
+                    });
+                }
+                allBookingsRaw = tempBookings;
+
+                allBookingsRaw.sort((a, b) => { 
+                    let timeA = (a.timestamp && a.timestamp.toMillis) ? a.timestamp.toMillis() : 0; 
+                    let timeB = (b.timestamp && b.timestamp.toMillis) ? b.timestamp.toMillis() : 0; 
+                    return timeB - timeA; 
+                });
+                
                 renderCampaignList();
-            } catch (error) {} 
-            finally { document.getElementById('loadingBookings').style.display = 'none'; }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('campaignCardsContainer').innerHTML = '<p style="color:red; text-align:center;">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</p>';
+            } finally { 
+                if(loadingEl) loadingEl.style.display = 'none'; 
+            }
         }
 
         function renderCampaignList() {
@@ -562,16 +581,6 @@
         function exportSessionData(sessionName) {
             let dataToExport = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)") === currentViewingCampaign);
             if(sessionName !== 'all') dataToExport = dataToExport.filter(r => (r.sessionDatetime || r.vaccineDate || r.sessionName || "ไม่ระบุรอบวัน/เวลา") === sessionName);
-            
-            // กรองข้อมูลเฉพาะปีของอาจารย์ที่ล็อกอินอยู่
-            if(currentAdminRole !== 'ALL') {
-                // ค้นหาใน mergedDataList (Master Data) เพื่อเช็คชั้นปี
-                dataToExport = dataToExport.filter(booking => {
-                    const student = mergedDataList.find(s => s.studentId === booking.studentId);
-                    return student && checkYearMatch(student.year, currentAdminRole);
-                });
-            }
-
             if(dataToExport.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
             const exportFormatted = dataToExport.map(row => ({
                 "วันที่และเวลาที่ทำรายการ": row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "ไม่มีระบุเวลา",
