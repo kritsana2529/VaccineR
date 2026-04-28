@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบตรวจสอบวัคซีน นศ. (Teacher Dashboard)</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        /* Neo-Brutalism Design */
+        :root {
+            --bg-color: #f4f4f5; --apricot: #FFB347; 
+            --text-color: #1a1a1a; --border-color: #1a1a1a;
+        }
+        * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .container { width: 100%; max-width: 1200px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; }
+        h1 { font-size: 24px; text-align: center; margin-top: 0; background: var(--apricot); padding: 15px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); }
+        
+        /* Navigation Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; }
+        .tab-btn { padding: 12px 20px; font-size: 16px; font-weight: bold; background: #eee; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.1s; }
+        .tab-btn.active { background: #a8e6cf; box-shadow: 4px 4px 0px var(--border-color); transform: translateY(-2px); }
+        .tab-btn:not(.active):hover { background: #e0e0e0; }
+
+        /* Sections */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Import Section Styles */
+        .upload-zone { border: 3px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; margin-bottom: 20px; background: #fafafa; cursor: pointer; }
+        .upload-zone:hover { border-color: var(--apricot); background: #fffbf0; }
+        .progress-container { width: 100%; background: #eee; border-radius: 10px; display: none; border: 2px solid var(--border-color); overflow: hidden; margin-bottom: 15px; }
+        .progress-bar { width: 0%; height: 20px; background: #a8e6cf; transition: width 0.3s; }
+        
+        /* Dashboard Section Styles */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+        .filter-bar select { padding: 10px; font-size: 16px; border: 3px solid var(--border-color); border-radius: 6px; }
+        .filter-bar button { padding: 10px 15px; font-size: 16px; font-weight: bold; background: var(--apricot); border: 3px solid var(--border-color); border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); }
+        .filter-bar button:active { box-shadow: 0px 0px 0px; transform: translate(2px, 2px); }
+
+        .table-wrapper { overflow-x: auto; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th, td { border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); padding: 12px; text-align: center; font-size: 14px; }
+        th { background: #f0f0f0; font-weight: bold; position: sticky; top: 0; }
+        td.text-left { text-align: left; }
+        
+        /* Status Badges */
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; border: 1px solid var(--border-color); }
+        .badge-green { background: #d4edda; color: #155724; }
+        .badge-red { background: #f8d7da; color: #721c24; }
+        .badge-gray { background: #e2e3e5; color: #383d41; }
+        
+        .view-file-btn { font-size: 12px; text-decoration: none; display: block; margin-top: 5px; color: #0066cc; font-weight: bold; }
+        .view-file-btn:hover { text-decoration: underline; }
+
+        .btn-main { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); }
+        .btn-main:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: translate(4px, 4px); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>👩‍🏫 ระบบประเมินความพร้อมด้านสุขภาพนักศึกษา</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">📋 กระดานตรวจสอบ (Dashboard)</button>
+            <button class="tab-btn" onclick="switchTab('import')">📥 นำเข้าข้อมูล นศ. (Excel)</button>
+        </div>
+
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="filter-bar">
+                <select id="filterYear" onchange="renderTable()">
+                    <option value="all">-- ทุกชั้นปี --</option>
+                    <option value="ชั้นปีที่ 1">ชั้นปีที่ 1</option>
+                    <option value="ชั้นปีที่ 2">ชั้นปีที่ 2</option>
+                    <option value="ชั้นปีที่ 3">ชั้นปีที่ 3</option>
+                    <option value="ชั้นปีที่ 4">ชั้นปีที่ 4</option>
+                </select>
+                <button onclick="loadDashboardData()">🔄 โหลดข้อมูลใหม่</button>
+                <button style="background: #ff8b94; margin-left: auto;" onclick="exportDashboardToExcel()">📊 Export Excel</button>
+            </div>
+
+            <p id="loadingDash" style="text-align:center; font-weight:bold;">⏳ กำลังประมวลผลข้อมูล...</p>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>รหัสนักศึกษา</th>
+                            <th class="text-left">ชื่อ-นามสกุล</th>
+                            <th>ชั้นปี</th>
+                            <th>สุกใส (VZV)</th>
+                            <th>ตับอักเสบบี (HBV)</th>
+                            <th>MMR</th>
+                            <th>Tdap</th>
+                            <th>ไข้หวัดใหญ่</th>
+                            <th>วัณโรค (TB)</th>
+                            <th>สถานะรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-import" class="tab-content">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <h2 style="text-align: center; margin-bottom: 5px;">อัปโหลดรายชื่อตั้งต้น (Master Data)</h2>
+                <p style="font-size: 14px; color: #555; text-align: center;">รูปแบบหัวคอลัมน์แถวแรก: <b>studentId, fullName, year, faculty</b></p>
+                
+                <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                    <p id="fileNameDisplay" style="font-size: 18px; font-weight: bold;">📁 คลิกลากวาง หรือเลือกไฟล์ Excel (.xlsx)</p>
+                    <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFile(this)">
+                </div>
+
+                <div class="progress-container" id="progressWrapper">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <p id="importStatus" style="text-align:center; font-weight:bold;"></p>
+                <button class="btn-main" id="importBtn" onclick="startImport()" disabled>🚀 นำเข้าข้อมูลลงฐานระบบ</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. การเชื่อมต่อ Firebase ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
+            authDomain: "vacciner-a3b0f.firebaseapp.com",
+            projectId: "vacciner-a3b0f",
+            storageBucket: "vacciner-a3b0f.firebasestorage.app",
+            messagingSenderId: "322679198332",
+            appId: "1:322679198332:web:01e4174c3f30845d576ff9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- ระบบสลับ Tab ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+            if(tabId === 'dashboard') loadDashboardData();
+        }
+
+        // ==========================================
+        // ส่วนที่ 1: ระบบนำเข้าข้อมูล (Import)
+        // ==========================================
+        let excelData = [];
+        function handleFile(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('fileNameDisplay').innerText = "✅ เลือกไฟล์: " + file.name;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    excelData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (excelData.length > 0) {
+                        document.getElementById('importStatus').innerText = `พบข้อมูลนักศึกษา ${excelData.length} รายการ`;
+                        document.getElementById('importBtn').disabled = false;
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        async function startImport() {
+            const btn = document.getElementById('importBtn');
+            const status = document.getElementById('importStatus');
+            const progressBar = document.getElementById('progressBar');
+            document.getElementById('progressWrapper').style.display = 'block';
+            btn.disabled = true;
+            
+            let count = 0; const total = excelData.length;
+
+            for (const student of excelData) {
+                if (student.studentId) {
+                    try {
+                        await db.collection('students_master').doc(String(student.studentId)).set({
+                            studentId: String(student.studentId),
+                            fullName: student.fullName || "",
+                            year: student.year || "",
+                            faculty: student.faculty || "",
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        
+                        count++;
+                        progressBar.style.width = Math.floor((count / total) * 100) + "%";
+                        status.innerText = `กำลังบันทึก: ${count} / ${total}`;
+                    } catch (e) { console.error(e); }
+                }
+            }
+            status.innerHTML = `<span style="color:#155724;">✅ นำเข้าเสร็จสมบูรณ์ ${count} รายการ</span>`;
+            btn.innerText = "เรียบร้อย";
+            loadDashboardData(); // โหลดหน้ากระดานใหม่
+        }
+
+        // ==========================================
+        // ส่วนที่ 2: ระบบกระดานตรวจสอบ (Dashboard)
+        // ==========================================
+        let mergedDataList = [];
+
+        // กฎเกณฑ์ที่ประเมินว่า "ผ่าน" ตามคู่มือ
+        const PASS_CRITERIA = {
+            vzv: ["มีหลักฐานเคยป่วยเป็นสุกใส", "ผลตรวจ Varicella IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส"],
+            hbv: ["ผลตรวจ Anti-HBs IgG > 10 unit", "รับวัคซีนตับอักเสบบีครบ 3 โด๊ส"],
+            mmr: ["ผลตรวจ Measles IgG/IgM Positive", "รับวัคซีน MMR อย่างน้อย 1 โด๊ส"],
+            tdap: ["รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)"],
+            flu: ["รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)"],
+            tb: ["ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)"]
+        };
+
+        window.onload = () => { loadDashboardData(); };
+
+        async function loadDashboardData() {
+            document.getElementById('loadingDash').style.display = 'block';
+            document.getElementById('studentTableBody').innerHTML = '';
+            mergedDataList = [];
+
+            try {
+                // 1. โหลด Master Data
+                const masterSnap = await db.collection('students_master').get();
+                let studentsMap = {};
+                masterSnap.forEach(doc => {
+                    const d = doc.data();
+                    studentsMap[d.studentId] = { ...d, records: {} }; // เตรียมที่เก็บประวัติ
+                });
+
+                // 2. โหลด Health Records (สมุดพก)
+                const recordsSnap = await db.collection('student_health_records').get();
+                recordsSnap.forEach(doc => {
+                    const r = doc.data();
+                    if(studentsMap[r.studentId]) {
+                        studentsMap[r.studentId].records = r;
+                    } else {
+                        // กรณีมีเด็กเข้าระบบเองโดยไม่มีชื่อใน Excel แอดมิน ก็รับข้อมูลไว้
+                        studentsMap[r.studentId] = { studentId: r.studentId, fullName: r.fullName, year: 'ไม่ระบุ', records: r };
+                    }
+                });
+
+                // แปลง Map เป็น Array เพื่อจัดการง่ายขึ้น
+                mergedDataList = Object.values(studentsMap);
+                // เรียงตามรหัสนักศึกษา
+                mergedDataList.sort((a,b) => a.studentId.localeCompare(b.studentId));
+
+                renderTable();
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loadingDash').innerText = "❌ เกิดข้อผิดพลาดในการดึงข้อมูล";
+            }
+        }
+
+        function evaluateDisease(diseaseCode, recordObj) {
+            const status = recordObj[`status_${diseaseCode}`];
+            const fileUrl = recordObj[`fileUrl_${diseaseCode}`];
+            
+            if (!status || status === "ยังไม่ดำเนินการ") {
+                return { isPass: false, html: `<span class="badge badge-gray">ยังไม่ส่งหลักฐาน</span>` };
+            }
+            
+            const isPass = PASS_CRITERIA[diseaseCode].includes(status);
+            const badgeClass = isPass ? 'badge-green' : 'badge-red';
+            const icon = isPass ? '✅' : '🔴';
+            
+            let html = `<span class="badge ${badgeClass}" title="${status}">${icon} ส่งแล้ว</span>`;
+            if (fileUrl) {
+                html += `<a href="${fileUrl}" target="_blank" class="view-file-btn">📄 ดูหลักฐาน</a>`;
+            }
+            return { isPass, html, statusText: status };
+        }
+
+        function renderTable() {
+            const filterYear = document.getElementById('filterYear').value;
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+            document.getElementById('loadingDash').style.display = 'none';
+
+            mergedDataList.forEach(student => {
+                if(filterYear !== 'all' && student.year !== filterYear) return;
+
+                const rec = student.records;
+                const vzv = evaluateDisease('vzv', rec);
+                const hbv = evaluateDisease('hbv', rec);
+                const mmr = evaluateDisease('mmr', rec);
+                const tdap = evaluateDisease('tdap', rec);
+                const flu = evaluateDisease('flu', rec);
+                const tb = evaluateDisease('tb', rec);
+
+                // ประเมินผลรวม (ต้องผ่านทั้ง 6 หมวด)
+                const allPassed = vzv.isPass && hbv.isPass && mmr.isPass && tdap.isPass && flu.isPass && tb.isPass;
+                let overallHtml = allPassed ? 
+                    `<span class="badge badge-green" style="font-size:14px;">🟢 พร้อมขึ้นฝึก</span>` : 
+                    `<span class="badge badge-red" style="font-size:14px;">🔴 ยังไม่ครบ</span>`;
+
+                student.overallPass = allPassed; // เก็บไว้ใช้ตอน Export
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${student.studentId}</strong></td>
+                    <td class="text-left">${student.fullName}</td>
+                    <td>${student.year || '-'}</td>
+                    <td>${vzv.html}</td>
+                    <td>${hbv.html}</td>
+                    <td>${mmr.html}</td>
+                    <td>${tdap.html}</td>
+                    <td>${flu.html}</td>
+                    <td>${tb.html}</td>
+                    <td>${overallHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // ส่วนที่ 3: Export Excel สำหรับอาจารย์
+        // ==========================================
+        function exportDashboardToExcel() {
+            const filterYear = document.getElementById('filterYear').value;
+            let exportData = [];
+
+            mergedDataList.forEach(student => {
+                if(filterYear !== 'all' && student.year !== filterYear) return;
+                const rec = student.records;
+                exportData.push({
+                    "รหัสนักศึกษา": student.studentId,
+                    "ชื่อ-นามสกุล": student.fullName,
+                    "ชั้นปี": student.year,
+                    "สถานะรวม": student.overallPass ? "พร้อมขึ้นฝึก" : "ยังไม่ครบ",
+                    "สุกใส (VZV)": rec['status_vzv'] || "ยังไม่ดำเนินการ",
+                    "ตับอักเสบบี (HBV)": rec['status_hbv'] || "ยังไม่ดำเนินการ",
+                    "MMR": rec['status_mmr'] || "ยังไม่ดำเนินการ",
+                    "Tdap": rec['status_tdap'] || "ยังไม่ดำเนินการ",
+                    "ไข้หวัดใหญ่": rec['status_flu'] || "ยังไม่ดำเนินการ",
+                    "วัณโรค (TB)": rec['status_tb'] || "ยังไม่ดำเนินการ"
+                });
+            });
+
+            if(exportData.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Student_Compliance");
+            XLSX.writeFile(workbook, `สรุปความพร้อมสุขภาพ_${filterYear === 'all' ? 'ทุกชั้นปี' : filterYear}.xlsx`);
+        }
+    </script>
+</body>
+</html>
