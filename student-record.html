@@ -35,8 +35,8 @@
         .guideline-box { background: #fff3cd; border: 2px solid #856404; color: #856404; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; line-height: 1.5; }
         .guideline-box strong { display: block; margin-bottom: 4px; color: #533f03; }
 
-        /* กล่องสำหรับใส่วันที่ จะซ่อนไว้จนกว่าจะเลือกสถานะที่ต้องใช้วันที่ */
         .date-section { background: #eef2f5; border: 2px dashed #8ba4b4; padding: 15px; border-radius: 8px; margin-top: 10px; display: none; }
+        .dose-group { background: #fff; border: 2px solid #ccc; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
 
         button.btn-save { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: var(--text-color); background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease; margin-top: 10px;}
         button.btn-save:active { box-shadow: 0px 0px 0px; transform: translate(4px, 4px); }
@@ -80,7 +80,7 @@
                     <div class="guideline-box">
                         <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
                         ✅ 1. มีหลักฐานเคยป่วย หรือ 2. ผลเลือด IgG เป็นบวก (ไม่ต้องฉีดวัคซีน)<br>
-                        ⚠️ 3. กรณีไม่มีภูมิ: ต้องฉีดวัคซีนให้ครบ 2 โด๊ส (ห่างกัน 1 เดือน)
+                        ⚠️ 3. กรณีไม่มีภูมิ: ต้องฉีดวัคซีนให้ครบ 2 โด๊ส (ห่างกัน 1 เดือน) พร้อมแนบหลักฐานทุกเข็ม
                     </div>
                     <div class="form-group">
                         <label>เลือกสถานะภูมิคุ้มกัน:</label>
@@ -92,21 +92,27 @@
                         </select>
                     </div>
                     
-                    <div id="dates_vzv" class="date-section">
-                        <div class="form-group">
-                            <label>📅 วันที่ฉีด โด๊สที่ 1:</label>
-                            <input type="date" id="date_vzv_1" onchange="calcVZV()">
-                        </div>
-                        <div class="form-group">
-                            <label>📅 วันที่ฉีด โด๊สที่ 2 (นัดหมายอัตโนมัติ 1 เดือน):</label>
-                            <input type="date" id="date_vzv_2">
-                        </div>
+                    <div class="form-group" id="general_upload_vzv" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐานยืนยัน (ใบผลเลือด/ใบรับรอง):</label>
+                        <input type="file" id="file_vzv" accept="image/*">
+                        <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์หลักฐานรวม</a>
                     </div>
 
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
-                        <input type="file" id="file_vzv" accept="image/*">
-                        <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
+                    <div id="dates_vzv" class="date-section">
+                        <div class="dose-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 1:</label>
+                            <input type="date" id="date_vzv_1" onchange="calcVZV()">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐาน โด๊สที่ 1:</label>
+                            <input type="file" id="file_vzv_1" accept="image/*">
+                            <a id="link_vzv_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานโด๊ส 1</a>
+                        </div>
+                        <div class="dose-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 2 (นัดหมายอัตโนมัติ 1 เดือน):</label>
+                            <input type="date" id="date_vzv_2">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐาน โด๊สที่ 2:</label>
+                            <input type="file" id="file_vzv_2" accept="image/*">
+                            <a id="link_vzv_2" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานโด๊ส 2</a>
+                        </div>
                     </div>
                 </div>
 
@@ -115,7 +121,7 @@
                     <div class="guideline-box">
                         <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
                         ✅ 1. ผลเลือด Anti-HBs IgG > 10 unit (ไม่ต้องฉีดวัคซีน)<br>
-                        ⚠️ 2. กรณีภูมิไม่ขึ้น: ต้องฉีดวัคซีนตับอักเสบบี 3 โด๊ส (เดือนที่ 0, 1, 6)
+                        ⚠️ 2. กรณีภูมิไม่ขึ้น: ต้องฉีดวัคซีน 3 โด๊ส (เดือนที่ 0, 1, 6) พร้อมแนบหลักฐานทุกเข็ม
                     </div>
                     <div class="form-group">
                         <label>เลือกสถานะภูมิคุ้มกัน:</label>
@@ -125,26 +131,35 @@
                             <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องดำเนินการฉีดวัคซีน 3 โด๊ส</option>
                         </select>
                     </div>
+
+                    <div class="form-group" id="general_upload_hbv" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐานยืนยัน (ใบผลเลือด/ใบรับรอง):</label>
+                        <input type="file" id="file_hbv" accept="image/*">
+                        <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์หลักฐานรวม</a>
+                    </div>
                     
                     <div id="dates_hbv" class="date-section">
-                        <div class="form-group">
+                        <div class="dose-group">
                             <label>📅 วันที่ฉีด โด๊สที่ 1:</label>
                             <input type="date" id="date_hbv_1" onchange="calcHBV()">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐาน โด๊สที่ 1:</label>
+                            <input type="file" id="file_hbv_1" accept="image/*">
+                            <a id="link_hbv_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานโด๊ส 1</a>
                         </div>
-                        <div class="form-group">
-                            <label>📅 วันที่ฉีด โด๊สที่ 2 (ห่างโด๊สแรก 1 เดือน):</label>
+                        <div class="dose-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 2 (นัด 1 เดือน):</label>
                             <input type="date" id="date_hbv_2">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐาน โด๊สที่ 2:</label>
+                            <input type="file" id="file_hbv_2" accept="image/*">
+                            <a id="link_hbv_2" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานโด๊ส 2</a>
                         </div>
-                        <div class="form-group">
-                            <label>📅 วันที่ฉีด โด๊สที่ 3 (ห่างโด๊สแรก 6 เดือน):</label>
+                        <div class="dose-group">
+                            <label>📅 วันที่ฉีด โด๊สที่ 3 (นัด 6 เดือน):</label>
                             <input type="date" id="date_hbv_3">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐาน โด๊สที่ 3:</label>
+                            <input type="file" id="file_hbv_3" accept="image/*">
+                            <a id="link_hbv_3" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานโด๊ส 3</a>
                         </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
-                        <input type="file" id="file_hbv" accept="image/*">
-                        <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
                 </div>
 
@@ -160,21 +175,24 @@
                         <select id="status_mmr" onchange="toggleDates('mmr')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
                             <option value="มีภูมิหรือฉีดครบแล้ว">✅ 1. มีภูมิคุ้มกัน Positive หรือเคยฉีดครบแล้ว</option>
-                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องดำเนินการฉีดวัคซีน</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องดำเนินการฉีดวัคซีนเพิ่ม</option>
                         </select>
                     </div>
 
-                    <div id="dates_mmr" class="date-section">
-                        <div class="form-group">
-                            <label>📅 วันที่ฉีด โด๊สล่าสุด:</label>
-                            <input type="date" id="date_mmr_1">
-                        </div>
+                    <div class="form-group" id="general_upload_mmr" style="margin-top: 15px;">
+                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐานยืนยัน (ใบผลเลือด/ประวัติเดิม):</label>
+                        <input type="file" id="file_mmr" accept="image/*">
+                        <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์หลักฐานรวม</a>
                     </div>
 
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
-                        <input type="file" id="file_mmr" accept="image/*">
-                        <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
+                    <div id="dates_mmr" class="date-section">
+                        <div class="dose-group">
+                            <label>📅 วันที่ฉีด โด๊สล่าสุด:</label>
+                            <input type="date" id="date_mmr_1">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐานการฉีดวัคซีน:</label>
+                            <input type="file" id="file_mmr_1" accept="image/*">
+                            <a id="link_mmr_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานวัคซีน</a>
+                        </div>
                     </div>
                 </div>
 
@@ -194,16 +212,13 @@
                     </div>
 
                     <div id="dates_tdap" class="date-section">
-                        <div class="form-group">
+                        <div class="dose-group">
                             <label>📅 วันที่ฉีด (กรอกวันที่ฉีดล่าสุด):</label>
                             <input type="date" id="date_tdap_1">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐานการฉีด:</label>
+                            <input type="file" id="file_tdap_1" accept="image/*">
+                            <a id="link_tdap_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานวัคซีน</a>
                         </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
-                        <input type="file" id="file_tdap" accept="image/*">
-                        <a id="link_tdap" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
                 </div>
 
@@ -211,7 +226,7 @@
                     <div class="disease-title">5. ไข้หวัดใหญ่ (Influenza)</div>
                     <div class="guideline-box">
                         <strong>📌 ขั้นตอนการตรวจสอบ:</strong>
-                        ต้องฉีดทุกปี (ยกเว้นขึ้นปี 4 ให้ฉีดครั้งสุดท้าย) กรุณาระบุวันที่ฉีดล่าสุดเพื่อให้ระบบตรวจสอบวันหมดอายุ
+                        ต้องฉีดทุกปี (ยกเว้นขึ้นปี 4 ให้ฉีดครั้งสุดท้าย) กรุณาระบุวันที่ฉีดล่าสุดและแนบหลักฐาน
                     </div>
                     <div class="form-group">
                         <label>อัปเดตสถานะของคุณ:</label>
@@ -222,16 +237,13 @@
                     </div>
 
                     <div id="dates_flu" class="date-section">
-                        <div class="form-group">
+                        <div class="dose-group">
                             <label>📅 วันที่ฉีดวัคซีนไข้หวัดใหญ่ (ล่าสุด):</label>
                             <input type="date" id="date_flu_1">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐานการฉีด:</label>
+                            <input type="file" id="file_flu_1" accept="image/*">
+                            <a id="link_flu_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานวัคซีน</a>
                         </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน:</label>
-                        <input type="file" id="file_flu" accept="image/*">
-                        <a id="link_flu" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
                 </div>
 
@@ -250,16 +262,13 @@
                     </div>
 
                     <div id="dates_tb" class="date-section">
-                        <div class="form-group">
+                        <div class="dose-group">
                             <label>📅 วันที่เข้ารับการ X-ray (ต้องไม่เกิน 6 เดือน):</label>
                             <input type="date" id="date_tb_1">
+                            <label style="font-size:13px; color:#555; margin-top:8px;">แนบภาพหลักฐาน (ใบผล X-ray):</label>
+                            <input type="file" id="file_tb_1" accept="image/*">
+                            <a id="link_tb_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูผล X-ray</a>
                         </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label style="font-size:13px; color:#555;">อัปโหลดภาพหลักฐาน (ใบผล X-ray):</label>
-                        <input type="file" id="file_tb" accept="image/*">
-                        <a id="link_tb" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ที่เคยอัปโหลดไว้</a>
                     </div>
                 </div>
 
@@ -270,7 +279,7 @@
     </div>
 
     <script>
-        // --- 1. Firebase Config ของคุณ ---
+        // --- 1. Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
             authDomain: "vacciner-a3b0f.firebaseapp.com",
@@ -284,14 +293,15 @@
         const storage = firebase.storage();
 
         const diseases = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
+        const fileSuffixes = ['', '_1', '_2', '_3']; // รองรับไฟล์รวม และไฟล์แยกตามเข็ม
         let currentId = "";
 
-        // --- ฟังก์ชันคำนวณบวกเดือนอัตโนมัติ ---
+        // คำนวณเดือน
         function addMonths(dateStr, months) {
             if(!dateStr) return "";
             let d = new Date(dateStr);
             d.setMonth(d.getMonth() + months);
-            return d.toISOString().split('T')[0]; // คืนค่า YYYY-MM-DD
+            return d.toISOString().split('T')[0];
         }
 
         function calcVZV() {
@@ -307,7 +317,6 @@
             }
         }
 
-        // --- ฟังก์ชันสลับหน้าแท็บ ---
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -315,32 +324,32 @@
             btnElement.classList.add('active');
         }
 
-        // --- ฟังก์ชันเปิด/ปิด กล่องใส่วันที่ตามสถานะที่เลือก ---
         function toggleDates(disease) {
             const status = document.getElementById(`status_${disease}`).value;
             const dateBox = document.getElementById(`dates_${disease}`);
+            const generalUpload = document.getElementById(`general_upload_${disease}`);
             
-            // เงื่อนไขในการโชว์ช่องใส่วันที่
-            if(disease === 'vzv' || disease === 'hbv' || disease === 'mmr' || disease === 'tdap') {
-                if(status.includes("กำลังฉีดวัคซีน") || status.includes("เคยฉีดภายใน10ปี")) {
-                    dateBox.style.display = 'block';
-                } else {
-                    dateBox.style.display = 'none';
-                }
-            } else if (disease === 'flu' || disease === 'tb') {
-                if(status !== "ยังไม่ดำเนินการ") {
-                    dateBox.style.display = 'block';
-                } else {
-                    dateBox.style.display = 'none';
-                }
+            let needsDate = false;
+            let isMultiDose = false;
+
+            if (disease === 'vzv' || disease === 'hbv' || disease === 'mmr' || disease === 'tdap') {
+                if(status.includes("กำลังฉีดวัคซีน") || status.includes("เคยฉีดภายใน10ปี")) needsDate = true;
+                if(status.includes("กำลังฉีดวัคซีน") || status.includes("เคยฉีดภายใน10ปี")) isMultiDose = true;
+            } else {
+                if(status !== "ยังไม่ดำเนินการ") needsDate = true;
+            }
+
+            if(dateBox) dateBox.style.display = needsDate ? 'block' : 'none';
+            
+            // ซ่อนปุ่มอัปโหลดแบบรวม หากเด็กอยู่ในโหมดฉีดทีละเข็ม
+            if(generalUpload) {
+                generalUpload.style.display = isMultiDose ? 'none' : 'block';
             }
         }
 
-        // --- เข้าสู่ระบบ และดึงข้อมูลเก่ามาใส่ฟอร์ม ---
         async function loginStudent() {
             const sid = document.getElementById('loginStudentId').value.trim();
             if(!sid) return alert("กรุณาระบุรหัสนักศึกษา");
-
             const btn = document.querySelector('#loginSection .btn-save');
             btn.innerText = "⏳ กำลังค้นหาข้อมูล..."; btn.disabled = true;
 
@@ -348,10 +357,8 @@
                 const masterDoc = await db.collection('students_master').doc(sid).get();
                 if(!masterDoc.exists) {
                     alert("❌ ไม่พบรหัสนักศึกษานี้ กรุณาติดต่อแอดมิน");
-                    btn.innerText = "🔍 เข้าสู่ระบบ / ค้นหาข้อมูล"; btn.disabled = false;
-                    return;
+                    btn.innerText = "🔍 เข้าสู่ระบบ / ค้นหาข้อมูล"; btn.disabled = false; return;
                 }
-
                 const data = masterDoc.data();
                 document.getElementById('studentName').value = data.fullName;
                 currentId = sid;
@@ -359,37 +366,32 @@
                 const recordDoc = await db.collection('student_health_records').doc(sid).get();
                 if(recordDoc.exists) {
                     const rec = recordDoc.data();
-                    
                     diseases.forEach(d => {
-                        // โหลดสถานะ
                         if(rec[`status_${d}`]) {
                             document.getElementById(`status_${d}`).value = rec[`status_${d}`];
-                            toggleDates(d); // ทริกเกอร์โชว์กล่องวันที่ถ้าจำเป็น
+                            toggleDates(d);
                         }
-                        // โหลดวันที่ต่างๆ
-                        if(rec[`date_${d}_1`]) document.getElementById(`date_${d}_1`).value = rec[`date_${d}_1`];
-                        if(rec[`date_${d}_2`]) document.getElementById(`date_${d}_2`).value = rec[`date_${d}_2`];
-                        if(rec[`date_${d}_3`]) document.getElementById(`date_${d}_3`).value = rec[`date_${d}_3`];
-                        
-                        // โหลดลิงก์รูปภาพ
-                        if(rec[`fileUrl_${d}`]) {
-                            const link = document.getElementById(`link_${d}`);
-                            link.href = rec[`fileUrl_${d}`];
-                            link.style.display = 'inline-block';
+                        for(let i=1; i<=3; i++) {
+                            let dateEl = document.getElementById(`date_${d}_${i}`);
+                            if(dateEl && rec[`date_${d}_${i}`]) dateEl.value = rec[`date_${d}_${i}`];
+                        }
+                        for (const suf of fileSuffixes) {
+                            const link = document.getElementById(`link_${d}${suf}`);
+                            if(link && rec[`fileUrl_${d}${suf}`]) {
+                                link.href = rec[`fileUrl_${d}${suf}`];
+                                link.style.display = 'inline-block';
+                            }
                         }
                     });
                 }
-
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('recordSection').style.display = 'block';
-
             } catch (error) {
                 alert("❌ เกิดข้อผิดพลาด");
                 btn.innerText = "🔍 เข้าสู่ระบบ / ค้นหาข้อมูล"; btn.disabled = false;
             }
         }
 
-        // --- ฟังก์ชันบีบอัดรูปภาพ ---
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -401,18 +403,10 @@
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
                         const maxWidth = 1200;
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > height && width > maxWidth) {
-                            height *= maxWidth / width;
-                            width = maxWidth;
-                        } else if (height > maxWidth) {
-                            width *= maxWidth / height;
-                            height = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
+                        let width = img.width; let height = img.height;
+                        if (width > height && width > maxWidth) { height *= maxWidth / width; width = maxWidth; } 
+                        else if (height > maxWidth) { width *= maxWidth / height; height = maxWidth; }
+                        canvas.width = width; canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
                         canvas.toBlob((blob) => {
                             resolve(new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' }));
@@ -422,7 +416,6 @@
             });
         }
 
-        // --- บันทึกข้อมูลและไฟล์ ---
         document.getElementById('vaccineRecordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
@@ -441,23 +434,20 @@
                 for (const d of diseases) {
                     payload[`status_${d}`] = document.getElementById(`status_${d}`).value;
                     
-                    // ดึงวันที่เซฟเก็บไว้ (ถ้ามีช่องให้กรอก)
-                    let date1 = document.getElementById(`date_${d}_1`);
-                    let date2 = document.getElementById(`date_${d}_2`);
-                    let date3 = document.getElementById(`date_${d}_3`);
-                    if(date1) payload[`date_${d}_1`] = date1.value;
-                    if(date2) payload[`date_${d}_2`] = date2.value;
-                    if(date3) payload[`date_${d}_3`] = date3.value;
-                    
-                    // จัดการไฟล์
-                    const fileInput = document.getElementById(`file_${d}`);
-                    if (fileInput.files.length > 0) {
-                        const originalFile = fileInput.files[0];
-                        let finalFile = originalFile.type.startsWith('image/') ? await compressImage(originalFile) : originalFile;
-                        
-                        const ref = storage.ref(`vaccine_proofs/${currentId}_${d}_${Date.now()}.jpg`);
-                        await ref.put(finalFile);
-                        payload[`fileUrl_${d}`] = await ref.getDownloadURL();
+                    for(let i=1; i<=3; i++) {
+                        let dateEl = document.getElementById(`date_${d}_${i}`);
+                        if(dateEl) payload[`date_${d}_${i}`] = dateEl.value;
+                    }
+
+                    for (const suf of fileSuffixes) {
+                        const fileInput = document.getElementById(`file_${d}${suf}`);
+                        if (fileInput && fileInput.files.length > 0) {
+                            const originalFile = fileInput.files[0];
+                            let finalFile = originalFile.type.startsWith('image/') ? await compressImage(originalFile) : originalFile;
+                            const ref = storage.ref(`vaccine_proofs/${currentId}_${d}${suf}_${Date.now()}.jpg`);
+                            await ref.put(finalFile);
+                            payload[`fileUrl_${d}${suf}`] = await ref.getDownloadURL();
+                        }
                     }
                 }
 
