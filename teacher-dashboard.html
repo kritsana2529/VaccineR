@@ -15,23 +15,18 @@
         * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        .container { width: 100%; max-width: 1300px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; position: relative;}
+        .container { width: 100%; max-width: 1400px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; position: relative;}
         h1 { font-size: 24px; text-align: center; margin-top: 0; background: var(--apricot); padding: 15px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); }
         
-        /* ปุ่มกลับหน้าแรก */
         .btn-home { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #000; font-weight: bold; background: #eee; padding: 10px 15px; border: 3px solid #000; border-radius: 8px; margin-bottom: 20px; box-shadow: 2px 2px 0px #000; transition: all 0.1s;}
         .btn-home:active { box-shadow: 0px 0px 0px #000; transform: translate(2px, 2px); }
 
-        /* Navigation Tabs */
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; flex-wrap: wrap;}
         .tab-btn { padding: 12px 20px; font-size: 16px; font-weight: bold; background: #eee; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.1s; flex-grow: 1; text-align: center;}
         .tab-btn.active { background: #a8e6cf; box-shadow: 4px 4px 0px var(--border-color); transform: translateY(-2px); }
-        .tab-btn:not(.active):hover { background: #e0e0e0; }
-
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Dashboard & Import Styles */
         .upload-zone { border: 3px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; margin-bottom: 20px; background: #fafafa; cursor: pointer; }
         .upload-zone:hover { border-color: var(--apricot); background: #fffbf0; }
         .progress-container { width: 100%; background: #eee; border-radius: 10px; display: none; border: 2px solid var(--border-color); overflow: hidden; margin-bottom: 15px; }
@@ -43,7 +38,7 @@
         .filter-bar button:active { box-shadow: 0px 0px 0px; transform: translate(2px, 2px); }
 
         .table-wrapper { overflow-x: auto; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); max-height: 700px;}
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
         th, td { border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); padding: 12px 8px; text-align: center; font-size: 14px; vertical-align: top;}
         th { background: #f0f0f0; font-weight: bold; position: sticky; top: 0; z-index: 1;}
         td.text-left { text-align: left; }
@@ -52,12 +47,18 @@
         .badge-green { background: #d4edda; color: #155724; }
         .badge-red { background: #f8d7da; color: #721c24; }
         .badge-gray { background: #e2e3e5; color: #383d41; }
-        .badge-legacy { background: #fff3cd; color: #856404; } /* ใช้สำหรับสีเหลือง / กำลังดำเนินการ */
+        .badge-legacy { background: #fff3cd; color: #856404; }
         
-        .date-info { font-size: 11px; color: #555; background: #f9f9f9; border: 1px dashed #ccc; padding: 2px 4px; border-radius: 4px; margin-top: 2px; text-align: left;}
-        
-        .view-file-btn { font-size: 12px; text-decoration: none; display: inline-block; margin-top: 5px; color: #fff; background: #0066cc; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #004080;}
+        /* สไตล์สำหรับกล่องตรวจหลักฐาน */
+        .proof-box { background: #fdfdfd; border: 1px dashed #ccc; padding: 6px; border-radius: 6px; margin-top: 4px; text-align: left; box-shadow: 1px 1px 3px rgba(0,0,0,0.05); }
+        .view-file-btn { font-size: 11px; text-decoration: none; display: inline-block; color: #fff; background: #0066cc; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #004080; white-space: nowrap;}
         .view-file-btn:hover { background: #004a99; }
+        
+        /* ปุ่มกดยืนยัน อนุมัติ/ปฏิเสธ */
+        .btn-tiny { padding: 3px 6px; font-size: 11px; border-radius: 4px; border: 1px solid #999; cursor: pointer; background: #eee; font-weight: bold; white-space: nowrap;}
+        .btn-tiny:active { transform: scale(0.95); }
+        .btn-yes { background: #d4edda; border-color: #28a745; color: #155724; }
+        .btn-no { background: #f8d7da; border-color: #dc3545; color: #721c24; }
 
         .btn-main { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); }
         .btn-main:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: translate(4px, 4px); }
@@ -65,7 +66,6 @@
         .camp-card { border: 3px solid var(--border-color); padding: 15px 20px; border-radius: 8px; background: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 4px 4px 0px var(--border-color); transition: 0.2s; }
         .camp-card:hover { transform: translateY(-2px); background: #fffbf0; }
         .btn-small { padding: 8px 12px; font-size: 14px; font-weight: bold; background: var(--apricot); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); }
-        .btn-small:active { box-shadow: 0px 0px 0px; transform: translate(2px, 2px); }
         .session-item { border: 2px dashed #ccc; padding: 15px; border-radius: 8px; background: #fafafa; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
@@ -99,16 +99,16 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="min-width:90px;">รหัสนักศึกษา</th>
+                            <th style="min-width:90px;">รหัส</th>
                             <th class="text-left" style="min-width:140px;">ชื่อ-นามสกุล</th>
                             <th style="min-width:60px;">ปี</th>
-                            <th style="min-width:120px;">สุกใส (VZV)</th>
-                            <th style="min-width:120px;">ตับอักเสบบี (HBV)</th>
-                            <th style="min-width:120px;">MMR</th>
-                            <th style="min-width:120px;">Tdap</th>
-                            <th style="min-width:120px;">ไข้หวัดใหญ่</th>
-                            <th style="min-width:120px;">วัณโรค (TB)</th>
-                            <th style="min-width:90px;">สถานะรวม</th>
+                            <th style="min-width:180px;">สุกใส (VZV)</th>
+                            <th style="min-width:180px;">ตับอักเสบบี (HBV)</th>
+                            <th style="min-width:160px;">MMR</th>
+                            <th style="min-width:160px;">Tdap</th>
+                            <th style="min-width:160px;">ไข้หวัดใหญ่</th>
+                            <th style="min-width:160px;">วัณโรค (TB)</th>
+                            <th style="min-width:100px;">สถานะรวม</th>
                         </tr>
                     </thead>
                     <tbody id="studentTableBody"></tbody>
@@ -118,13 +118,10 @@
 
         <div id="tab-bookings" class="tab-content">
             <div id="campaignListView">
-                <div class="filter-bar">
-                    <button onclick="loadAllBookings()">🔄 รีเฟรชข้อมูลโครงการ</button>
-                </div>
+                <div class="filter-bar"><button onclick="loadAllBookings()">🔄 รีเฟรชข้อมูลโครงการ</button></div>
                 <p id="loadingBookings" style="text-align:center; font-weight:bold;">⏳ กำลังดึงข้อมูลโครงการ...</p>
                 <div id="campaignCardsContainer" style="display:flex; flex-direction:column; gap:15px;"></div>
             </div>
-
             <div id="campaignDetailView" style="display:none;">
                 <button class="btn-home" style="margin-bottom: 10px;" onclick="backToCampaignList()">⬅️ ย้อนกลับไปหน้าโครงการ</button>
                 <h3 id="detailCampaignTitle" style="border-bottom: 3px solid var(--border-color); padding-bottom: 10px; color:#d35400;">ชื่อโครงการ</h3>
@@ -138,19 +135,15 @@
         <div id="tab-import" class="tab-content">
             <div style="max-width: 600px; margin: 0 auto;">
                 <h2 style="text-align: center; margin-bottom: 5px;">อัปโหลดรายชื่อตั้งต้น (Master Data)</h2>
-                <p style="font-size: 14px; color: #555; text-align: center;">รูปแบบหัวคอลัมน์แถวแรก: <b>studentId, fullName, year, faculty</b></p>
                 <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-                    <p id="fileNameDisplay" style="font-size: 18px; font-weight: bold;">📁 คลิกลากวาง หรือเลือกไฟล์ Excel (.xlsx)</p>
+                    <p id="fileNameDisplay" style="font-size: 18px; font-weight: bold;">📁 คลิกลากวาง หรือเลือกไฟล์ Excel</p>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFile(this)">
                 </div>
-                <div class="progress-container" id="progressWrapper">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
+                <div class="progress-container" id="progressWrapper"><div class="progress-bar" id="progressBar"></div></div>
                 <p id="importStatus" style="text-align:center; font-weight:bold;"></p>
                 <button class="btn-main" id="importBtn" onclick="startImport()" disabled>🚀 นำเข้าข้อมูลลงฐานระบบ</button>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -171,21 +164,15 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
             if(btnElement) btnElement.classList.add('active');
-            
             if(tabId === 'dashboard') loadDashboardData();
             if(tabId === 'bookings') loadAllBookings();
         }
 
         window.onload = () => { loadDashboardData(); };
 
-        // ==========================================
-        // ส่วนที่ 1: ระบบกระดานตรวจสอบ (Dashboard)
-        // ==========================================
         let mergedDataList = [];
-        
-        // อัปเดตเกณฑ์ผ่านให้ตรงกับหน้าจอของนักศึกษาเวอร์ชันล่าสุด
         const PASS_CRITERIA = {
-            vzv: ["มีหลักฐานเคยป่วย", "IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส"], // รวมของเก่าเผื่อไว้
+            vzv: ["มีหลักฐานเคยป่วย", "IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส"], 
             hbv: ["IgG > 10", "ผลตรวจ Anti-HBs IgG > 10 unit", "รับวัคซีนตับอักเสบบีครบ 3 โด๊ส"],
             mmr: ["มีภูมิหรือฉีดครบแล้ว", "ผลตรวจ Measles IgG/IgM Positive", "รับวัคซีน MMR อย่างน้อย 1 โด๊ส"],
             tdap: ["เคยฉีดภายใน10ปี", "รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)"],
@@ -197,90 +184,113 @@
             document.getElementById('loadingDash').style.display = 'block';
             document.getElementById('studentTableBody').innerHTML = '';
             mergedDataList = [];
-
             try {
                 const masterSnap = await db.collection('students_master').get();
                 let studentsMap = {};
-                masterSnap.forEach(doc => {
-                    const d = doc.data();
-                    studentsMap[d.studentId] = { ...d, records: {} }; 
-                });
+                masterSnap.forEach(doc => { studentsMap[doc.data().studentId] = { ...doc.data(), records: {} }; });
 
                 const recordsSnap = await db.collection('student_health_records').get();
                 recordsSnap.forEach(doc => {
                     const r = doc.data();
-                    if(studentsMap[r.studentId]) {
-                        studentsMap[r.studentId].records = r;
-                    } else {
-                        studentsMap[r.studentId] = { studentId: r.studentId, fullName: r.fullName, year: 'ไม่ระบุ', records: r };
-                    }
+                    if(studentsMap[r.studentId]) studentsMap[r.studentId].records = r;
+                    else studentsMap[r.studentId] = { studentId: r.studentId, fullName: r.fullName, year: 'ไม่ระบุ', records: r };
                 });
 
                 mergedDataList = Object.values(studentsMap);
                 mergedDataList.sort((a,b) => a.studentId.localeCompare(b.studentId));
                 renderTable();
+            } catch (error) { document.getElementById('loadingDash').innerText = "❌ เกิดข้อผิดพลาดในการดึงข้อมูล"; }
+        }
 
-            } catch (error) {
-                console.error(error);
-                document.getElementById('loadingDash').innerText = "❌ เกิดข้อผิดพลาดในการดึงข้อมูล";
+        // --- 🌟 อัปเดตสถานะการอนุมัติ (Verify) ขึ้น Firebase ทันที ---
+        window.setVerifyStatus = async function(studentId, fieldCode, status) {
+            try {
+                await db.collection('student_health_records').doc(studentId).update({
+                    [`verify_${fieldCode}`]: status
+                });
+                // อัปเดตข้อมูลในหน่วยความจำและรีเฟรชตาราง
+                let student = mergedDataList.find(s => s.studentId === studentId);
+                if(student) student.records[`verify_${fieldCode}`] = status;
+                renderTable();
+            } catch (e) {
+                console.error(e); alert("❌ ไม่สามารถอัปเดตสถานะได้");
             }
         }
 
-        // ฟังก์ชันประเมินผลและสร้าง UI แสดงวันที่
-        function evaluateDisease(diseaseCode, recordObj) {
-            const status = recordObj[`status_${diseaseCode}`];
-            const fileUrl = recordObj[`fileUrl_${diseaseCode}`];
+        // --- 🌟 ฟังก์ชันสร้างกล่องตรวจหลักฐาน (มีปุ่ม Approve/Reject) ---
+        function buildVerifyUI(studentId, fieldCode, fileUrl, labelText) {
+            if(!fileUrl) return ''; // ถ้าไม่มีไฟล์ ไม่ต้องโชว์กล่อง
             
+            // ดึงสถานะการอนุมัติจาก Object
+            const studentData = mergedDataList.find(s => s.studentId === studentId);
+            const vStatus = studentData ? studentData.records[`verify_${fieldCode}`] : undefined;
+            
+            let vBadge = '', vBtns = '';
+            if(vStatus === 'approved') {
+                vBadge = `<span style="color:green; font-weight:bold;">✅ อนุมัติแล้ว</span>`;
+                vBtns = `<button class="btn-tiny" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'pending')">🔄 แก้ไข</button>`;
+            } else if (vStatus === 'rejected') {
+                vBadge = `<span style="color:red; font-weight:bold;">❌ ปฏิเสธ</span>`;
+                vBtns = `<button class="btn-tiny" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'pending')">🔄 แก้ไข</button>`;
+            } else {
+                vBadge = `<span style="color:#d35400; font-weight:bold;">⏳ รอยืนยัน</span>`;
+                vBtns = `<button class="btn-tiny btn-yes" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'approved')">✔️ ยอมรับ</button> 
+                         <button class="btn-tiny btn-no" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'rejected')">❌ ปฏิเสธ</button>`;
+            }
+
+            return `
+            <div class="proof-box">
+                <div style="font-size:11px; margin-bottom:4px; font-weight:bold;">${labelText}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+                    <a href="${fileUrl}" target="_blank" class="view-file-btn">📄 เปิดดูรูป</a>
+                    <div style="display:flex; gap:4px; align-items:center; font-size:11px;">
+                        ${vBadge} ${vBtns}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function evaluateDisease(diseaseCode, recordObj, studentId) {
+            const status = recordObj[`status_${diseaseCode}`];
             if (!status || status === "ยังไม่ดำเนินการ") return { isPass: false, html: `<span class="badge badge-gray">ยังไม่ดำเนินการ</span>` };
             
             const isPass = PASS_CRITERIA[diseaseCode].includes(status);
-            
-            // ประเมินว่ากำลัง "อยู่ระหว่างฉีด" หรือไม่ (สีเหลือง)
             const isInProgress = status.includes("กำลังฉีด") || status.includes("ไม่มีข้อมูล");
             
-            let badgeClass = 'badge-red';
-            let icon = '🔴';
-            let statusText = 'ไม่ผ่านเกณฑ์';
+            let badgeClass = 'badge-red'; let icon = '🔴'; let statusText = 'ไม่ผ่านเกณฑ์';
+            if (isPass) { badgeClass = 'badge-green'; icon = '✅'; statusText = 'ผ่านเกณฑ์'; } 
+            else if (isInProgress) { badgeClass = 'badge-legacy'; icon = '⏳'; statusText = 'กำลังดำเนินการ'; }
 
-            if (isPass) {
-                badgeClass = 'badge-green';
-                icon = '✅';
-                statusText = 'ผ่านเกณฑ์';
-            } else if (isInProgress) {
-                badgeClass = 'badge-legacy'; // ใช้สีเหลือง
-                icon = '⏳';
-                statusText = 'กำลังดำเนินการ';
-            }
+            let linksHtml = '<div style="margin-top:5px;">';
+            
+            // ไฟล์หลักฐานรวม
+            linksHtml += buildVerifyUI(studentId, diseaseCode, recordObj[`fileUrl_${diseaseCode}`], '📌 หลักฐานรวม/ผลเลือด');
 
-            // เตรียมดึงข้อมูลวันที่มาโชว์
-            let datesHtml = '';
+            // แยกตามเข็ม
             if (diseaseCode === 'vzv') {
-                if(recordObj.date_vzv_1) datesHtml += `<div class="date-info">เข็ม1: ${recordObj.date_vzv_1}</div>`;
-                if(recordObj.date_vzv_2) datesHtml += `<div class="date-info">เข็ม2: ${recordObj.date_vzv_2}</div>`;
+                linksHtml += buildVerifyUI(studentId, 'vzv_1', recordObj.fileUrl_vzv_1, '💉 เข็ม 1: ' + (recordObj.date_vzv_1 || '-'));
+                linksHtml += buildVerifyUI(studentId, 'vzv_2', recordObj.fileUrl_vzv_2, '💉 เข็ม 2: ' + (recordObj.date_vzv_2 || '-'));
             }
             if (diseaseCode === 'hbv') {
-                if(recordObj.date_hbv_1) datesHtml += `<div class="date-info">เข็ม1: ${recordObj.date_hbv_1}</div>`;
-                if(recordObj.date_hbv_2) datesHtml += `<div class="date-info">เข็ม2: ${recordObj.date_hbv_2}</div>`;
-                if(recordObj.date_hbv_3) datesHtml += `<div class="date-info">เข็ม3: ${recordObj.date_hbv_3}</div>`;
+                linksHtml += buildVerifyUI(studentId, 'hbv_1', recordObj.fileUrl_hbv_1, '💉 เข็ม 1: ' + (recordObj.date_hbv_1 || '-'));
+                linksHtml += buildVerifyUI(studentId, 'hbv_2', recordObj.fileUrl_hbv_2, '💉 เข็ม 2: ' + (recordObj.date_hbv_2 || '-'));
+                linksHtml += buildVerifyUI(studentId, 'hbv_3', recordObj.fileUrl_hbv_3, '💉 เข็ม 3: ' + (recordObj.date_hbv_3 || '-'));
             }
-            if (['mmr', 'tdap', 'flu', 'tb'].includes(diseaseCode) && recordObj[`date_${diseaseCode}_1`]) {
-                let prefix = diseaseCode === 'tb' ? 'X-ray:' : 'ฉีดล่าสุด:';
-                datesHtml += `<div class="date-info">${prefix} ${recordObj[`date_${diseaseCode}_1`]}</div>`;
+            if (['mmr', 'tdap', 'flu', 'tb'].includes(diseaseCode)) {
+                let pfx = diseaseCode === 'tb' ? '🩺 X-ray:' : '💉 ฉีดล่าสุด:';
+                linksHtml += buildVerifyUI(studentId, `${diseaseCode}_1`, recordObj[`fileUrl_${diseaseCode}_1`], pfx + ' ' + (recordObj[`date_${diseaseCode}_1`] || '-'));
             }
             
-            let html = `<span class="badge ${badgeClass}" title="${status}">${icon} ${statusText}</span>`;
-            html += datesHtml;
-            if (fileUrl) html += `<br><a href="${fileUrl}" target="_blank" class="view-file-btn">ดูหลักฐาน</a>`;
+            linksHtml += '</div>';
             
+            let html = `<span class="badge ${badgeClass}" title="${status}">${icon} ${statusText}</span>${linksHtml}`;
             return { isPass, html, statusText: status };
         }
 
-        // ตัวกรองชั้นปีอัจฉริยะ
         function checkYearMatch(studentYear, filterYear) {
             if (filterYear === 'all') return true;
             let sYear = String(studentYear || "").trim();
-            let fNum = filterYear.match(/\d+/); 
-            let sNum = sYear.match(/\d+/);      
+            let fNum = filterYear.match(/\d+/); let sNum = sYear.match(/\d+/);      
             if (fNum && sNum) return fNum[0] === sNum[0]; 
             return sYear === filterYear; 
         }
@@ -288,23 +298,32 @@
         function renderTable() {
             const filterYear = document.getElementById('filterYear').value;
             const tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = '';
-            document.getElementById('loadingDash').style.display = 'none';
+            tbody.innerHTML = ''; document.getElementById('loadingDash').style.display = 'none';
 
             mergedDataList.forEach(student => {
                 if(!checkYearMatch(student.year, filterYear)) return;
 
                 const rec = student.records;
-                const vzv = evaluateDisease('vzv', rec);
-                const hbv = evaluateDisease('hbv', rec);
-                const mmr = evaluateDisease('mmr', rec);
-                const tdap = evaluateDisease('tdap', rec);
-                const flu = evaluateDisease('flu', rec);
-                const tb = evaluateDisease('tb', rec);
+                // ส่ง studentId เข้าไปในฟังก์ชันด้วย เพื่อสร้างปุ่ม Approve
+                const vzv = evaluateDisease('vzv', rec, student.studentId);
+                const hbv = evaluateDisease('hbv', rec, student.studentId);
+                const mmr = evaluateDisease('mmr', rec, student.studentId);
+                const tdap = evaluateDisease('tdap', rec, student.studentId);
+                const flu = evaluateDisease('flu', rec, student.studentId);
+                const tb = evaluateDisease('tb', rec, student.studentId);
 
+                // เช็คว่ามีไฟล์ไหนที่ถูกอาจารย์กด "ปฏิเสธ (rejected)" ไว้หรือไม่
+                const hasRejectedFiles = Object.keys(rec).some(key => key.startsWith('verify_') && rec[key] === 'rejected');
                 const allPassed = vzv.isPass && hbv.isPass && mmr.isPass && tdap.isPass && flu.isPass && tb.isPass;
-                let overallHtml = allPassed ? `<span class="badge badge-green">🟢 พร้อมฝึก</span>` : `<span class="badge badge-red">🔴 ไม่พร้อม</span>`;
-                student.overallPass = allPassed;
+
+                let overallHtml = '';
+                if(hasRejectedFiles) {
+                    overallHtml = `<span class="badge badge-red">🔴 หลักฐานไม่ผ่าน</span>`;
+                    student.overallPass = false;
+                } else {
+                    overallHtml = allPassed ? `<span class="badge badge-green">🟢 พร้อมฝึก</span>` : `<span class="badge badge-red">🔴 ไม่พร้อม</span>`;
+                    student.overallPass = allPassed;
+                }
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -319,38 +338,43 @@
             });
         }
 
-        // ฟังก์ชันโหลดข้อมูลลง Excel (เพิ่มคอลัมน์วันที่)
+        // --- 🌟 อัปเดต Export Excel ให้บอกด้วยว่าเข็มไหนผ่านการอนุมัติแล้ว ---
+        function getVerText(status) {
+            if(status === 'approved') return ' (✅ ผ่าน)';
+            if(status === 'rejected') return ' (❌ ไม่ผ่าน)';
+            return '';
+        }
+
         function exportDashboardToExcel() {
             const filterYear = document.getElementById('filterYear').value;
             let exportData = [];
             mergedDataList.forEach(student => {
                 if(!checkYearMatch(student.year, filterYear)) return;
-                
                 const rec = student.records;
                 exportData.push({
                     "รหัสนักศึกษา": student.studentId, "ชื่อ-นามสกุล": student.fullName, "ชั้นปี": student.year,
                     "สถานะภาพรวม": student.overallPass ? "พร้อมขึ้นฝึก" : "ยังไม่ครบ",
                     
-                    "สถานะ สุกใส (VZV)": rec['status_vzv'] || "ยังไม่ดำเนินการ",
-                    "วันที่ สุกใส เข็ม 1": rec['date_vzv_1'] || "-",
-                    "วันที่ สุกใส เข็ม 2": rec['date_vzv_2'] || "-",
+                    "สถานะ สุกใส (VZV)": (rec['status_vzv'] || "ยังไม่ดำเนินการ") + getVerText(rec['verify_vzv']),
+                    "วันที่ สุกใส เข็ม 1": (rec['date_vzv_1'] || "-") + getVerText(rec['verify_vzv_1']),
+                    "วันที่ สุกใส เข็ม 2": (rec['date_vzv_2'] || "-") + getVerText(rec['verify_vzv_2']),
                     
-                    "สถานะ ตับอักเสบบี (HBV)": rec['status_hbv'] || "ยังไม่ดำเนินการ",
-                    "วันที่ ตับอักเสบบี เข็ม 1": rec['date_hbv_1'] || "-",
-                    "วันที่ ตับอักเสบบี เข็ม 2": rec['date_hbv_2'] || "-",
-                    "วันที่ ตับอักเสบบี เข็ม 3": rec['date_hbv_3'] || "-",
+                    "สถานะ ตับอักเสบบี (HBV)": (rec['status_hbv'] || "ยังไม่ดำเนินการ") + getVerText(rec['verify_hbv']),
+                    "วันที่ ตับอักเสบบี เข็ม 1": (rec['date_hbv_1'] || "-") + getVerText(rec['verify_hbv_1']), 
+                    "วันที่ ตับอักเสบบี เข็ม 2": (rec['date_hbv_2'] || "-") + getVerText(rec['verify_hbv_2']), 
+                    "วันที่ ตับอักเสบบี เข็ม 3": (rec['date_hbv_3'] || "-") + getVerText(rec['verify_hbv_3']),
                     
-                    "สถานะ MMR": rec['status_mmr'] || "ยังไม่ดำเนินการ",
-                    "วันที่ฉีด MMR ล่าสุด": rec['date_mmr_1'] || "-",
+                    "สถานะ MMR": (rec['status_mmr'] || "ยังไม่ดำเนินการ") + getVerText(rec['verify_mmr']),
+                    "วันที่ฉีด MMR ล่าสุด": (rec['date_mmr_1'] || "-") + getVerText(rec['verify_mmr_1']),
                     
-                    "สถานะ Tdap": rec['status_tdap'] || "ยังไม่ดำเนินการ",
-                    "วันที่ฉีด Tdap ล่าสุด": rec['date_tdap_1'] || "-",
+                    "สถานะ Tdap": (rec['status_tdap'] || "ยังไม่ดำเนินการ") + getVerText(rec['verify_tdap']),
+                    "วันที่ฉีด Tdap ล่าสุด": (rec['date_tdap_1'] || "-") + getVerText(rec['verify_tdap_1']),
                     
-                    "สถานะ ไข้หวัดใหญ่": rec['status_flu'] || "ยังไม่ดำเนินการ",
-                    "วันที่ฉีด ไข้หวัดใหญ่ ล่าสุด": rec['date_flu_1'] || "-",
+                    "สถานะ ไข้หวัดใหญ่": (rec['status_flu'] || "ยังไม่ดำเนินการ") + getVerText(rec['verify_flu']),
+                    "วันที่ฉีด ไข้หวัดใหญ่ ล่าสุด": (rec['date_flu_1'] || "-") + getVerText(rec['verify_flu_1']),
                     
-                    "สถานะ วัณโรค (TB)": rec['status_tb'] || "ยังไม่ดำเนินการ",
-                    "วันที่ X-ray ล่าสุด": rec['date_tb_1'] || "-"
+                    "สถานะ วัณโรค (TB)": (rec['status_tb'] || "ยังไม่ดำเนินการ") + getVerText(rec['verify_tb']),
+                    "วันที่ X-ray ล่าสุด": (rec['date_tb_1'] || "-") + getVerText(rec['verify_tb_1'])
                 });
             });
             if(exportData.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
@@ -361,111 +385,62 @@
         }
 
         // ==========================================
-        // ส่วนที่ 2 & 3: ประวัติจองคิว & นำเข้า Excel (เหมือนเดิม)
+        // ส่วนที่ 2 & 3: ประวัติจองคิว & นำเข้า Excel 
         // ==========================================
-        let allBookingsRaw = []; 
-        let currentViewingCampaign = ""; 
-
+        let allBookingsRaw = []; let currentViewingCampaign = ""; 
         async function loadAllBookings() {
-            document.getElementById('loadingBookings').style.display = 'block';
-            document.getElementById('campaignCardsContainer').innerHTML = '';
-            backToCampaignList(); 
-            allBookingsRaw = [];
-
+            document.getElementById('loadingBookings').style.display = 'block'; document.getElementById('campaignCardsContainer').innerHTML = '';
+            backToCampaignList(); allBookingsRaw = [];
             try {
                 const snapshot = await db.collection('vaccine_responses').get();
                 snapshot.forEach(doc => allBookingsRaw.push(doc.data()));
-                allBookingsRaw.sort((a, b) => {
-                    let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
-                    let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
-                    return timeB - timeA;
-                });
+                allBookingsRaw.sort((a, b) => { let timeA = a.timestamp ? a.timestamp.toMillis() : 0; let timeB = b.timestamp ? b.timestamp.toMillis() : 0; return timeB - timeA; });
                 renderCampaignList();
-            } catch (error) {
-                console.error(error);
-                document.getElementById('campaignCardsContainer').innerHTML = '<p style="color:red; text-align:center;">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</p>';
-            } finally {
-                document.getElementById('loadingBookings').style.display = 'none';
-            }
+            } catch (error) { document.getElementById('campaignCardsContainer').innerHTML = '<p style="color:red; text-align:center;">❌ เกิดข้อผิดพลาด</p>'; } 
+            finally { document.getElementById('loadingBookings').style.display = 'none'; }
         }
 
         function renderCampaignList() {
             let groupedByCamp = {};
-            allBookingsRaw.forEach(row => {
-                let campName = row.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)";
-                if(!groupedByCamp[campName]) groupedByCamp[campName] = [];
-                groupedByCamp[campName].push(row);
-            });
-
+            allBookingsRaw.forEach(row => { let campName = row.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)"; if(!groupedByCamp[campName]) groupedByCamp[campName] = []; groupedByCamp[campName].push(row); });
             const container = document.getElementById('campaignCardsContainer');
-            if(Object.keys(groupedByCamp).length === 0) {
-                container.innerHTML = '<p style="text-align:center;">ไม่พบประวัติการจองคิว</p>';
-                return;
-            }
-
+            if(Object.keys(groupedByCamp).length === 0) { container.innerHTML = '<p style="text-align:center;">ไม่พบประวัติการจองคิว</p>'; return; }
             for(let campName in groupedByCamp) {
-                let count = groupedByCamp[campName].length;
-                let isLegacy = campName === "ข้อมูลเก่า (ไม่มีชื่อโครงการ)";
+                let count = groupedByCamp[campName].length; let isLegacy = campName === "ข้อมูลเก่า (ไม่มีชื่อโครงการ)";
                 let badge = isLegacy ? `<span style="background:#fff3cd; color:#856404; padding:2px 6px; border-radius:4px; font-size:12px; border:1px solid #856404; margin-bottom:5px; display:inline-block;">⚠️ ข้อมูลแบบเก่า</span>` : '';
-                const card = document.createElement('div');
-                card.className = 'camp-card';
-                card.innerHTML = `
-                    <div>${badge}<div style="font-weight:bold; font-size:18px;">${campName}</div><div style="color:#555; font-size:14px; margin-top:5px;">👥 ยอดจองทั้งหมด: ${count} คน</div></div>
-                    <button class="btn-small" onclick="viewCampaignDetail('${campName}')">ดูข้อมูล / ดาวน์โหลด ➔</button>
-                `;
+                const card = document.createElement('div'); card.className = 'camp-card';
+                card.innerHTML = `<div>${badge}<div style="font-weight:bold; font-size:18px;">${campName}</div><div style="color:#555; font-size:14px; margin-top:5px;">👥 ยอดจองทั้งหมด: ${count} คน</div></div><button class="btn-small" onclick="viewCampaignDetail('${campName}')">ดูข้อมูล / ดาวน์โหลด ➔</button>`;
                 container.appendChild(card);
             }
         }
 
         function viewCampaignDetail(campName) {
-            currentViewingCampaign = campName;
-            document.getElementById('detailCampaignTitle').innerText = `📋 โครงการ: ${campName}`;
+            currentViewingCampaign = campName; document.getElementById('detailCampaignTitle').innerText = `📋 โครงการ: ${campName}`;
             let campData = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)") === campName);
             let groupedBySession = {};
-            campData.forEach(row => {
-                let sessionName = row.sessionDatetime || row.vaccineDate || row.sessionName || "ไม่ระบุรอบวัน/เวลา";
-                if(!groupedBySession[sessionName]) groupedBySession[sessionName] = [];
-                groupedBySession[sessionName].push(row);
-            });
-            const container = document.getElementById('sessionCardsContainer');
-            container.innerHTML = '';
+            campData.forEach(row => { let sessionName = row.sessionDatetime || row.vaccineDate || row.sessionName || "ไม่ระบุรอบวัน/เวลา"; if(!groupedBySession[sessionName]) groupedBySession[sessionName] = []; groupedBySession[sessionName].push(row); });
+            const container = document.getElementById('sessionCardsContainer'); container.innerHTML = '';
             for(let sesName in groupedBySession) {
-                let count = groupedBySession[sesName].length;
-                const div = document.createElement('div');
-                div.className = 'session-item';
-                div.innerHTML = `
-                    <div><strong style="font-size:16px;">📅 รอบ: ${sesName}</strong><br><span style="font-size:14px; color:#555;">จองแล้ว: ${count} คน</span></div>
-                    <button class="btn-small" style="background:#ff8b94;" onclick="exportSessionData('${sesName}')">📊 ดึงข้อมูล Excel รอบนี้</button>
-                `;
+                let count = groupedBySession[sesName].length; const div = document.createElement('div'); div.className = 'session-item';
+                div.innerHTML = `<div><strong style="font-size:16px;">📅 รอบ: ${sesName}</strong><br><span style="font-size:14px; color:#555;">จองแล้ว: ${count} คน</span></div><button class="btn-small" style="background:#ff8b94;" onclick="exportSessionData('${sesName}')">📊 ดึงข้อมูล Excel รอบนี้</button>`;
                 container.appendChild(div);
             }
-            document.getElementById('campaignListView').style.display = 'none';
-            document.getElementById('campaignDetailView').style.display = 'block';
+            document.getElementById('campaignListView').style.display = 'none'; document.getElementById('campaignDetailView').style.display = 'block';
         }
 
-        function backToCampaignList() {
-            document.getElementById('campaignListView').style.display = 'block';
-            document.getElementById('campaignDetailView').style.display = 'none';
-        }
-
+        function backToCampaignList() { document.getElementById('campaignListView').style.display = 'block'; document.getElementById('campaignDetailView').style.display = 'none'; }
+        
         function exportSessionData(sessionName) {
             let dataToExport = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)") === currentViewingCampaign);
-            if(sessionName !== 'all') {
-                dataToExport = dataToExport.filter(r => (r.sessionDatetime || r.vaccineDate || r.sessionName || "ไม่ระบุรอบวัน/เวลา") === sessionName);
-            }
+            if(sessionName !== 'all') dataToExport = dataToExport.filter(r => (r.sessionDatetime || r.vaccineDate || r.sessionName || "ไม่ระบุรอบวัน/เวลา") === sessionName);
             if(dataToExport.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
             const exportFormatted = dataToExport.map(row => ({
                 "วันที่และเวลาที่ทำรายการ": row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "ไม่มีระบุเวลา",
-                "ชื่อโครงการ": row.campaignName || "ข้อมูลเก่า",
-                "รหัสนักศึกษา": row.studentId || "-", "ชื่อ-สกุล": row.fullName || "-", "เบอร์โทรศัพท์": row.phone || "-",
-                "รอบวันที่เลือกฉีด": row.sessionDatetime || row.vaccineDate || row.sessionName || "-",
-                "รายการวัคซีนที่เลือก": row.sessionVaccines || row.vaccines || row.testProgram || "-"
+                "ชื่อโครงการ": row.campaignName || "ข้อมูลเก่า", "รหัสนักศึกษา": row.studentId || "-", "ชื่อ-สกุล": row.fullName || "-", "เบอร์โทรศัพท์": row.phone || "-",
+                "รอบวันที่เลือกฉีด": row.sessionDatetime || row.vaccineDate || row.sessionName || "-", "รายการวัคซีนที่เลือก": row.sessionVaccines || row.vaccines || row.testProgram || "-"
             }));
-            const worksheet = XLSX.utils.json_to_sheet(exportFormatted);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
-            let safeSessionName = sessionName === 'all' ? 'รวมทุกรอบ' : sessionName.replace(/[<>:"/\\|?*]+/g, '_');
-            let safeCampName = currentViewingCampaign.replace(/[<>:"/\\|?*]+/g, '_');
+            const worksheet = XLSX.utils.json_to_sheet(exportFormatted); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
+            let safeSessionName = sessionName === 'all' ? 'รวมทุกรอบ' : sessionName.replace(/[<>:"/\\|?*]+/g, '_'); let safeCampName = currentViewingCampaign.replace(/[<>:"/\\|?*]+/g, '_');
             XLSX.writeFile(workbook, `ข้อมูลจองคิว_${safeCampName}_${safeSessionName}.xlsx`);
         }
 
@@ -473,46 +448,30 @@
         function handleFile(input) {
             const file = input.files[0];
             if (file) {
-                document.getElementById('fileNameDisplay').innerText = "✅ เลือกไฟล์: " + file.name;
-                const reader = new FileReader();
+                document.getElementById('fileNameDisplay').innerText = "✅ เลือกไฟล์: " + file.name; const reader = new FileReader();
                 reader.onload = (e) => {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    excelData = XLSX.utils.sheet_to_json(firstSheet);
-                    if (excelData.length > 0) {
-                        document.getElementById('importStatus').innerText = `พบข้อมูลนักศึกษา ${excelData.length} รายการ`;
-                        document.getElementById('importBtn').disabled = false;
-                    }
-                };
-                reader.readAsArrayBuffer(file);
+                    const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]; excelData = XLSX.utils.sheet_to_json(firstSheet);
+                    if (excelData.length > 0) { document.getElementById('importStatus').innerText = `พบข้อมูลนักศึกษา ${excelData.length} รายการ`; document.getElementById('importBtn').disabled = false; }
+                }; reader.readAsArrayBuffer(file);
             }
         }
 
         async function startImport() {
-            const btn = document.getElementById('importBtn');
-            const status = document.getElementById('importStatus');
-            const progressBar = document.getElementById('progressBar');
-            document.getElementById('progressWrapper').style.display = 'block';
-            btn.disabled = true;
-            let count = 0; const total = excelData.length;
+            const btn = document.getElementById('importBtn'); const status = document.getElementById('importStatus'); const progressBar = document.getElementById('progressBar');
+            document.getElementById('progressWrapper').style.display = 'block'; btn.disabled = true; let count = 0; const total = excelData.length;
             for (const student of excelData) {
                 if (student.studentId) {
                     try {
                         await db.collection('students_master').doc(String(student.studentId)).set({
-                            studentId: String(student.studentId), fullName: student.fullName || "",
-                            year: student.year || "", faculty: student.faculty || "",
+                            studentId: String(student.studentId), fullName: student.fullName || "", year: student.year || "", faculty: student.faculty || "",
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         }, { merge: true });
-                        count++;
-                        progressBar.style.width = Math.floor((count / total) * 100) + "%";
-                        status.innerText = `กำลังบันทึก: ${count} / ${total}`;
+                        count++; progressBar.style.width = Math.floor((count / total) * 100) + "%"; status.innerText = `กำลังบันทึก: ${count} / ${total}`;
                     } catch (e) { console.error(e); }
                 }
             }
-            status.innerHTML = `<span style="color:#155724;">✅ นำเข้าเสร็จสมบูรณ์ ${count} รายการ</span>`;
-            btn.innerText = "เรียบร้อย";
-            loadDashboardData(); 
+            status.innerHTML = `<span style="color:#155724;">✅ นำเข้าเสร็จสมบูรณ์ ${count} รายการ</span>`; btn.innerText = "เรียบร้อย"; loadDashboardData(); 
         }
     </script>
 </body>
