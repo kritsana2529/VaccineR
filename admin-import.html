@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบนำเข้าข้อมูลนักศึกษา (Admin Import)</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        :root { --apricot: #FFB347; --border-color: #1a1a1a; }
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        body { background-color: #f4f4f5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 600px; background: #fff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; }
+        h1 { background: var(--apricot); padding: 15px; border: 3px solid var(--border-color); border-radius: 8px; text-align: center; font-size: 20px; }
+        .upload-zone { border: 3px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; margin-bottom: 20px; background: #fafafa; cursor: pointer; }
+        .upload-zone:hover { border-color: var(--apricot); background: #fffbf0; }
+        button { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); }
+        button:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: translate(2px, 2px); }
+        #status { margin-top: 20px; font-weight: bold; text-align: center; }
+        .progress-bar { width: 0%; height: 20px; background: #28a745; transition: width 0.3s; border-radius: 10px; margin-top: 10px; }
+        .progress-container { width: 100%; background: #eee; border-radius: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📥 นำเข้าประวัตินักศึกษา (Excel)</h1>
+        <p style="font-size: 14px; color: #555;">กรุณาเตรียมไฟล์ Excel ที่มีหัวคอลัมน์: <b>studentId, fullName, year, faculty</b></p>
+        
+        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+            <p id="fileNameDisplay">คลิกเพื่อเลือกไฟล์ Excel (.xlsx)</p>
+            <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFile(this)">
+        </div>
+
+        <div class="progress-container" id="progressWrapper">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div id="status"></div>
+        <button id="importBtn" onclick="startImport()" disabled>🚀 เริ่มนำเข้าข้อมูล</button>
+    </div>
+
+    <script>
+        // --- 1. ตั้งค่า Firebase Config (ใช้ตัวเดียวกับหน้าจองคิว) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
+            authDomain: "vacciner-a3b0f.firebaseapp.com",
+            projectId: "vacciner-a3b0f",
+            storageBucket: "vacciner-a3b0f.firebasestorage.app",
+            messagingSenderId: "322679198332",
+            appId: "1:322679198332:web:01e4174c3f30845d576ff9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let jsonData = [];
+
+        // --- 2. ฟังก์ชันอ่านไฟล์ Excel ---
+        function handleFile(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('fileNameDisplay').innerText = "เลือกไฟล์: " + file.name;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (jsonData.length > 0) {
+                        document.getElementById('status').innerText = `พบข้อมูลทั้งหมด ${jsonData.length} รายการ`;
+                        document.getElementById('importBtn').disabled = false;
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        // --- 3. ฟังก์ชันบันทึกลง Firebase (Batch Upload) ---
+        async function startImport() {
+            const btn = document.getElementById('importBtn');
+            const status = document.getElementById('status');
+            const progressBar = document.getElementById('progressBar');
+            const progressWrapper = document.getElementById('progressWrapper');
+
+            btn.disabled = true;
+            progressWrapper.style.display = 'block';
+            
+            let count = 0;
+            const total = jsonData.length;
+
+            // นำข้อมูลเข้าทีละรายการ (หรือใช้ Batch ถ้าข้อมูลหลักพัน)
+            for (const student of jsonData) {
+                if (student.studentId) {
+                    try {
+                        // บันทึกลงคอลเลกชัน students_master โดยใช้รหัสนักศึกษาเป็น ID ของเอกสาร
+                        await db.collection('students_master').doc(String(student.studentId)).set({
+                            studentId: String(student.studentId),
+                            fullName: student.fullName || "",
+                            year: student.year || "",
+                            faculty: student.faculty || "",
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        
+                        count++;
+                        let percent = Math.floor((count / total) * 100);
+                        progressBar.style.width = percent + "%";
+                        status.innerText = `กำลังนำเข้า: ${count} / ${total} รายการ`;
+                    } catch (e) {
+                        console.error("Error writing document: ", e);
+                    }
+                }
+            }
+
+            status.innerHTML = `<span style="color: green;">✅ นำเข้าข้อมูลสำเร็จทั้งหมด ${count} รายการ!</span>`;
+            btn.innerText = "นำเข้าเรียบร้อย";
+        }
+    </script>
+</body>
+</html>
