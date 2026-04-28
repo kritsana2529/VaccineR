@@ -29,7 +29,7 @@
 
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; margin-bottom: 6px; }
-        input[type="password"] { width: 100%; padding: 12px; font-size: 16px; border: 3px solid var(--border-color); border-radius: 8px; }
+        input[type="password"] { width: 100%; padding: 12px; font-size: 16px; border: 3px solid var(--border-color); border-radius: 8px; text-align: center;}
 
         .upload-zone { border: 3px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; margin-bottom: 20px; background: #fafafa; cursor: pointer; }
         .upload-zone:hover { border-color: var(--apricot); background: #fffbf0; }
@@ -69,14 +69,16 @@
 </head>
 <body>
 
-    <div id="loginContainer" class="container" style="max-width: 400px; margin-top: 10vh;">
-        <a href="index.html" class="btn-home" style="margin-bottom: 15px;">🏠 กลับหน้าเมนูหลัก</a>
-        <h1 style="font-size:22px;">🔒 เข้าสู่ระบบอาจารย์</h1>
+    <div id="loginContainer" class="container" style="max-width: 400px; margin-top: 10vh; text-align:center;">
+        <div style="font-size:50px; margin-bottom:10px;">👩‍🏫</div>
+        <h1 style="font-size:22px; margin-bottom:20px;">เข้าสู่ระบบอาจารย์</h1>
+        <p style="color:#555; font-size:14px; margin-bottom:20px;">กรุณาใส่รหัสผ่านเพื่อเข้าใช้งานกระดานตรวจสอบ</p>
+        
         <div class="form-group">
-            <label>รหัสผ่าน (Password):</label>
             <input type="password" id="adminPassword" placeholder="ใส่รหัสผ่าน (1234)" onkeypress="if(event.key==='Enter') loginAdmin()">
         </div>
-        <button class="btn-main" onclick="loginAdmin()">เข้าสู่ระบบ</button>
+        <button class="btn-main" style="margin-bottom: 15px;" onclick="loginAdmin()">🔐 เข้าสู่ระบบ</button>
+        <a href="index.html" class="btn-home" style="width:100%; justify-content:center; background:#fff;">⬅️ กลับหน้าเมนูหลัก</a>
     </div>
 
     <div id="mainDashboard" class="container" style="display: none;">
@@ -177,15 +179,18 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- ระบบ Login ---
+        // --- 🌟 ระบบ Login ---
         function loginAdmin() {
             const pwd = document.getElementById('adminPassword').value;
-            if (pwd === '1234') { // รหัสผ่านคือ 1234
+            if (pwd === '1234') { // กำหนดรหัสผ่าน
                 document.getElementById('loginContainer').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
+                // โหลดข้อมูลหลังจากล็อกอินผ่านแล้วเท่านั้น
                 loadDashboardData(); 
             } else {
-                alert("❌ รหัสผ่านไม่ถูกต้อง");
+                // แจ้งเตือนเมื่อผิด และเด้งกลับไปหน้าแรกทันที
+                alert("❌ รหัสผ่านไม่ถูกต้อง! ระบบจะพากลับไปหน้าหลัก");
+                window.location.href = "index.html"; 
             }
         }
 
@@ -207,7 +212,7 @@
 
         let mergedDataList = [];
         const PASS_CRITERIA = {
-            vzv: ["มีหลักฐานเคยป่วย", "IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส", "มีหลักฐานเคยป่วยเป็นสุกใส", "ผลตรวจ Varicella IgG Positive"], 
+            vzv: ["มีหลักฐานเคยป่วย", "IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส"], 
             hbv: ["IgG > 10", "ผลตรวจ Anti-HBs IgG > 10 unit", "รับวัคซีนตับอักเสบบีครบ 3 โด๊ส"],
             mmr: ["มีภูมิหรือฉีดครบแล้ว", "ผลตรวจ Measles IgG/IgM Positive", "รับวัคซีน MMR อย่างน้อย 1 โด๊ส"],
             tdap: ["เคยฉีดภายใน10ปี", "รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)", "เคยฉีดมาแล้ว (ยังไม่เกิน 10 ปี)"],
@@ -237,7 +242,6 @@
             } catch (error) { console.error(error); }
         }
 
-        // 🌟 แปลงสถานะเป็นไอคอนสั้นๆ เพื่อให้ตารางแคบลง
         function getShortBadge(diseaseCode, recordObj) {
             const status = recordObj[`status_${diseaseCode}`];
             if (!status || status === "ยังไม่ดำเนินการ") return `<span style="font-size:16px; color:#999;" title="ยังไม่ดำเนินการ">-</span>`;
@@ -253,7 +257,6 @@
             return `<span style="font-size:18px;" title="ไม่ผ่าน">🔴</span>`;
         }
 
-        // ตัวกรองชั้นปีอัจฉริยะ
         function checkYearMatch(studentYear, filterYear) {
             if (filterYear === 'all') return true;
             let sYear = String(studentYear || "").trim();
@@ -273,7 +276,7 @@
                 const rec = student.records;
                 const hasRejectedFiles = Object.keys(rec).some(key => key.startsWith('verify_') && rec[key] === 'rejected');
                 
-                const isPass = (code) => PASS_CRITERIA[code].includes(rec[`status_${code}`]);
+                const isPass = (code) => PASS_CRITERIA[code] ? PASS_CRITERIA[code].includes(rec[`status_${code}`]) : false;
                 const allPassed = isPass('vzv') && isPass('hbv') && isPass('mmr') && isPass('tdap') && isPass('flu') && isPass('tb');
 
                 let overallHtml = '';
@@ -415,7 +418,7 @@
         }
 
         // ==========================================
-        // ส่งออก Excel (คงฟังก์ชันเดิมเพื่อให้ได้ข้อมูลครบถ้วน)
+        // ส่งออก Excel
         // ==========================================
         function getVerText(status) {
             if(status === 'approved') return ' (✅ ผ่าน)';
