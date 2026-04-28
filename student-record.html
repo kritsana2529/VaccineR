@@ -41,6 +41,12 @@
         button.btn-save { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: var(--text-color); background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease; margin-top: 10px;}
         button.btn-save:active { box-shadow: 0px 0px 0px; transform: translate(4px, 4px); }
         .current-file-link { display: inline-block; margin-top: 10px; font-size: 14px; color: #0066cc; text-decoration: none; font-weight: bold; background: #e6f2ff; padding: 6px 12px; border-radius: 4px; border: 1px solid #0066cc; }
+        
+        /* กล่องแจ้งเตือน */
+        #notificationArea { margin-bottom: 20px; }
+        .alert-box { border: 3px solid; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .alert-red { background: #f8d7da; border-color: #dc3545; color: #721c24; box-shadow: 4px 4px 0px #dc3545; }
+        .alert-yellow { background: #fff3cd; border-color: #856404; color: #856404; box-shadow: 4px 4px 0px #856404; }
     </style>
 </head>
 <body>
@@ -58,6 +64,8 @@
         </div>
 
         <div id="recordSection" style="display:none;">
+            <div id="notificationArea"></div>
+
             <h2 style="background:#a8e6cf;">👤 ข้อมูลนักศึกษา</h2>
             <div class="form-group">
                 <label>ชื่อ-นามสกุล</label>
@@ -293,7 +301,7 @@
         const storage = firebase.storage();
 
         const diseases = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
-        const fileSuffixes = ['', '_1', '_2', '_3']; // รองรับไฟล์รวม และไฟล์แยกตามเข็ม
+        const fileSuffixes = ['', '_1', '_2', '_3']; 
         let currentId = "";
 
         // คำนวณเดือน
@@ -340,11 +348,7 @@
             }
 
             if(dateBox) dateBox.style.display = needsDate ? 'block' : 'none';
-            
-            // ซ่อนปุ่มอัปโหลดแบบรวม หากเด็กอยู่ในโหมดฉีดทีละเข็ม
-            if(generalUpload) {
-                generalUpload.style.display = isMultiDose ? 'none' : 'block';
-            }
+            if(generalUpload) generalUpload.style.display = isMultiDose ? 'none' : 'block';
         }
 
         async function loginStudent() {
@@ -366,6 +370,73 @@
                 const recordDoc = await db.collection('student_health_records').doc(sid).get();
                 if(recordDoc.exists) {
                     const rec = recordDoc.data();
+                    let alertHtml = '';
+
+                    // 🚨 1. สร้างระบบแจ้งเตือนเมื่อหลักฐานถูกปฏิเสธ (Rejection Alert)
+                    let rejectedItems = [];
+                    const nameMap = {
+                        'vzv': 'สุกใส (หลักฐานรวม)', 'vzv_1': 'สุกใส (เข็ม 1)', 'vzv_2': 'สุกใส (เข็ม 2)',
+                        'hbv': 'ตับอักเสบบี (หลักฐานรวม)', 'hbv_1': 'ตับอักเสบบี (เข็ม 1)', 'hbv_2': 'ตับอักเสบบี (เข็ม 2)', 'hbv_3': 'ตับอักเสบบี (เข็ม 3)',
+                        'mmr': 'MMR (หลักฐานรวม)', 'mmr_1': 'MMR (เข็มล่าสุด)',
+                        'tdap': 'Tdap (หลักฐานรวม)', 'tdap_1': 'Tdap (เข็มล่าสุด)',
+                        'flu': 'ไข้หวัดใหญ่ (หลักฐานรวม)', 'flu_1': 'ไข้หวัดใหญ่ (เข็มล่าสุด)',
+                        'tb': 'วัณโรค (หลักฐานรวม)', 'tb_1': 'วัณโรค (X-ray ล่าสุด)'
+                    };
+
+                    Object.keys(rec).forEach(key => {
+                        if(key.startsWith('verify_') && rec[key] === 'rejected') {
+                            let code = key.replace('verify_', '');
+                            rejectedItems.push(nameMap[code] || code);
+                        }
+                    });
+
+                    if(rejectedItems.length > 0) {
+                        alertHtml += `<div class="alert-box alert-red">
+                            <h3 style="margin-top:0; margin-bottom:10px;">❌ มีหลักฐานที่ไม่ผ่านการอนุมัติ</h3>
+                            <p style="margin:0;">กรุณาตรวจสอบและอัปโหลดหลักฐานที่ถูกต้องใหม่ สำหรับรายการต่อไปนี้:<br> <strong>${rejectedItems.join(', ')}</strong></p>
+                        </div>`;
+                    }
+
+                    // 📅 2. สร้างระบบแจ้งเตือนนัดหมายที่ใกล้ถึง (Upcoming Reminder)
+                    let upcomingItems = [];
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const fourteenDaysFromNow = new Date(today); fourteenDaysFromNow.setDate(today.getDate() + 14);
+
+                    // เช็ครอบเข็มต่อไป (เฉพาะเข็ม 2 และ 3 ของสุกใส/ตับอักเสบบี)
+                    const checkAppointments = [
+                        { dateField: 'date_vzv_2', fileField: 'fileUrl_vzv_2', label: 'สุกใส เข็มที่ 2' },
+                        { dateField: 'date_hbv_2', fileField: 'fileUrl_hbv_2', label: 'ตับอักเสบบี เข็มที่ 2' },
+                        { dateField: 'date_hbv_3', fileField: 'fileUrl_hbv_3', label: 'ตับอักเสบบี เข็มที่ 3' }
+                    ];
+
+                    checkAppointments.forEach(app => {
+                        // แจ้งเตือนเฉพาะกรณีที่มีวันนัดแล้ว แต่ "ยังไม่ได้อัปโหลดไฟล์หลักฐาน"
+                        if(rec[app.dateField] && !rec[app.fileField]) { 
+                            let appDate = new Date(rec[app.dateField]);
+                            if(appDate <= fourteenDaysFromNow) {
+                                let diffTime = appDate - today;
+                                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                let statusText = "";
+                                if(diffDays < 0) statusText = `<span style="color:#dc3545; font-weight:bold;">(เลยกำหนดมาแล้ว ${Math.abs(diffDays)} วัน)</span>`;
+                                else if (diffDays === 0) statusText = `<span style="color:#d35400; font-weight:bold;">(ถึงกำหนดฉีดวันนี้!)</span>`;
+                                else statusText = `<span style="font-weight:bold;">(เหลืออีก ${diffDays} วัน)</span>`;
+                                
+                                upcomingItems.push(`<li style="margin-bottom:5px;"><strong>${app.label}</strong>: กำหนดฉีดวันที่ ${rec[app.dateField]} ${statusText}</li>`);
+                            }
+                        }
+                    });
+
+                    if(upcomingItems.length > 0) {
+                        alertHtml += `<div class="alert-box alert-yellow">
+                            <h3 style="margin-top:0; margin-bottom:10px;">📅 แจ้งเตือนนัดหมายวัคซีนใกล้ถึง</h3>
+                            <ul style="margin:0; padding-left:20px;">${upcomingItems.join('')}</ul>
+                        </div>`;
+                    }
+
+                    // นำกล่องแจ้งเตือนไปแสดง
+                    document.getElementById('notificationArea').innerHTML = alertHtml;
+
+                    // โหลดข้อมูลเก่าเข้าสู่ฟอร์ม
                     diseases.forEach(d => {
                         if(rec[`status_${d}`]) {
                             document.getElementById(`status_${d}`).value = rec[`status_${d}`];
@@ -447,6 +518,9 @@
                             const ref = storage.ref(`vaccine_proofs/${currentId}_${d}${suf}_${Date.now()}.jpg`);
                             await ref.put(finalFile);
                             payload[`fileUrl_${d}${suf}`] = await ref.getDownloadURL();
+                            
+                            // 🌟 เคลียร์สถานะ Reject เดิมออกเมื่อเด็กอัปโหลดไฟล์ใหม่เข้ามา
+                            payload[`verify_${d}${suf}`] = 'pending';
                         }
                     }
                 }
