@@ -3,57 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ศูนย์บริการสุขภาพ นศ. คณะพยาบาลศาสตร์</title>
+    <title>Student Health Services - คณะพยาบาลศาสตร์</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
-        /* Neo-Brutalism & Mobile-First Design */
-        :root {
+        /* 🎨 ธีม Neo-Brutalism & สี Apricot */
+        :root { 
             --bg-color: #f4f4f5; 
-            --apricot: #FFB347; /* สีประจำคณะ */
+            --apricot: #FFB347; 
             --text-color: #1a1a1a; 
-            --border-color: #1a1a1a;
+            --border-color: #1a1a1a; 
         }
-        * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; justify-content: center;}
         
-        .container { width: 100%; max-width: 500px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 8px 8px 0px var(--border-color); padding: 30px 24px; text-align: center; }
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
         
-        .logo-placeholder { font-size: 50px; margin-bottom: 10px; }
-        h1 { font-size: 22px; margin-top: 0; margin-bottom: 5px; color: var(--text-color); }
-        p.subtitle { font-size: 15px; color: #555; margin-bottom: 30px; font-weight: bold; }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* 🚀 หน้าต่างต้อนรับ (Welcome Screen) */
+        #welcomeScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 4px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 12px 12px 0px var(--border-color);
+            padding: 50px 30px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            transition: all 0.5s ease-in-out;
+        }
 
-        .menu-btn {
-            display: flex; align-items: center; justify-content: center; width: 100%; padding: 18px; font-size: 18px; font-weight: bold; color: var(--text-color); text-decoration: none; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease; margin-bottom: 15px;
+        .welcome-badge {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .title-eng {
+            font-size: 36px;
+            font-weight: 800;
+            background: var(--apricot);
+            padding: 15px 25px;
+            border: 4px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 6px 6px 0px var(--border-color);
+            margin-bottom: 15px;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .title-th {
+            font-size: 20px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 40px;
+        }
+
+        .btn-enter {
+            font-size: 22px;
+            font-weight: 800;
+            background: #a8e6cf;
+            color: var(--text-color);
+            padding: 16px 40px;
+            border: 4px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 6px 6px 0px var(--border-color);
+            transition: all 0.1s ease;
+        }
+
+        .btn-enter:active {
+            box-shadow: 0px 0px 0px var(--border-color);
+            transform: translate(6px, 6px);
+        }
+
+        /* 📌 หน้าเมนูหลัก (Main Menu) */
+        #mainMenu {
+            display: none; /* ซ่อนไว้ก่อนในตอนแรก */
+            width: 100%;
+            max-width: 600px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .menu-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu-header h2 {
+            font-size: 26px;
+            font-weight: 800;
+            background: var(--apricot);
+            display: inline-block;
+            padding: 10px 20px;
+            border: 3px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0px var(--border-color);
+        }
+
+        .menu-card {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 4px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 8px 8px 0px var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-4px);
+            background: #fffbf0;
+            box-shadow: 12px 12px 0px var(--border-color);
+        }
+
+        .menu-card:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px var(--border-color);
+        }
+
+        .menu-icon {
+            font-size: 40px;
+            margin-right: 20px;
+            background: #eee;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .menu-text {
+            flex-grow: 1;
+        }
+
+        .menu-text h3 {
+            margin: 0 0 5px 0;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .menu-text p {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
         }
         
-        .menu-btn:active { box-shadow: 0px 0px 0px var(--border-color); transform: translate(4px, 4px); }
-        
-        /* สีกำหนดตามประเภทผู้ใช้งาน */
-        .btn-booking { background: #a8e6cf; }
-        .btn-record { background: #ffccb6; }
-        .btn-teacher { background: var(--apricot); margin-top: 30px; }
-        
-        .icon { font-size: 24px; margin-right: 10px; }
+        /* ซ่อนปุ่มแอดมินสำหรับนศ. ให้อยู่ล่างสุด */
+        .admin-link {
+            display: block;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #666;
+            text-decoration: underline;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .admin-link:hover { color: #d35400; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="logo-placeholder">🏥</div>
-        <h1>ศูนย์บริการสุขภาพนักศึกษา</h1>
-        <p class="subtitle">ระบบเตรียมความพร้อมก่อนขึ้นฝึกปฏิบัติ</p>
+    <div id="welcomeScreen">
+        <div class="welcome-badge">🏥</div>
+        <div class="title-eng">Student Health<br>Services</div>
+        <div class="title-th">ระบบบริการสุขภาพนักศึกษา<br>คณะพยาบาลศาสตร์</div>
+        
+        <button class="btn-enter" onclick="enterSystem()">🚀 เข้าสู่ระบบ (Enter)</button>
+    </div>
 
-        <a href="booking.html" class="menu-btn btn-booking">
-            <span class="icon">💉</span> จองคิวฉีดวัคซีน
+    <div id="mainMenu">
+        <div class="menu-header">
+            <h2>🏥 บริการสุขภาพนักศึกษา</h2>
+            <p style="color:#555; font-size:16px;">กรุณาเลือกทำรายการที่ต้องการ</p>
+        </div>
+
+        <a href="booking.html" class="menu-card">
+            <div class="menu-icon">💉</div>
+            <div class="menu-text">
+                <h3>ระบบจองคิวฉีดวัคซีน</h3>
+                <p>ลงทะเบียนเลือกวันและเวลาเข้ารับวัคซีน</p>
+            </div>
+            <div style="font-size:24px; font-weight:bold;">➔</div>
         </a>
 
-        <a href="student-record.html" class="menu-btn btn-record">
-            <span class="icon">🩺</span> สมุดพกวัคซีนออนไลน์
+        <a href="student-record.html" class="menu-card">
+            <div class="menu-icon">📑</div>
+            <div class="menu-text">
+                <h3>สมุดพกวัคซีนออนไลน์</h3>
+                <p>บันทึกประวัติสุขภาพและอัปโหลดหลักฐาน</p>
+            </div>
+            <div style="font-size:24px; font-weight:bold;">➔</div>
         </a>
 
-        <a href="teacher-dashboard.html" class="menu-btn btn-teacher">
-            <span class="icon">👩‍🏫</span> กระดานตรวจสอบ (สำหรับอาจารย์)
+        <a href="teacher-dashboard.html" class="admin-link">
+            👩‍🏫 สำหรับอาจารย์ / ผู้ดูแลระบบ (Admin)
         </a>
     </div>
 
+    <script>
+        // ฟังก์ชันเมื่อกดปุ่ม เข้าสู่ระบบ
+        function enterSystem() {
+            // ซ่อนหน้าต้อนรับ
+            document.getElementById('welcomeScreen').style.display = 'none';
+            // แสดงเมนูหลัก
+            document.getElementById('mainMenu').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
