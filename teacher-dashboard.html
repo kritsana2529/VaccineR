@@ -15,9 +15,13 @@
         * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        .container { width: 100%; max-width: 1200px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; }
+        .container { width: 100%; max-width: 1200px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; position: relative;}
         h1 { font-size: 24px; text-align: center; margin-top: 0; background: var(--apricot); padding: 15px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); }
         
+        /* ปุ่มกลับหน้าแรก */
+        .btn-home { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #000; font-weight: bold; background: #eee; padding: 10px 15px; border: 3px solid #000; border-radius: 8px; margin-bottom: 20px; box-shadow: 2px 2px 0px #000; transition: all 0.1s;}
+        .btn-home:active { box-shadow: 0px 0px 0px #000; transform: translate(2px, 2px); }
+
         /* Navigation Tabs */
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; flex-wrap: wrap;}
         .tab-btn { padding: 12px 20px; font-size: 16px; font-weight: bold; background: #eee; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.1s; flex-grow: 1; text-align: center;}
@@ -27,13 +31,12 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Import Section Styles */
+        /* Dashboard & Import Styles */
         .upload-zone { border: 3px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; margin-bottom: 20px; background: #fafafa; cursor: pointer; }
         .upload-zone:hover { border-color: var(--apricot); background: #fffbf0; }
         .progress-container { width: 100%; background: #eee; border-radius: 10px; display: none; border: 2px solid var(--border-color); overflow: hidden; margin-bottom: 15px; }
         .progress-bar { width: 0%; height: 20px; background: #a8e6cf; transition: width 0.3s; }
         
-        /* Dashboard Section Styles */
         .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;}
         .filter-bar select { padding: 10px; font-size: 16px; border: 3px solid var(--border-color); border-radius: 6px; }
         .filter-bar button { padding: 10px 15px; font-size: 16px; font-weight: bold; background: var(--apricot); border: 3px solid var(--border-color); border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); }
@@ -49,23 +52,32 @@
         .badge-green { background: #d4edda; color: #155724; }
         .badge-red { background: #f8d7da; color: #721c24; }
         .badge-gray { background: #e2e3e5; color: #383d41; }
-        .badge-legacy { background: #fff3cd; color: #856404; }
         
         .view-file-btn { font-size: 12px; text-decoration: none; display: block; margin-top: 5px; color: #0066cc; font-weight: bold; }
         .view-file-btn:hover { text-decoration: underline; }
 
         .btn-main { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); }
         .btn-main:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: translate(4px, 4px); }
+
+        /* Styles สำหรับ Card โครงการ */
+        .camp-card { border: 3px solid var(--border-color); padding: 15px 20px; border-radius: 8px; background: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 4px 4px 0px var(--border-color); transition: 0.2s; }
+        .camp-card:hover { transform: translateY(-2px); background: #fffbf0; }
+        .btn-small { padding: 8px 12px; font-size: 14px; font-weight: bold; background: var(--apricot); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-small:active { box-shadow: 0px 0px 0px; transform: translate(2px, 2px); }
+        
+        .session-item { border: 2px dashed #ccc; padding: 15px; border-radius: 8px; background: #fafafa; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <a href="index.html" class="btn-home">🏠 กลับหน้าเมนูหลัก</a>
+
         <h1>👩‍🏫 กระดานแอดมิน ศูนย์บริการสุขภาพ นศ.</h1>
         
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('dashboard')">📋 ตรวจสมุดพกวัคซีน</button>
-            <button class="tab-btn" onclick="switchTab('bookings')">📅 ประวัติจองคิวทั้งหมด (ข้อมูลเก่า+ใหม่)</button>
+            <button class="tab-btn" onclick="switchTab('bookings')">📅 ประวัติจองคิว (แยกตามรอบ)</button>
             <button class="tab-btn" onclick="switchTab('import')">📥 นำเข้า นศ. (Master Data)</button>
         </div>
 
@@ -104,26 +116,23 @@
         </div>
 
         <div id="tab-bookings" class="tab-content">
-            <div class="filter-bar">
-                <button onclick="loadAllBookings()">🔄 โหลดประวัติการจองใหม่</button>
-                <button style="background: #ff8b94; margin-left: auto;" onclick="exportBookingsToExcel()">📊 Export ประวัติการจองทั้งหมด</button>
+            <div id="campaignListView">
+                <div class="filter-bar">
+                    <button onclick="loadAllBookings()">🔄 รีเฟรชข้อมูลโครงการ</button>
+                </div>
+                <p id="loadingBookings" style="text-align:center; font-weight:bold;">⏳ กำลังดึงข้อมูลโครงการ...</p>
+                <div id="campaignCardsContainer" style="display:flex; flex-direction:column; gap:15px;"></div>
             </div>
-            <p id="loadingBookings" style="text-align:center; font-weight:bold;">⏳ กำลังดึงข้อมูลการจองคิว... (รวมของเก่า)</p>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>วัน/เวลา ที่กดจอง</th>
-                            <th>ชื่อโครงการ</th>
-                            <th>รหัสนักศึกษา</th>
-                            <th class="text-left">ชื่อ-นามสกุล</th>
-                            <th>เบอร์โทรศัพท์</th>
-                            <th>รอบวันที่เลือกฉีด</th>
-                            <th>รายการวัคซีนที่เลือก</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bookingsTableBody"></tbody>
-                </table>
+
+            <div id="campaignDetailView" style="display:none;">
+                <button class="btn-home" style="margin-bottom: 10px;" onclick="backToCampaignList()">⬅️ ย้อนกลับไปหน้าโครงการ</button>
+                <h3 id="detailCampaignTitle" style="border-bottom: 3px solid var(--border-color); padding-bottom: 10px; color:#d35400;">ชื่อโครงการ</h3>
+                
+                <div style="display:flex; gap:10px; margin-bottom: 20px;">
+                    <button class="btn-main" style="background:#a8e6cf; font-size:16px;" onclick="exportSessionData('all')">📊 ดาวน์โหลด Excel รวมทุกรอบในโครงการนี้</button>
+                </div>
+
+                <div id="sessionCardsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
         </div>
 
@@ -215,25 +224,18 @@
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('loadingDash').innerText = "❌ เกิดข้อผิดพลาดในการดึงข้อมูล";
             }
         }
 
         function evaluateDisease(diseaseCode, recordObj) {
             const status = recordObj[`status_${diseaseCode}`];
             const fileUrl = recordObj[`fileUrl_${diseaseCode}`];
-            
-            if (!status || status === "ยังไม่ดำเนินการ") {
-                return { isPass: false, html: `<span class="badge badge-gray">ยังไม่ส่งหลักฐาน</span>` };
-            }
-            
+            if (!status || status === "ยังไม่ดำเนินการ") return { isPass: false, html: `<span class="badge badge-gray">ยังไม่ส่งหลักฐาน</span>` };
             const isPass = PASS_CRITERIA[diseaseCode].includes(status);
             const badgeClass = isPass ? 'badge-green' : 'badge-red';
             const icon = isPass ? '✅' : '🔴';
-            
             let html = `<span class="badge ${badgeClass}" title="${status}">${icon} ส่งแล้ว</span>`;
             if (fileUrl) html += `<a href="${fileUrl}" target="_blank" class="view-file-btn">📄 ดูหลักฐาน</a>`;
-            
             return { isPass, html, statusText: status };
         }
 
@@ -245,7 +247,6 @@
 
             mergedDataList.forEach(student => {
                 if(filterYear !== 'all' && student.year !== filterYear) return;
-
                 const rec = student.records;
                 const vzv = evaluateDisease('vzv', rec);
                 const hbv = evaluateDisease('hbv', rec);
@@ -255,10 +256,7 @@
                 const tb = evaluateDisease('tb', rec);
 
                 const allPassed = vzv.isPass && hbv.isPass && mmr.isPass && tdap.isPass && flu.isPass && tb.isPass;
-                let overallHtml = allPassed ? 
-                    `<span class="badge badge-green" style="font-size:14px;">🟢 พร้อมขึ้นฝึก</span>` : 
-                    `<span class="badge badge-red" style="font-size:14px;">🔴 ยังไม่ครบ</span>`;
-
+                let overallHtml = allPassed ? `<span class="badge badge-green">🟢 พร้อมขึ้นฝึก</span>` : `<span class="badge badge-red">🔴 ยังไม่ครบ</span>`;
                 student.overallPass = allPassed;
 
                 const tr = document.createElement('tr');
@@ -266,12 +264,8 @@
                     <td><strong>${student.studentId}</strong></td>
                     <td class="text-left">${student.fullName}</td>
                     <td>${student.year || '-'}</td>
-                    <td>${vzv.html}</td>
-                    <td>${hbv.html}</td>
-                    <td>${mmr.html}</td>
-                    <td>${tdap.html}</td>
-                    <td>${flu.html}</td>
-                    <td>${tb.html}</td>
+                    <td>${vzv.html}</td><td>${hbv.html}</td><td>${mmr.html}</td>
+                    <td>${tdap.html}</td><td>${flu.html}</td><td>${tb.html}</td>
                     <td>${overallHtml}</td>
                 `;
                 tbody.appendChild(tr);
@@ -281,118 +275,161 @@
         function exportDashboardToExcel() {
             const filterYear = document.getElementById('filterYear').value;
             let exportData = [];
-
             mergedDataList.forEach(student => {
                 if(filterYear !== 'all' && student.year !== filterYear) return;
                 const rec = student.records;
                 exportData.push({
-                    "รหัสนักศึกษา": student.studentId,
-                    "ชื่อ-นามสกุล": student.fullName,
-                    "ชั้นปี": student.year,
+                    "รหัสนักศึกษา": student.studentId, "ชื่อ-นามสกุล": student.fullName, "ชั้นปี": student.year,
                     "สถานะรวม": student.overallPass ? "พร้อมขึ้นฝึก" : "ยังไม่ครบ",
-                    "สุกใส (VZV)": rec['status_vzv'] || "ยังไม่ดำเนินการ",
-                    "ตับอักเสบบี (HBV)": rec['status_hbv'] || "ยังไม่ดำเนินการ",
-                    "MMR": rec['status_mmr'] || "ยังไม่ดำเนินการ",
-                    "Tdap": rec['status_tdap'] || "ยังไม่ดำเนินการ",
-                    "ไข้หวัดใหญ่": rec['status_flu'] || "ยังไม่ดำเนินการ",
-                    "วัณโรค (TB)": rec['status_tb'] || "ยังไม่ดำเนินการ"
+                    "สุกใส (VZV)": rec['status_vzv'] || "ยังไม่ดำเนินการ", "ตับอักเสบบี (HBV)": rec['status_hbv'] || "ยังไม่ดำเนินการ",
+                    "MMR": rec['status_mmr'] || "ยังไม่ดำเนินการ", "Tdap": rec['status_tdap'] || "ยังไม่ดำเนินการ",
+                    "ไข้หวัดใหญ่": rec['status_flu'] || "ยังไม่ดำเนินการ", "วัณโรค (TB)": rec['status_tb'] || "ยังไม่ดำเนินการ"
                 });
             });
-
             if(exportData.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
-
             const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Student_Health");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "HealthData");
             XLSX.writeFile(workbook, `สมุดพกวัคซีน_${filterYear === 'all' ? 'ทุกชั้นปี' : filterYear}.xlsx`);
         }
 
         // ==========================================
-        // ส่วนที่ 2: ระบบประวัติการจองคิวทั้งหมด (แก้ไขให้ดึงของเก่าได้ 100%)
+        // ส่วนที่ 2: ระบบประวัติการจองคิวแยกตามโครงการ
         // ==========================================
-        let allBookingsData = [];
+        let allBookingsRaw = []; // เก็บข้อมูลดิบทั้งหมด
+        let currentViewingCampaign = ""; // เก็บชื่อแคมเปญที่กำลังดูอยู่
 
         async function loadAllBookings() {
             document.getElementById('loadingBookings').style.display = 'block';
-            const tbody = document.getElementById('bookingsTableBody');
-            tbody.innerHTML = '';
-            allBookingsData = [];
+            document.getElementById('campaignCardsContainer').innerHTML = '';
+            backToCampaignList(); // รีเซ็ตหน้ากลับมาเป็นหน้าแรกของแท็บ
+            allBookingsRaw = [];
 
             try {
-                // แก้ไข: กวาดข้อมูลออกมาทั้งหมดโดยไม่ต้องเรียงลำดับจาก Firebase 
-                // เพื่อป้องกันการถูกกรองทิ้งหากข้อมูลชุดเก่าไม่มีฟิลด์ timestamp
                 const snapshot = await db.collection('vaccine_responses').get();
-                
-                let tempArray = [];
-                snapshot.forEach(doc => {
-                    tempArray.push(doc.data());
-                });
+                snapshot.forEach(doc => allBookingsRaw.push(doc.data()));
 
-                // เรียงลำดับข้อมูลด้วย JavaScript แทน (เรียงจากใหม่ไปเก่า)
-                tempArray.sort((a, b) => {
+                // เรียงเวลาจากใหม่ไปเก่า
+                allBookingsRaw.sort((a, b) => {
                     let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
                     let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
                     return timeB - timeA;
                 });
 
-                tempArray.forEach(row => {
-                    const timestampStr = row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "ไม่มีระบุเวลา (ข้อมูลเก่า)";
-                    const campaignStr = row.campaignName || `<span class="badge badge-legacy">ข้อมูลเก่า (ไม่มีชื่อโครงการ)</span>`;
-                    const dateStr = row.sessionDatetime || row.vaccineDate || row.sessionName || "ไม่ระบุ";
-                    const vaccineStr = row.sessionVaccines || row.vaccines || row.testProgram || "ไม่ระบุ";
-
-                    allBookingsData.push({
-                        timestamp: timestampStr,
-                        campaignName: row.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)",
-                        studentId: row.studentId || "-",
-                        fullName: row.fullName || "-",
-                        phone: row.phone || "-",
-                        sessionDatetime: dateStr,
-                        sessionVaccines: vaccineStr
-                    });
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${timestampStr}</td>
-                        <td>${campaignStr}</td>
-                        <td><strong>${row.studentId || "-"}</strong></td>
-                        <td class="text-left">${row.fullName || "-"}</td>
-                        <td>${row.phone || "-"}</td>
-                        <td>${dateStr}</td>
-                        <td>${vaccineStr}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                if(tempArray.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">ไม่พบประวัติการจองคิว</td></tr>';
-                }
+                renderCampaignList();
 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = '<tr><td colspan="7" style="color:red;">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>';
+                document.getElementById('campaignCardsContainer').innerHTML = '<p style="color:red; text-align:center;">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</p>';
             } finally {
                 document.getElementById('loadingBookings').style.display = 'none';
             }
         }
 
-        function exportBookingsToExcel() {
-            if(allBookingsData.length === 0) { alert("ไม่มีข้อมูลการจองคิวสำหรับ Export"); return; }
+        function renderCampaignList() {
+            let groupedByCamp = {};
+            
+            // จัดกลุ่มตามชื่อโครงการ
+            allBookingsRaw.forEach(row => {
+                let campName = row.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)";
+                if(!groupedByCamp[campName]) groupedByCamp[campName] = [];
+                groupedByCamp[campName].push(row);
+            });
 
-            const exportFormatted = allBookingsData.map(row => ({
-                "วันที่และเวลาที่ทำรายการ": row.timestamp,
-                "ชื่อโครงการ": row.campaignName,
-                "รหัสนักศึกษา": row.studentId,
-                "ชื่อ-สกุล": row.fullName,
-                "เบอร์โทรศัพท์": row.phone,
-                "รอบวันที่เลือกฉีด": row.sessionDatetime,
-                "รายการวัคซีนที่เลือก": row.sessionVaccines
+            const container = document.getElementById('campaignCardsContainer');
+            
+            if(Object.keys(groupedByCamp).length === 0) {
+                container.innerHTML = '<p style="text-align:center;">ไม่พบประวัติการจองคิว</p>';
+                return;
+            }
+
+            for(let campName in groupedByCamp) {
+                let count = groupedByCamp[campName].length;
+                let isLegacy = campName === "ข้อมูลเก่า (ไม่มีชื่อโครงการ)";
+                let badge = isLegacy ? `<span style="background:#fff3cd; color:#856404; padding:2px 6px; border-radius:4px; font-size:12px; border:1px solid #856404; margin-bottom:5px; display:inline-block;">⚠️ ข้อมูลแบบเก่า</span>` : '';
+
+                const card = document.createElement('div');
+                card.className = 'camp-card';
+                card.innerHTML = `
+                    <div>
+                        ${badge}
+                        <div style="font-weight:bold; font-size:18px;">${campName}</div>
+                        <div style="color:#555; font-size:14px; margin-top:5px;">👥 ยอดจองทั้งหมด: ${count} คน</div>
+                    </div>
+                    <button class="btn-small" onclick="viewCampaignDetail('${campName}')">ดูข้อมูล / ดาวน์โหลด ➔</button>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        function viewCampaignDetail(campName) {
+            currentViewingCampaign = campName;
+            document.getElementById('detailCampaignTitle').innerText = `📋 โครงการ: ${campName}`;
+            
+            // กรองข้อมูลเฉพาะแคมเปญนี้
+            let campData = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)") === campName);
+
+            // จัดกลุ่มตามรอบ (Session)
+            let groupedBySession = {};
+            campData.forEach(row => {
+                let sessionName = row.sessionDatetime || row.vaccineDate || row.sessionName || "ไม่ระบุรอบวัน/เวลา";
+                if(!groupedBySession[sessionName]) groupedBySession[sessionName] = [];
+                groupedBySession[sessionName].push(row);
+            });
+
+            const container = document.getElementById('sessionCardsContainer');
+            container.innerHTML = '';
+
+            for(let sesName in groupedBySession) {
+                let count = groupedBySession[sesName].length;
+                const div = document.createElement('div');
+                div.className = 'session-item';
+                div.innerHTML = `
+                    <div>
+                        <strong style="font-size:16px;">📅 รอบ: ${sesName}</strong><br>
+                        <span style="font-size:14px; color:#555;">จองแล้ว: ${count} คน</span>
+                    </div>
+                    <button class="btn-small" style="background:#ff8b94;" onclick="exportSessionData('${sesName}')">📊 ดึงข้อมูล Excel รอบนี้</button>
+                `;
+                container.appendChild(div);
+            }
+
+            document.getElementById('campaignListView').style.display = 'none';
+            document.getElementById('campaignDetailView').style.display = 'block';
+        }
+
+        function backToCampaignList() {
+            document.getElementById('campaignListView').style.display = 'block';
+            document.getElementById('campaignDetailView').style.display = 'none';
+        }
+
+        function exportSessionData(sessionName) {
+            let dataToExport = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)") === currentViewingCampaign);
+
+            if(sessionName !== 'all') {
+                dataToExport = dataToExport.filter(r => (r.sessionDatetime || r.vaccineDate || r.sessionName || "ไม่ระบุรอบวัน/เวลา") === sessionName);
+            }
+
+            if(dataToExport.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
+
+            const exportFormatted = dataToExport.map(row => ({
+                "วันที่และเวลาที่ทำรายการ": row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "ไม่มีระบุเวลา",
+                "ชื่อโครงการ": row.campaignName || "ข้อมูลเก่า",
+                "รหัสนักศึกษา": row.studentId || "-",
+                "ชื่อ-สกุล": row.fullName || "-",
+                "เบอร์โทรศัพท์": row.phone || "-",
+                "รอบวันที่เลือกฉีด": row.sessionDatetime || row.vaccineDate || row.sessionName || "-",
+                "รายการวัคซีนที่เลือก": row.sessionVaccines || row.vaccines || row.testProgram || "-"
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(exportFormatted);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "All_Bookings");
-            XLSX.writeFile(workbook, "ประวัติการจองคิววัคซีนทั้งหมด.xlsx");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
+            
+            // ตั้งชื่อไฟล์ให้ไม่ให้มีอักขระพิเศษที่ห้ามตั้งเป็นชื่อไฟล์
+            let safeSessionName = sessionName === 'all' ? 'รวมทุกรอบ' : sessionName.replace(/[<>:"/\\|?*]+/g, '_');
+            let safeCampName = currentViewingCampaign.replace(/[<>:"/\\|?*]+/g, '_');
+            XLSX.writeFile(workbook, `ข้อมูลจองคิว_${safeCampName}_${safeSessionName}.xlsx`);
         }
 
         // ==========================================
