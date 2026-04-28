@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>สมุดพกวัคซีนออนไลน์ นศ.พยาบาล</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        /* Neo-Brutalism & Mobile-First Design */
+        :root {
+            --bg-color: #f4f4f5; --apricot: #FFB347; 
+            --text-color: #1a1a1a; --border-color: #1a1a1a;
+        }
+        * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .container { width: 100%; max-width: 600px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; }
+        h1, h2 { font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 24px; background: var(--apricot); padding: 12px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); line-height: 1.5; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 15px; }
+        input[type="text"], select, input[type="file"] { width: 100%; padding: 12px; font-size: 16px; border: 3px solid var(--border-color); border-radius: 8px; background: #fff; transition: all 0.2s ease; }
+        input:focus, select:focus { outline: none; background: #fffbf0; box-shadow: 4px 4px 0px var(--border-color); }
+        
+        /* สไตล์การ์ดโรคแต่ละชนิด */
+        .disease-card { background: #fff; border: 3px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-color); }
+        .disease-title { font-size: 18px; font-weight: bold; color: #d35400; margin-bottom: 10px; border-bottom: 2px dashed #ccc; padding-bottom: 5px;}
+        .file-upload-wrapper { margin-top: 10px; background: #f9f9f9; padding: 10px; border-radius: 6px; border: 1px solid #ddd; }
+        
+        button { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: var(--text-color); background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease; margin-bottom: 10px;}
+        button:active:not(:disabled) { box-shadow: 0px 0px 0px var(--border-color); transform: translate(4px, 4px); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .btn-search { background: var(--apricot); padding: 12px; font-size: 16px; margin-top: 10px; }
+        .alert { display: none; background: #d4edda; color: #155724; padding: 14px; border: 3px solid #155724; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center; box-shadow: 4px 4px 0px #155724; }
+        
+        .current-file-link { display: inline-block; margin-top: 5px; font-size: 14px; color: #0066cc; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="loginSection">
+        <h1>🩺 สมุดพกวัคซีนออนไลน์</h1>
+        <p style="text-align:center; color:#555;">ระบบบันทึกประวัติวัคซีนเพื่อเตรียมความพร้อมก่อนขึ้นฝึกปฏิบัติ</p>
+        
+        <div class="form-group">
+            <label>รหัสนักศึกษา</label>
+            <input type="text" id="loginStudentId" placeholder="กรอกรหัสนักศึกษา 9 หลัก">
+            <button class="btn-search" onclick="loginStudent()">🔍 เข้าสู่ระบบ / ค้นหาข้อมูล</button>
+        </div>
+    </div>
+
+    <div class="container" id="recordSection" style="display:none;">
+        <h2 style="background:#a8e6cf;">👤 ข้อมูลนักศึกษา</h2>
+        <div class="form-group">
+            <label>ชื่อ-นามสกุล</label>
+            <input type="text" id="studentName" placeholder="ระบุชื่อ-สกุล (หากเข้าครั้งแรก)">
+        </div>
+        
+        <div class="alert" id="successAlert">✅ บันทึกข้อมูลและอัปโหลดหลักฐานสำเร็จ!</div>
+
+        <form id="vaccineRecordForm">
+            <div class="disease-card">
+                <div class="disease-title">1. โรคสุกใส (Varicella)</div>
+                <select id="status_vzv">
+                    <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                    <option value="มีหลักฐานเคยป่วยเป็นสุกใส">✅ มีหลักฐานว่าเคยป่วยเป็นสุกใส</option>
+                    <option value="ผลตรวจ Varicella IgG Positive">✅ ผลตรวจ Varicella IgG Positive</option>
+                    <option value="รับวัคซีนสุกใสครบ 2 โด๊ส">✅ รับวัคซีนสุกใสครบ 2 โด๊ส</option>
+                </select>
+                <div class="file-upload-wrapper">
+                    <label style="font-size:13px;">แนบหลักฐาน (สมุดวัคซีน/ใบรับรองแพทย์/ผลแลป):</label>
+                    <input type="file" id="file_vzv" accept="image/*,.pdf">
+                    <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานปัจจุบันที่เคยแนบไว้</a>
+                </div>
+            </div>
+
+            <div class="disease-card">
+                <div class="disease-title">2. ไวรัสตับอักเสบบี (Hepatitis B)</div>
+                <select id="status_hbv">
+                    <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                    <option value="ผลตรวจ Anti-HBs IgG > 10 unit">✅ ผลตรวจ Anti-HBs IgG > 10 unit</option>
+                    <option value="รับวัคซีนตับอักเสบบีครบ 3 โด๊ส">✅ รับวัคซีนตับอักเสบบีครบ 3 โด๊ส</option>
+                </select>
+                <div class="file-upload-wrapper">
+                    <label style="font-size:13px;">แนบหลักฐาน:</label>
+                    <input type="file" id="file_hbv" accept="image/*,.pdf">
+                    <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานปัจจุบัน</a>
+                </div>
+            </div>
+
+            <div class="disease-card">
+                <div class="disease-title">3. หัด-คางทูม-หัดเยอรมัน (MMR)</div>
+                <select id="status_mmr">
+                    <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                    <option value="ผลตรวจ Measles IgG/IgM Positive">✅ ผลตรวจ Measles IgG/IgM Positive</option>
+                    <option value="รับวัคซีน MMR อย่างน้อย 1 โด๊ส">✅ รับวัคซีน MMR อย่างน้อย 1 โด๊ส (หลังอายุ 1 ปี)</option>
+                </select>
+                <div class="file-upload-wrapper">
+                    <label style="font-size:13px;">แนบหลักฐาน:</label>
+                    <input type="file" id="file_mmr" accept="image/*,.pdf">
+                    <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานปัจจุบัน</a>
+                </div>
+            </div>
+
+            <div class="disease-card">
+                <div class="disease-title">4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)</div>
+                <select id="status_tdap">
+                    <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                    <option value="รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)">✅ รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)</option>
+                </select>
+                <div class="file-upload-wrapper">
+                    <label style="font-size:13px;">แนบหลักฐาน:</label>
+                    <input type="file" id="file_tdap" accept="image/*,.pdf">
+                    <a id="link_tdap" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานปัจจุบัน</a>
+                </div>
+            </div>
+
+            <div class="disease-card">
+                <div class="disease-title">5. ไข้หวัดใหญ่ (Influenza)</div>
+                <select id="status_flu">
+                    <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                    <option value="รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)">✅ รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)</option>
+                </select>
+                <div class="file-upload-wrapper">
+                    <label style="font-size:13px;">แนบหลักฐาน:</label>
+                    <input type="file" id="file_flu" accept="image/*,.pdf">
+                    <a id="link_flu" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานปัจจุบัน</a>
+                </div>
+            </div>
+
+            <div class="disease-card">
+                <div class="disease-title">6. วัณโรค (Tuberculosis)</div>
+                <select id="status_tb">
+                    <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                    <option value="ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)">✅ ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)</option>
+                </select>
+                <div class="file-upload-wrapper">
+                    <label style="font-size:13px;">แนบหลักฐาน (ใบผล X-ray):</label>
+                    <input type="file" id="file_tb" accept="image/*,.pdf">
+                    <a id="link_tb" class="current-file-link" target="_blank" style="display:none;">📄 ดูหลักฐานปัจจุบัน</a>
+                </div>
+            </div>
+
+            <button type="submit" id="saveBtn">💾 บันทึกและอัปเดตข้อมูล</button>
+            <p id="uploadingText" style="text-align:center; display:none; color:#d35400; font-weight:bold;">⏳ กำลังอัปโหลดไฟล์... ห้ามปิดหน้าต่าง</p>
+        </form>
+    </div>
+
+    <script>
+        // --- 1. การเชื่อมต่อ Firebase ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
+            authDomain: "vacciner-a3b0f.firebaseapp.com",
+            projectId: "vacciner-a3b0f",
+            storageBucket: "vacciner-a3b0f.firebasestorage.app",
+            messagingSenderId: "322679198332",
+            appId: "1:322679198332:web:01e4174c3f30845d576ff9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage(); // เรียกใช้ Storage
+
+        let currentStudentId = "";
+        const diseases = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
+
+        // --- 2. ฟังก์ชัน Login และดึงข้อมูลเดิม ---
+        async function loginStudent() {
+            const sid = document.getElementById('loginStudentId').value.trim();
+            if(!sid) { alert("กรุณาระบุรหัสนักศึกษา"); return; }
+            
+            const btn = document.querySelector('.btn-search');
+            btn.innerText = "⏳ กำลังค้นหา..."; btn.disabled = true;
+
+            try {
+                // ค้นหาในฐานข้อมูลว่าเคยมีประวัติไหม
+                const docRef = db.collection('student_health_records').doc(sid);
+                const docSnap = await docRef.get();
+
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    document.getElementById('studentName').value = data.fullName || "";
+                    
+                    // ดึงค่าสถานะและลิงก์ไฟล์เดิมมาแสดง
+                    diseases.forEach(d => {
+                        if(data[`status_${d}`]) document.getElementById(`status_${d}`).value = data[`status_${d}`];
+                        if(data[`fileUrl_${d}`]) {
+                            const linkEl = document.getElementById(`link_${d}`);
+                            linkEl.href = data[`fileUrl_${d}`];
+                            linkEl.style.display = 'inline-block';
+                        }
+                    });
+                } else {
+                    alert("เข้าสู่ระบบครั้งแรก กรุณากรอกชื่อ-สกุล และเริ่มบันทึกข้อมูลได้เลยครับ");
+                }
+
+                currentStudentId = sid;
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('recordSection').style.display = 'block';
+
+            } catch(e) {
+                console.error(e); alert("❌ เกิดข้อผิดพลาดในการดึงข้อมูล");
+            } finally {
+                btn.innerText = "🔍 เข้าสู่ระบบ / ค้นหาข้อมูล"; btn.disabled = false;
+            }
+        }
+
+        // --- 3. ฟังก์ชันบันทึกข้อมูลและอัปโหลดไฟล์ ---
+        document.getElementById('vaccineRecordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('studentName').value.trim();
+            if(!fullName) { alert("กรุณาระบุชื่อ-นามสกุล"); return; }
+
+            const saveBtn = document.getElementById('saveBtn');
+            const uploadText = document.getElementById('uploadingText');
+            saveBtn.disabled = true; saveBtn.innerText = "⏳ กำลังประมวลผล...";
+            uploadText.style.display = 'block';
+
+            // เตรียม Object ข้อมูลที่จะบันทึกลง Database
+            let recordData = {
+                studentId: currentStudentId,
+                fullName: fullName,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                // วนลูปจัดการไฟล์ทั้ง 6 หมวดโรค
+                for (const d of diseases) {
+                    recordData[`status_${d}`] = document.getElementById(`status_${d}`).value;
+                    
+                    const fileInput = document.getElementById(`file_${d}`);
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        // ตั้งชื่อไฟล์ใน Storage (เช่น 6601001_hbv.jpg)
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `vaccine_proofs/${currentStudentId}_${d}_${Date.now()}.${fileExt}`;
+                        
+                        // อัปโหลดไฟล์ไปที่ Firebase Storage
+                        const storageRef = storage.ref().child(fileName);
+                        await storageRef.put(file);
+                        
+                        // ขอลิงก์ดาวน์โหลด
+                        const downloadURL = await storageRef.getDownloadURL();
+                        recordData[`fileUrl_${d}`] = downloadURL;
+                    }
+                }
+
+                // บันทึกข้อมูลข้อความ+ลิงก์ไฟล์ ลง Firestore
+                await db.collection('student_health_records').doc(currentStudentId).set(recordData, { merge: true });
+
+                document.getElementById('successAlert').style.display = 'block';
+                setTimeout(() => document.getElementById('successAlert').style.display = 'none', 4000);
+                
+                // รีเซ็ตช่องไฟล์ เพื่อไม่ให้อัปโหลดซ้ำในการกด Save ครั้งต่อไป
+                diseases.forEach(d => { document.getElementById(`file_${d}`).value = ""; });
+                
+                // แอบรีโหลดข้อมูลใหม่มาโชว์ลิงก์ที่อัปไปเมื่อกี้
+                loginStudent();
+
+            } catch (error) {
+                console.error(error); alert("❌ เกิดข้อผิดพลาดในการบันทึกหรืออัปโหลดไฟล์");
+            } finally {
+                saveBtn.disabled = false; saveBtn.innerText = "💾 บันทึกและอัปเดตข้อมูล";
+                uploadText.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
