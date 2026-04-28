@@ -15,7 +15,7 @@
         * { box-sizing: border-box; font-family: 'Sarabun', 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        .container { width: 100%; max-width: 1200px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; position: relative;}
+        .container { width: 100%; max-width: 1300px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; position: relative;}
         h1 { font-size: 24px; text-align: center; margin-top: 0; background: var(--apricot); padding: 15px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); }
         
         /* ปุ่มกลับหน้าแรก */
@@ -42,29 +42,30 @@
         .filter-bar button { padding: 10px 15px; font-size: 16px; font-weight: bold; background: var(--apricot); border: 3px solid var(--border-color); border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); }
         .filter-bar button:active { box-shadow: 0px 0px 0px; transform: translate(2px, 2px); }
 
-        .table-wrapper { overflow-x: auto; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); max-height: 600px;}
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th, td { border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); padding: 12px; text-align: center; font-size: 14px; }
+        .table-wrapper { overflow-x: auto; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); max-height: 700px;}
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        th, td { border-bottom: 2px solid var(--border-color); border-right: 2px solid var(--border-color); padding: 12px 8px; text-align: center; font-size: 14px; vertical-align: top;}
         th { background: #f0f0f0; font-weight: bold; position: sticky; top: 0; z-index: 1;}
         td.text-left { text-align: left; }
         
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; border: 1px solid var(--border-color); }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; border: 1px solid var(--border-color); margin-bottom: 5px;}
         .badge-green { background: #d4edda; color: #155724; }
         .badge-red { background: #f8d7da; color: #721c24; }
         .badge-gray { background: #e2e3e5; color: #383d41; }
+        .badge-legacy { background: #fff3cd; color: #856404; } /* ใช้สำหรับสีเหลือง / กำลังดำเนินการ */
         
-        .view-file-btn { font-size: 12px; text-decoration: none; display: block; margin-top: 5px; color: #0066cc; font-weight: bold; }
-        .view-file-btn:hover { text-decoration: underline; }
+        .date-info { font-size: 11px; color: #555; background: #f9f9f9; border: 1px dashed #ccc; padding: 2px 4px; border-radius: 4px; margin-top: 2px; text-align: left;}
+        
+        .view-file-btn { font-size: 12px; text-decoration: none; display: inline-block; margin-top: 5px; color: #fff; background: #0066cc; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #004080;}
+        .view-file-btn:hover { background: #004a99; }
 
         .btn-main { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); }
         .btn-main:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: translate(4px, 4px); }
 
-        /* Styles สำหรับ Card โครงการ */
         .camp-card { border: 3px solid var(--border-color); padding: 15px 20px; border-radius: 8px; background: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 4px 4px 0px var(--border-color); transition: 0.2s; }
         .camp-card:hover { transform: translateY(-2px); background: #fffbf0; }
         .btn-small { padding: 8px 12px; font-size: 14px; font-weight: bold; background: var(--apricot); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); }
         .btn-small:active { box-shadow: 0px 0px 0px; transform: translate(2px, 2px); }
-        
         .session-item { border: 2px dashed #ccc; padding: 15px; border-radius: 8px; background: #fafafa; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
@@ -98,16 +99,16 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>รหัสนักศึกษา</th>
-                            <th class="text-left">ชื่อ-นามสกุล</th>
-                            <th>ชั้นปี</th>
-                            <th>สุกใส (VZV)</th>
-                            <th>ตับอักเสบบี (HBV)</th>
-                            <th>MMR</th>
-                            <th>Tdap</th>
-                            <th>ไข้หวัดใหญ่</th>
-                            <th>วัณโรค (TB)</th>
-                            <th>สถานะรวม</th>
+                            <th style="min-width:90px;">รหัสนักศึกษา</th>
+                            <th class="text-left" style="min-width:140px;">ชื่อ-นามสกุล</th>
+                            <th style="min-width:60px;">ปี</th>
+                            <th style="min-width:120px;">สุกใส (VZV)</th>
+                            <th style="min-width:120px;">ตับอักเสบบี (HBV)</th>
+                            <th style="min-width:120px;">MMR</th>
+                            <th style="min-width:120px;">Tdap</th>
+                            <th style="min-width:120px;">ไข้หวัดใหญ่</th>
+                            <th style="min-width:120px;">วัณโรค (TB)</th>
+                            <th style="min-width:90px;">สถานะรวม</th>
                         </tr>
                     </thead>
                     <tbody id="studentTableBody"></tbody>
@@ -127,11 +128,9 @@
             <div id="campaignDetailView" style="display:none;">
                 <button class="btn-home" style="margin-bottom: 10px;" onclick="backToCampaignList()">⬅️ ย้อนกลับไปหน้าโครงการ</button>
                 <h3 id="detailCampaignTitle" style="border-bottom: 3px solid var(--border-color); padding-bottom: 10px; color:#d35400;">ชื่อโครงการ</h3>
-                
                 <div style="display:flex; gap:10px; margin-bottom: 20px;">
                     <button class="btn-main" style="background:#a8e6cf; font-size:16px;" onclick="exportSessionData('all')">📊 ดาวน์โหลด Excel รวมทุกรอบในโครงการนี้</button>
                 </div>
-
                 <div id="sessionCardsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
         </div>
@@ -140,16 +139,13 @@
             <div style="max-width: 600px; margin: 0 auto;">
                 <h2 style="text-align: center; margin-bottom: 5px;">อัปโหลดรายชื่อตั้งต้น (Master Data)</h2>
                 <p style="font-size: 14px; color: #555; text-align: center;">รูปแบบหัวคอลัมน์แถวแรก: <b>studentId, fullName, year, faculty</b></p>
-                
                 <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
                     <p id="fileNameDisplay" style="font-size: 18px; font-weight: bold;">📁 คลิกลากวาง หรือเลือกไฟล์ Excel (.xlsx)</p>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFile(this)">
                 </div>
-
                 <div class="progress-container" id="progressWrapper">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
-                
                 <p id="importStatus" style="text-align:center; font-weight:bold;"></p>
                 <button class="btn-main" id="importBtn" onclick="startImport()" disabled>🚀 นำเข้าข้อมูลลงฐานระบบ</button>
             </div>
@@ -158,7 +154,7 @@
     </div>
 
     <script>
-        // --- 1. การเชื่อมต่อ Firebase (อัปเดต Config ของคุณแล้ว) ---
+        // --- 1. การเชื่อมต่อ Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyBsEXH7UzyDvOQbq7Q_cv_DufA4cDHktIM",
             authDomain: "vacciner-a3b0f.firebaseapp.com",
@@ -186,13 +182,15 @@
         // ส่วนที่ 1: ระบบกระดานตรวจสอบ (Dashboard)
         // ==========================================
         let mergedDataList = [];
+        
+        // อัปเดตเกณฑ์ผ่านให้ตรงกับหน้าจอของนักศึกษาเวอร์ชันล่าสุด
         const PASS_CRITERIA = {
-            vzv: ["มีหลักฐานเคยป่วยเป็นสุกใส", "ผลตรวจ Varicella IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส"],
-            hbv: ["ผลตรวจ Anti-HBs IgG > 10 unit", "รับวัคซีนตับอักเสบบีครบ 3 โด๊ส"],
-            mmr: ["ผลตรวจ Measles IgG/IgM Positive", "รับวัคซีน MMR อย่างน้อย 1 โด๊ส"],
-            tdap: ["รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)"],
-            flu: ["รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)"],
-            tb: ["ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)"]
+            vzv: ["มีหลักฐานเคยป่วย", "IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส"], // รวมของเก่าเผื่อไว้
+            hbv: ["IgG > 10", "ผลตรวจ Anti-HBs IgG > 10 unit", "รับวัคซีนตับอักเสบบีครบ 3 โด๊ส"],
+            mmr: ["มีภูมิหรือฉีดครบแล้ว", "ผลตรวจ Measles IgG/IgM Positive", "รับวัคซีน MMR อย่างน้อย 1 โด๊ส"],
+            tdap: ["เคยฉีดภายใน10ปี", "รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)"],
+            flu: ["รับวัคซีนแล้ว", "รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)"],
+            tb: ["X-ray ปกติ", "ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)"]
         };
 
         async function loadDashboardData() {
@@ -228,28 +226,62 @@
             }
         }
 
+        // ฟังก์ชันประเมินผลและสร้าง UI แสดงวันที่
         function evaluateDisease(diseaseCode, recordObj) {
             const status = recordObj[`status_${diseaseCode}`];
             const fileUrl = recordObj[`fileUrl_${diseaseCode}`];
-            if (!status || status === "ยังไม่ดำเนินการ") return { isPass: false, html: `<span class="badge badge-gray">ยังไม่ส่งหลักฐาน</span>` };
+            
+            if (!status || status === "ยังไม่ดำเนินการ") return { isPass: false, html: `<span class="badge badge-gray">ยังไม่ดำเนินการ</span>` };
+            
             const isPass = PASS_CRITERIA[diseaseCode].includes(status);
-            const badgeClass = isPass ? 'badge-green' : 'badge-red';
-            const icon = isPass ? '✅' : '🔴';
-            let html = `<span class="badge ${badgeClass}" title="${status}">${icon} ส่งแล้ว</span>`;
-            if (fileUrl) html += `<a href="${fileUrl}" target="_blank" class="view-file-btn">📄 ดูหลักฐาน</a>`;
+            
+            // ประเมินว่ากำลัง "อยู่ระหว่างฉีด" หรือไม่ (สีเหลือง)
+            const isInProgress = status.includes("กำลังฉีด") || status.includes("ไม่มีข้อมูล");
+            
+            let badgeClass = 'badge-red';
+            let icon = '🔴';
+            let statusText = 'ไม่ผ่านเกณฑ์';
+
+            if (isPass) {
+                badgeClass = 'badge-green';
+                icon = '✅';
+                statusText = 'ผ่านเกณฑ์';
+            } else if (isInProgress) {
+                badgeClass = 'badge-legacy'; // ใช้สีเหลือง
+                icon = '⏳';
+                statusText = 'กำลังดำเนินการ';
+            }
+
+            // เตรียมดึงข้อมูลวันที่มาโชว์
+            let datesHtml = '';
+            if (diseaseCode === 'vzv') {
+                if(recordObj.date_vzv_1) datesHtml += `<div class="date-info">เข็ม1: ${recordObj.date_vzv_1}</div>`;
+                if(recordObj.date_vzv_2) datesHtml += `<div class="date-info">เข็ม2: ${recordObj.date_vzv_2}</div>`;
+            }
+            if (diseaseCode === 'hbv') {
+                if(recordObj.date_hbv_1) datesHtml += `<div class="date-info">เข็ม1: ${recordObj.date_hbv_1}</div>`;
+                if(recordObj.date_hbv_2) datesHtml += `<div class="date-info">เข็ม2: ${recordObj.date_hbv_2}</div>`;
+                if(recordObj.date_hbv_3) datesHtml += `<div class="date-info">เข็ม3: ${recordObj.date_hbv_3}</div>`;
+            }
+            if (['mmr', 'tdap', 'flu', 'tb'].includes(diseaseCode) && recordObj[`date_${diseaseCode}_1`]) {
+                let prefix = diseaseCode === 'tb' ? 'X-ray:' : 'ฉีดล่าสุด:';
+                datesHtml += `<div class="date-info">${prefix} ${recordObj[`date_${diseaseCode}_1`]}</div>`;
+            }
+            
+            let html = `<span class="badge ${badgeClass}" title="${status}">${icon} ${statusText}</span>`;
+            html += datesHtml;
+            if (fileUrl) html += `<br><a href="${fileUrl}" target="_blank" class="view-file-btn">ดูหลักฐาน</a>`;
+            
             return { isPass, html, statusText: status };
         }
 
-        // 🌟 ฟังก์ชันตัวกรองอัจฉริยะ: ดึงตัวเลขจากชั้นปีมาเทียบกัน
+        // ตัวกรองชั้นปีอัจฉริยะ
         function checkYearMatch(studentYear, filterYear) {
             if (filterYear === 'all') return true;
             let sYear = String(studentYear || "").trim();
             let fNum = filterYear.match(/\d+/); 
             let sNum = sYear.match(/\d+/);      
-            
-            if (fNum && sNum) {
-                return fNum[0] === sNum[0]; 
-            }
+            if (fNum && sNum) return fNum[0] === sNum[0]; 
             return sYear === filterYear; 
         }
 
@@ -271,7 +303,7 @@
                 const tb = evaluateDisease('tb', rec);
 
                 const allPassed = vzv.isPass && hbv.isPass && mmr.isPass && tdap.isPass && flu.isPass && tb.isPass;
-                let overallHtml = allPassed ? `<span class="badge badge-green">🟢 พร้อมขึ้นฝึก</span>` : `<span class="badge badge-red">🔴 ยังไม่ครบ</span>`;
+                let overallHtml = allPassed ? `<span class="badge badge-green">🟢 พร้อมฝึก</span>` : `<span class="badge badge-red">🔴 ไม่พร้อม</span>`;
                 student.overallPass = allPassed;
 
                 const tr = document.createElement('tr');
@@ -287,6 +319,7 @@
             });
         }
 
+        // ฟังก์ชันโหลดข้อมูลลง Excel (เพิ่มคอลัมน์วันที่)
         function exportDashboardToExcel() {
             const filterYear = document.getElementById('filterYear').value;
             let exportData = [];
@@ -296,21 +329,39 @@
                 const rec = student.records;
                 exportData.push({
                     "รหัสนักศึกษา": student.studentId, "ชื่อ-นามสกุล": student.fullName, "ชั้นปี": student.year,
-                    "สถานะรวม": student.overallPass ? "พร้อมขึ้นฝึก" : "ยังไม่ครบ",
-                    "สุกใส (VZV)": rec['status_vzv'] || "ยังไม่ดำเนินการ", "ตับอักเสบบี (HBV)": rec['status_hbv'] || "ยังไม่ดำเนินการ",
-                    "MMR": rec['status_mmr'] || "ยังไม่ดำเนินการ", "Tdap": rec['status_tdap'] || "ยังไม่ดำเนินการ",
-                    "ไข้หวัดใหญ่": rec['status_flu'] || "ยังไม่ดำเนินการ", "วัณโรค (TB)": rec['status_tb'] || "ยังไม่ดำเนินการ"
+                    "สถานะภาพรวม": student.overallPass ? "พร้อมขึ้นฝึก" : "ยังไม่ครบ",
+                    
+                    "สถานะ สุกใส (VZV)": rec['status_vzv'] || "ยังไม่ดำเนินการ",
+                    "วันที่ สุกใส เข็ม 1": rec['date_vzv_1'] || "-",
+                    "วันที่ สุกใส เข็ม 2": rec['date_vzv_2'] || "-",
+                    
+                    "สถานะ ตับอักเสบบี (HBV)": rec['status_hbv'] || "ยังไม่ดำเนินการ",
+                    "วันที่ ตับอักเสบบี เข็ม 1": rec['date_hbv_1'] || "-",
+                    "วันที่ ตับอักเสบบี เข็ม 2": rec['date_hbv_2'] || "-",
+                    "วันที่ ตับอักเสบบี เข็ม 3": rec['date_hbv_3'] || "-",
+                    
+                    "สถานะ MMR": rec['status_mmr'] || "ยังไม่ดำเนินการ",
+                    "วันที่ฉีด MMR ล่าสุด": rec['date_mmr_1'] || "-",
+                    
+                    "สถานะ Tdap": rec['status_tdap'] || "ยังไม่ดำเนินการ",
+                    "วันที่ฉีด Tdap ล่าสุด": rec['date_tdap_1'] || "-",
+                    
+                    "สถานะ ไข้หวัดใหญ่": rec['status_flu'] || "ยังไม่ดำเนินการ",
+                    "วันที่ฉีด ไข้หวัดใหญ่ ล่าสุด": rec['date_flu_1'] || "-",
+                    
+                    "สถานะ วัณโรค (TB)": rec['status_tb'] || "ยังไม่ดำเนินการ",
+                    "วันที่ X-ray ล่าสุด": rec['date_tb_1'] || "-"
                 });
             });
             if(exportData.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
             const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "HealthData");
-            XLSX.writeFile(workbook, `สมุดพกวัคซีน_${filterYear === 'all' ? 'ทุกชั้นปี' : filterYear}.xlsx`);
+            XLSX.writeFile(workbook, `สรุปประวัติสุขภาพ_${filterYear === 'all' ? 'ทุกชั้นปี' : filterYear}.xlsx`);
         }
 
         // ==========================================
-        // ส่วนที่ 2: ระบบประวัติการจองคิวแยกตามโครงการ
+        // ส่วนที่ 2 & 3: ประวัติจองคิว & นำเข้า Excel (เหมือนเดิม)
         // ==========================================
         let allBookingsRaw = []; 
         let currentViewingCampaign = ""; 
@@ -324,15 +375,12 @@
             try {
                 const snapshot = await db.collection('vaccine_responses').get();
                 snapshot.forEach(doc => allBookingsRaw.push(doc.data()));
-
                 allBookingsRaw.sort((a, b) => {
                     let timeA = a.timestamp ? a.timestamp.toMillis() : 0;
                     let timeB = b.timestamp ? b.timestamp.toMillis() : 0;
                     return timeB - timeA;
                 });
-
                 renderCampaignList();
-
             } catch (error) {
                 console.error(error);
                 document.getElementById('campaignCardsContainer').innerHTML = '<p style="color:red; text-align:center;">❌ เกิดข้อผิดพลาดในการดึงข้อมูล</p>';
@@ -343,7 +391,6 @@
 
         function renderCampaignList() {
             let groupedByCamp = {};
-            
             allBookingsRaw.forEach(row => {
                 let campName = row.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)";
                 if(!groupedByCamp[campName]) groupedByCamp[campName] = [];
@@ -351,7 +398,6 @@
             });
 
             const container = document.getElementById('campaignCardsContainer');
-            
             if(Object.keys(groupedByCamp).length === 0) {
                 container.innerHTML = '<p style="text-align:center;">ไม่พบประวัติการจองคิว</p>';
                 return;
@@ -361,15 +407,10 @@
                 let count = groupedByCamp[campName].length;
                 let isLegacy = campName === "ข้อมูลเก่า (ไม่มีชื่อโครงการ)";
                 let badge = isLegacy ? `<span style="background:#fff3cd; color:#856404; padding:2px 6px; border-radius:4px; font-size:12px; border:1px solid #856404; margin-bottom:5px; display:inline-block;">⚠️ ข้อมูลแบบเก่า</span>` : '';
-
                 const card = document.createElement('div');
                 card.className = 'camp-card';
                 card.innerHTML = `
-                    <div>
-                        ${badge}
-                        <div style="font-weight:bold; font-size:18px;">${campName}</div>
-                        <div style="color:#555; font-size:14px; margin-top:5px;">👥 ยอดจองทั้งหมด: ${count} คน</div>
-                    </div>
+                    <div>${badge}<div style="font-weight:bold; font-size:18px;">${campName}</div><div style="color:#555; font-size:14px; margin-top:5px;">👥 ยอดจองทั้งหมด: ${count} คน</div></div>
                     <button class="btn-small" onclick="viewCampaignDetail('${campName}')">ดูข้อมูล / ดาวน์โหลด ➔</button>
                 `;
                 container.appendChild(card);
@@ -379,33 +420,25 @@
         function viewCampaignDetail(campName) {
             currentViewingCampaign = campName;
             document.getElementById('detailCampaignTitle').innerText = `📋 โครงการ: ${campName}`;
-            
             let campData = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)") === campName);
-
             let groupedBySession = {};
             campData.forEach(row => {
                 let sessionName = row.sessionDatetime || row.vaccineDate || row.sessionName || "ไม่ระบุรอบวัน/เวลา";
                 if(!groupedBySession[sessionName]) groupedBySession[sessionName] = [];
                 groupedBySession[sessionName].push(row);
             });
-
             const container = document.getElementById('sessionCardsContainer');
             container.innerHTML = '';
-
             for(let sesName in groupedBySession) {
                 let count = groupedBySession[sesName].length;
                 const div = document.createElement('div');
                 div.className = 'session-item';
                 div.innerHTML = `
-                    <div>
-                        <strong style="font-size:16px;">📅 รอบ: ${sesName}</strong><br>
-                        <span style="font-size:14px; color:#555;">จองแล้ว: ${count} คน</span>
-                    </div>
+                    <div><strong style="font-size:16px;">📅 รอบ: ${sesName}</strong><br><span style="font-size:14px; color:#555;">จองแล้ว: ${count} คน</span></div>
                     <button class="btn-small" style="background:#ff8b94;" onclick="exportSessionData('${sesName}')">📊 ดึงข้อมูล Excel รอบนี้</button>
                 `;
                 container.appendChild(div);
             }
-
             document.getElementById('campaignListView').style.display = 'none';
             document.getElementById('campaignDetailView').style.display = 'block';
         }
@@ -417,35 +450,25 @@
 
         function exportSessionData(sessionName) {
             let dataToExport = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า (ไม่มีชื่อโครงการ)") === currentViewingCampaign);
-
             if(sessionName !== 'all') {
                 dataToExport = dataToExport.filter(r => (r.sessionDatetime || r.vaccineDate || r.sessionName || "ไม่ระบุรอบวัน/เวลา") === sessionName);
             }
-
             if(dataToExport.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
-
             const exportFormatted = dataToExport.map(row => ({
                 "วันที่และเวลาที่ทำรายการ": row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "ไม่มีระบุเวลา",
                 "ชื่อโครงการ": row.campaignName || "ข้อมูลเก่า",
-                "รหัสนักศึกษา": row.studentId || "-",
-                "ชื่อ-สกุล": row.fullName || "-",
-                "เบอร์โทรศัพท์": row.phone || "-",
+                "รหัสนักศึกษา": row.studentId || "-", "ชื่อ-สกุล": row.fullName || "-", "เบอร์โทรศัพท์": row.phone || "-",
                 "รอบวันที่เลือกฉีด": row.sessionDatetime || row.vaccineDate || row.sessionName || "-",
                 "รายการวัคซีนที่เลือก": row.sessionVaccines || row.vaccines || row.testProgram || "-"
             }));
-
             const worksheet = XLSX.utils.json_to_sheet(exportFormatted);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
-            
             let safeSessionName = sessionName === 'all' ? 'รวมทุกรอบ' : sessionName.replace(/[<>:"/\\|?*]+/g, '_');
             let safeCampName = currentViewingCampaign.replace(/[<>:"/\\|?*]+/g, '_');
             XLSX.writeFile(workbook, `ข้อมูลจองคิว_${safeCampName}_${safeSessionName}.xlsx`);
         }
 
-        // ==========================================
-        // ส่วนที่ 3: ระบบนำเข้าข้อมูล Excel
-        // ==========================================
         let excelData = [];
         function handleFile(input) {
             const file = input.files[0];
@@ -473,15 +496,12 @@
             document.getElementById('progressWrapper').style.display = 'block';
             btn.disabled = true;
             let count = 0; const total = excelData.length;
-
             for (const student of excelData) {
                 if (student.studentId) {
                     try {
                         await db.collection('students_master').doc(String(student.studentId)).set({
-                            studentId: String(student.studentId),
-                            fullName: student.fullName || "",
-                            year: student.year || "",
-                            faculty: student.faculty || "",
+                            studentId: String(student.studentId), fullName: student.fullName || "",
+                            year: student.year || "", faculty: student.faculty || "",
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         }, { merge: true });
                         count++;
