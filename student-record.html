@@ -3,74 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>สมุดพกวัคซีนออนไลน์ คณะพยาบาลศาสตร์</title>
+    <title>สมุดพกวัคซีนออนไลน์ - นศ.พยาบาล</title>
     
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
     
     <style>
-        :root { --bg-color: #f4f4f5; --apricot: #FFB347; --text-color: #1a1a1a; --border-color: #1a1a1a; }
-        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        /* 🎨 ธีม Neo-Brutalism (Apricot + Blue + Gold) */
+        :root { 
+            --bg-color: #e4e4e7; 
+            --apricot: #FFB347; 
+            --gold: #D4AF37;
+            --green: #a8e6cf;
+            --pink: #ff8b94;
+            --blue: #80c6ff;
+            --blue-dark: #0056b3;
+            --text-color: #000000; 
+            --border-color: #000000;
+            --border-width: 3px;
+        }
         
-        .container { width: 100%; max-width: 700px; background: #ffffff; border: 3px solid var(--border-color); border-radius: 12px; box-shadow: 6px 6px 0px var(--border-color); padding: 24px; margin-bottom: 24px; }
-        h1, h2 { font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 20px; background: var(--apricot); padding: 12px; border: 3px solid var(--border-color); border-radius: 8px; box-shadow: 4px 4px 0px var(--border-color); line-height: 1.5; }
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; color: var(--text-color); }
         
-        .btn-home { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #000; font-weight: bold; background: #eee; padding: 10px 15px; border: 3px solid #000; border-radius: 8px; margin-bottom: 20px; box-shadow: 2px 2px 0px #000; transition: all 0.1s; align-self: flex-start; }
-        .btn-home:active { box-shadow: 0px 0px 0px #000; transform: translate(2px, 2px); }
+        body { 
+            background-color: var(--bg-color); 
+            margin: 0; padding: 20px; 
+            display: flex; flex-direction: column; align-items: center; 
+            background-image: radial-gradient(#bbb 1px, transparent 0); background-size: 20px 20px; 
+        }
+        
+        .container { 
+            width: 100%; max-width: 750px; background: #ffffff; 
+            border: 4px solid var(--border-color); box-shadow: 10px 10px 0px var(--border-color); 
+            padding: 25px; margin-bottom: 24px; position: relative;
+        }
+
+        h1, h2 { 
+            font-size: 24px; text-align: center; margin-top: 0; margin-bottom: 20px; 
+            background: var(--apricot); padding: 12px; border: var(--border-width) solid var(--border-color); 
+            box-shadow: 4px 4px 0px var(--border-color); text-transform: uppercase; font-weight: 900;
+        }
+        
+        button, .btn-home, .btn-main, .view-file-btn, .tab-btn { 
+            font-weight: 900; border: var(--border-width) solid var(--border-color); 
+            box-shadow: 4px 4px 0px var(--border-color); cursor: pointer; transition: all 0.1s ease-in-out; 
+            color: #000; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; 
+        }
+        button:active, .btn-home:active, .btn-main:active, .view-file-btn:active, .tab-btn:active { 
+            box-shadow: 0px 0px 0px var(--border-color); transform: translate(4px, 4px); 
+        }
+
+        .btn-home { background: #fff; padding: 10px 15px; margin-bottom: 20px; font-size: 16px; }
+        .btn-main { width: 100%; background: var(--green); padding: 15px; font-size: 20px; margin-top: 15px; }
+        .btn-main:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: translate(4px, 4px); }
 
         .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 15px; }
-        input[type="text"], input[type="date"], select, input[type="file"] { width: 100%; padding: 12px; font-size: 15px; border: 3px solid var(--border-color); border-radius: 8px; background: #fff; transition: all 0.2s ease; }
+        label { display: block; font-weight: 900; margin-bottom: 8px; font-size: 16px; }
+        input[type="text"], input[type="date"], select, input[type="file"] { 
+            width: 100%; padding: 12px; font-size: 16px; font-weight: 600; 
+            border: var(--border-width) solid var(--border-color); background: #fff; 
+            box-shadow: 4px 4px 0px var(--border-color); transition: 0.1s;
+        }
+        input:focus, select:focus { background: #fffbf0; outline: none; }
         
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; }
-        .tab-btn { padding: 10px 14px; font-size: 14px; font-weight: bold; background: #eee; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.1s; flex-grow: 1; text-align: center;}
-        .tab-btn.active { background: #a8e6cf; box-shadow: 3px 3px 0px var(--border-color); transform: translateY(-2px); }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; border-bottom: 4px solid var(--border-color); padding-bottom: 15px; }
+        .tab-btn { background: #f0f0f0; padding: 10px 15px; font-size: 15px; flex-grow: 1; }
+        .tab-btn.active { background: var(--blue); transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-color); }
+        .tab-content { display: none; background: #fff; border: 4px solid var(--border-color); padding: 20px; margin-bottom: 20px; box-shadow: 6px 6px 0px var(--border-color); }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .disease-title { font-size: 20px; font-weight: 900; background: var(--gold); padding: 8px 15px; border: 3px solid #000; display: inline-block; margin-bottom: 15px; box-shadow: 3px 3px 0px #000; }
+        .guideline-box { background: #fff3cd; border: 3px solid #000; padding: 12px; font-size: 15px; font-weight: 600; margin-bottom: 20px; box-shadow: 4px 4px 0px #000; }
+        .date-section { background: #f9f9fa; border: 3px dashed #000; padding: 15px; margin-top: 15px; display: none; }
+        .dose-group { background: #fff; border: 2px solid #000; padding: 12px; margin-bottom: 10px; box-shadow: 2px 2px 0px #000; }
+
+        .current-file-link { margin-top: 10px; font-size: 14px; background: #fff; padding: 6px 12px; border: 2px solid #000; font-weight: 900; display: inline-block; box-shadow: 2px 2px 0px #000; text-decoration: none; color: var(--blue-dark); }
         
-        .tab-content { display: none; background: #fff; border: 3px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-color); }
-        .tab-content.active { display: block; }
-
-        .disease-title { font-size: 18px; font-weight: bold; color: #d35400; margin-bottom: 12px; border-bottom: 2px dashed #ccc; padding-bottom: 5px; }
-        .guideline-box { background: #fff3cd; border: 2px solid #856404; color: #856404; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; line-height: 1.5; }
-        .guideline-box strong { display: block; margin-bottom: 4px; color: #533f03; }
-
-        .date-section { background: #eef2f5; border: 2px dashed #8ba4b4; padding: 15px; border-radius: 8px; margin-top: 10px; display: none; }
-        .dose-group { background: #fff; border: 2px solid #ccc; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
-
-        .history-badge { background: #e9ecef; border: 1px solid #dee2e6; color: #495057; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
-
-        button.btn-save { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: var(--text-color); background: #a8e6cf; border: 3px solid var(--border-color); border-radius: 8px; cursor: pointer; box-shadow: 4px 4px 0px var(--border-color); transition: all 0.1s ease; margin-top: 10px;}
-        button.btn-save:active { box-shadow: 0px 0px 0px; transform: translate(4px, 4px); }
-        .current-file-link { display: inline-block; margin-top: 10px; font-size: 14px; color: #0066cc; text-decoration: none; font-weight: bold; background: #e6f2ff; padding: 6px 12px; border-radius: 4px; border: 1px solid #0066cc; }
+        .alert-box { border: 4px solid #000; padding: 15px; font-weight: 800; margin-bottom: 20px; box-shadow: 6px 6px 0px #000; }
+        .alert-red { background: var(--pink); }
         
-        #notificationArea { margin-bottom: 20px; }
-        .alert-box { border: 3px solid; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .alert-red { background: #f8d7da; border-color: #dc3545; color: #721c24; box-shadow: 4px 4px 0px #dc3545; }
+        /* 🖨️ สไตล์สำหรับการ Print PDF (เฉพาะส่วน PrintArea) */
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; background: #fff; }
+            .container, .btn-home { display: none !important; }
+            .print-header { border: 4px solid #000; padding: 20px; background: var(--apricot) !important; margin-bottom: 20px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print-disease-box { border: 3px solid #000; padding: 15px; margin-bottom: 20px; page-break-inside: avoid; }
+            .print-title { background: var(--blue-dark) !important; color: #fff !important; padding: 8px 12px; font-weight: 900; font-size: 18px; border: 2px solid #000; display: inline-block; margin-bottom: 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print-img { max-width: 100%; max-height: 250px; border: 2px solid #000; margin-top: 10px; display: block; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <a href="index.html" class="btn-home">🏠 กลับหน้าเมนูหลัก</a>
+    <div class="container" id="mainContainer">
+        <a href="index.html" class="btn-home">⬅️ กลับหน้าหลัก</a>
 
+        <!-- 🔒 ส่วนล็อกอิน -->
         <div id="loginSection">
-            <h1>📑 บันทึกประวัติสุขภาพนักศึกษา</h1>
+            <h1 style="background: var(--blue); color: #fff;">📑 สมุดพกสุขภาพ (นศ.)</h1>
             <div class="form-group">
-                <label>รหัสนักศึกษา</label>
-                <input type="text" id="loginStudentId" placeholder="กรอกรหัสนักศึกษา">
-                <button type="button" class="btn-save" style="background: var(--apricot); margin-top: 15px;" onclick="loginStudent()">🔍 เข้าสู่ระบบ / ค้นหาข้อมูล</button>
+                <label>รหัสนักศึกษา (Student ID):</label>
+                <input type="text" id="loginStudentId" placeholder="กรอกรหัสนักศึกษาของคุณ" onkeypress="if(event.key==='Enter') loginStudent()">
+                <button type="button" class="btn-main" style="background: var(--apricot);" onclick="loginStudent()">🔍 ค้นหาข้อมูล / เข้าสู่ระบบ</button>
             </div>
         </div>
 
+        <!-- 📋 ส่วนบันทึกประวัติ -->
         <div id="recordSection" style="display:none;">
-            <div id="notificationArea"></div>
-
-            <h2 style="background:#a8e6cf;">👤 ข้อมูลนักศึกษา</h2>
-            <div class="form-group">
-                <label>ชื่อ-นามสกุล</label>
-                <input type="text" id="studentName" readonly style="background:#eee; cursor:not-allowed;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 4px solid #000; padding-bottom: 15px; margin-bottom: 20px; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h2 style="margin:0; background:#fff; border:none; box-shadow:none; text-align:left; font-size:22px; padding:0;">👤 ข้อมูลของคุณ</h2>
+                    <input type="text" id="studentName" readonly style="background:#f0f0f0; border:none; box-shadow:none; padding:5px 0; font-size:18px;">
+                </div>
+                <button class="btn-home" style="background:var(--gold); margin:0;" onclick="printMyRecord()">🖨️ Save เป็น PDF</button>
             </div>
+
+            <div id="notificationArea"></div>
 
             <form id="vaccineRecordForm">
                 
@@ -83,88 +136,75 @@
                     <button type="button" class="tab-btn" onclick="switchTab('tb', this)">6. วัณโรค</button>
                 </div>
 
+                <!-- 1. โรคสุกใส (VZV) -->
                 <div id="tab-vzv" class="tab-content active">
                     <div class="disease-title">1. โรคสุกใส (Varicella)</div>
-                    <div class="guideline-box">
-                        <strong>📌 แนวปฏิบัติ:</strong>
-                        1. มีภูมิ/เคยป่วย (จบ) ⚠️ 2. ไม่มีภูมิ: ต้องฉีด 2 เข็ม ห่างกัน 1 เดือน
-                    </div>
+                    <div class="guideline-box">📌 มีภูมิ/เคยป่วย (จบ) หรือ ⚠️ ไม่มีภูมิ: ต้องฉีด 2 เข็ม ห่างกัน 1 เดือน</div>
                     <div class="form-group">
-                        <label>เลือกสถานะภูมิคุ้มกัน:</label>
+                        <label>สถานะปัจจุบัน:</label>
                         <select id="status_vzv" onchange="toggleDates('vzv')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="มีหลักฐานเคยป่วย">✅ 1. มีหลักฐานยืนยันว่าเคยป่วยเป็นสุกใส</option>
-                            <option value="IgG Positive">✅ 2. ผลตรวจเลือด Varicella IgG Positive (+)</option>
-                            <option value="กำลังฉีดวัคซีน">⚠️ 3. ไม่มีภูมิ ต้องดำเนินการฉีดวัคซีน 2 โด๊ส</option>
+                            <option value="มีหลักฐานเคยป่วย">✅ 1. มีหลักฐานเคยป่วยเป็นสุกใส</option>
+                            <option value="IgG Positive">✅ 2. ผลตรวจเลือด IgG Positive (+)</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 3. ไม่มีภูมิ (อยู่ระหว่างฉีด 2 โด๊ส)</option>
+                            <option value="รับวัคซีนสุกใสครบ 2 โด๊ส">✅ 4. ฉีดครบ 2 โด๊สแล้ว</option>
                         </select>
                     </div>
                     <div class="form-group" id="general_upload_vzv">
-                        <label style="font-size:13px; color:#555;">อัปโหลดหลักฐาน (ผลเลือด/ใบรับรอง):</label>
+                        <label>📸 อัปโหลดผลเลือด/ใบรับรองแพทย์:</label>
                         <input type="file" id="file_vzv" accept="image/*">
                         <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
                     </div>
                     <div id="dates_vzv" class="date-section">
                         <div class="dose-group">
-                            <label>📅 วันที่ฉีด โด๊สที่ 1:</label>
-                            <input type="date" id="date_vzv_1" onchange="calcVZV()">
+                            <label>📅 วันที่ฉีด โด๊ส 1:</label><input type="date" id="date_vzv_1" onchange="calcVZV()">
                             <input type="file" id="file_vzv_1" accept="image/*" style="margin-top:8px;">
-                            <a id="link_vzv_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์โด๊ส 1</a>
+                            <a id="link_vzv_1" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 1</a>
                         </div>
                         <div class="dose-group">
-                            <label>📅 วันที่ฉีด โด๊สที่ 2:</label>
-                            <input type="date" id="date_vzv_2">
+                            <label>📅 วันที่ฉีด โด๊ส 2:</label><input type="date" id="date_vzv_2">
                             <input type="file" id="file_vzv_2" accept="image/*" style="margin-top:8px;">
-                            <a id="link_vzv_2" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์โด๊ส 2</a>
+                            <a id="link_vzv_2" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 2</a>
                         </div>
                     </div>
                 </div>
 
+                <!-- 2. ไวรัสตับอักเสบบี (HBV) -->
                 <div id="tab-hbv" class="tab-content">
                     <div class="disease-title">2. ไวรัสตับอักเสบบี (Hepatitis B)</div>
-                    <div class="guideline-box">
-                        <strong>📌 แนวปฏิบัติ:</strong>
-                        1. ภูมิคุ้มกัน > 10 unit (จบ) ⚠️ 2. ไม่มีภูมิ: ฉีด 3 เข็ม (เดือน 0, 1, 6)
-                    </div>
+                    <div class="guideline-box">📌 ภูมิคุ้มกัน > 10 unit (จบ) หรือ ⚠️ ไม่มีภูมิ: ฉีด 3 เข็ม (0, 1, 6 เดือน)</div>
                     <div class="form-group">
-                        <label>เลือกสถานะภูมิคุ้มกัน:</label>
+                        <label>สถานะปัจจุบัน:</label>
                         <select id="status_hbv" onchange="toggleDates('hbv')">
                             <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
                             <option value="IgG > 10">✅ 1. ผลตรวจ Anti-HBs IgG > 10 unit</option>
-                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องดำเนินการฉีดวัคซีน 3 โด๊ส</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ (อยู่ระหว่างฉีด 3 โด๊ส)</option>
+                            <option value="รับวัคซีนตับอักเสบบีครบ 3 โด๊ส">✅ 3. ฉีดครบ 3 โด๊สแล้ว</option>
                         </select>
                     </div>
                     <div class="form-group" id="general_upload_hbv">
-                        <label style="font-size:13px; color:#555;">อัปโหลดหลักฐาน (ผลเลือด/ใบรับรอง):</label>
+                        <label>📸 อัปโหลดผลตรวจเลือด:</label>
                         <input type="file" id="file_hbv" accept="image/*">
                         <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
                     </div>
                     <div id="dates_hbv" class="date-section">
-                        <div class="dose-group">
-                            <label>📅 วันที่ฉีด เข็ม 1:</label><input type="date" id="date_hbv_1" onchange="calcHBV()">
-                            <input type="file" id="file_hbv_1" accept="image/*" style="margin-top:8px;">
-                            <a id="link_hbv_1" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 1</a>
-                        </div>
-                        <div class="dose-group">
-                            <label>📅 วันที่ฉีด เข็ม 2:</label><input type="date" id="date_hbv_2">
-                            <input type="file" id="file_hbv_2" accept="image/*" style="margin-top:8px;">
-                            <a id="link_hbv_2" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 2</a>
-                        </div>
-                        <div class="dose-group">
-                            <label>📅 วันที่ฉีด เข็ม 3:</label><input type="date" id="date_hbv_3">
-                            <input type="file" id="file_hbv_3" accept="image/*" style="margin-top:8px;">
-                            <a id="link_hbv_3" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 3</a>
-                        </div>
+                        <div class="dose-group"><label>เข็ม 1:</label><input type="date" id="date_hbv_1" onchange="calcHBV()"><input type="file" id="file_hbv_1" accept="image/*" style="margin-top:5px;"><a id="link_hbv_1" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 1</a></div>
+                        <div class="dose-group"><label>เข็ม 2:</label><input type="date" id="date_hbv_2"><input type="file" id="file_hbv_2" accept="image/*" style="margin-top:5px;"><a id="link_hbv_2" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 2</a></div>
+                        <div class="dose-group"><label>เข็ม 3:</label><input type="date" id="date_hbv_3"><input type="file" id="file_hbv_3" accept="image/*" style="margin-top:5px;"><a id="link_hbv_3" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 3</a></div>
                     </div>
                 </div>
 
+                <!-- 3. MMR -->
                 <div id="tab-mmr" class="tab-content">
                     <div class="disease-title">3. หัด-คางทูม-หัดเยอรมัน (MMR)</div>
-                    <div class="guideline-box">มีหลักฐานฉีดครบ 2 เข็ม หรือผลเลือด Positive ไม่ต้องฉีดเพิ่ม</div>
-                    <select id="status_mmr" onchange="toggleDates('mmr')">
-                        <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                        <option value="มีภูมิหรือฉีดครบแล้ว">✅ 1. มีภูมิคุ้มกันหรือเคยฉีดครบแล้ว</option>
-                        <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องฉีดเพิ่ม</option>
-                    </select>
+                    <div class="form-group">
+                        <label>สถานะปัจจุบัน:</label>
+                        <select id="status_mmr" onchange="toggleDates('mmr')">
+                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                            <option value="มีภูมิหรือฉีดครบแล้ว">✅ 1. มีภูมิคุ้มกันหรือเคยฉีดครบแล้ว</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องฉีดเพิ่ม</option>
+                        </select>
+                    </div>
                     <div id="dates_mmr" class="date-section">
                         <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_mmr_1">
                         <input type="file" id="file_mmr_1" accept="image/*" style="margin-top:8px;">
@@ -172,14 +212,17 @@
                     </div>
                 </div>
 
+                <!-- 4. Tdap -->
                 <div id="tab-tdap" class="tab-content">
                     <div class="disease-title">4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)</div>
-                    <div class="guideline-box">ต้องฉีดกระตุ้นทุก 10 ปี</div>
-                    <select id="status_tdap" onchange="toggleDates('tdap')">
-                        <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                        <option value="เคยฉีดภายใน10ปี">✅ 1. เคยฉีดมาแล้ว (ยังไม่เกิน 10 ปี)</option>
-                        <option value="กำลังฉีดวัคซีน">⚠️ 2. หมดอายุ/ต้องฉีดใหม่</option>
-                    </select>
+                    <div class="form-group">
+                        <label>สถานะปัจจุบัน:</label>
+                        <select id="status_tdap" onchange="toggleDates('tdap')">
+                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                            <option value="เคยฉีดภายใน10ปี">✅ 1. เคยฉีดมาแล้ว (ยังไม่เกิน 10 ปี)</option>
+                            <option value="กำลังฉีดวัคซีน">⚠️ 2. หมดอายุ/ต้องฉีดใหม่</option>
+                        </select>
+                    </div>
                     <div id="dates_tdap" class="date-section">
                         <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_tdap_1">
                         <input type="file" id="file_tdap_1" accept="image/*" style="margin-top:8px;">
@@ -187,43 +230,38 @@
                     </div>
                 </div>
 
+                <!-- 5. ไข้หวัดใหญ่ (Flu) -->
                 <div id="tab-flu" class="tab-content">
                     <div class="disease-title">5. ไข้หวัดใหญ่ (Influenza)</div>
-                    <div class="guideline-box"><strong>💉 ต้องฉีดเป็นประจำทุกปี</strong><br>กรุณาอัปเดตวันที่และแนบหลักฐานการฉีดครั้งล่าสุดของคุณ</div>
-                    <div id="last_flu_info" class="history-badge" style="display:none;">ประวัติล่าสุด: -</div>
+                    <div class="guideline-box">💉 ต้องฉีดและอัปเดตหลักฐานเป็นประจำทุกปี</div>
+                    <div class="form-group"><label>📅 วันที่ฉีด (รอบล่าสุด):</label><input type="date" id="date_flu_1"></div>
                     <div class="form-group">
-                        <label>📅 วันที่ฉีด (รอบล่าสุด):</label>
-                        <input type="date" id="date_flu_1">
-                    </div>
-                    <div class="form-group">
-                        <label>📸 อัปโหลดหลักฐานใหม่ (ปีปัจจุบัน):</label>
-                        <input type="file" id="file_flu_1" accept="image/*">
-                        <a id="link_flu_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบันในระบบ</a>
+                        <label>📸 อัปโหลดหลักฐานใหม่ (ปีปัจจุบัน):</label><input type="file" id="file_flu_1" accept="image/*">
+                        <a id="link_flu_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
                     </div>
                     <input type="hidden" id="status_flu" value="รับวัคซีนแล้ว">
                 </div>
 
+                <!-- 6. วัณโรค (TB) -->
                 <div id="tab-tb" class="tab-content">
                     <div class="disease-title">6. วัณโรค (Tuberculosis)</div>
-                    <div class="guideline-box"><strong>🩺 ต้องมีผลตรวจ X-ray ปอดที่ปกติ</strong><br>และต้องตรวจมาไม่เกิน 6 เดือนก่อนเข้าฝึกปฏิบัติ</div>
-                    <div id="last_tb_info" class="history-badge" style="display:none;">X-ray ล่าสุดเมื่อ: -</div>
+                    <div class="guideline-box">🩺 ผล X-ray ปอดต้องปกติ และตรวจมาไม่เกิน 6 เดือนก่อนขึ้นฝึก</div>
+                    <div class="form-group"><label>📅 วันที่เข้ารับการ X-ray:</label><input type="date" id="date_tb_1"></div>
                     <div class="form-group">
-                        <label>📅 วันที่เข้ารับการ X-ray:</label>
-                        <input type="date" id="date_tb_1">
-                    </div>
-                    <div class="form-group">
-                        <label>📸 อัปโหลดใบรายงานผล (CXR):</label>
-                        <input type="file" id="file_tb_1" accept="image/*">
+                        <label>📸 อัปโหลดใบรายงานผล (CXR):</label><input type="file" id="file_tb_1" accept="image/*">
                         <a id="link_tb_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูผล X-ray ปัจจุบัน</a>
                     </div>
                     <input type="hidden" id="status_tb" value="X-ray ปกติ">
                 </div>
 
-                <button type="submit" class="btn-save" id="saveBtn">💾 บันทึกและอัปเดตข้อมูลล่าสุด</button>
-                <p id="statusMsg" style="text-align:center; font-weight:bold; display:none; margin-top:15px; color:#d35400;"></p>
+                <button type="submit" class="btn-main" id="saveBtn">💾 บันทึกและส่งหลักฐาน</button>
+                <p id="statusMsg" style="text-align:center; font-weight:900; display:none; margin-top:15px; color:var(--blue-dark);"></p>
             </form>
         </div>
     </div>
+
+    <!-- 🖨️ พื้นที่สำหรับ Print PDF (ซ่อนไว้จนกว่าจะกดพิมพ์) -->
+    <div id="printArea" style="display:none;"></div>
 
     <script>
         const firebaseConfig = {
@@ -241,13 +279,9 @@
         const diseases = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
         const fileSuffixes = ['', '_1', '_2', '_3']; 
         let currentId = "";
+        let currentStudentData = null; // เก็บข้อมูลไว้ใช้ตอน Print
 
-        function addMonths(dateStr, months) {
-            if(!dateStr) return "";
-            let d = new Date(dateStr); d.setMonth(d.getMonth() + months);
-            return d.toISOString().split('T')[0];
-        }
-
+        function addMonths(dateStr, months) { if(!dateStr) return ""; let d = new Date(dateStr); d.setMonth(d.getMonth() + months); return d.toISOString().split('T')[0]; }
         function calcVZV() { let d = document.getElementById('date_vzv_1').value; if(d) document.getElementById('date_vzv_2').value = addMonths(d, 1); }
         function calcHBV() { let d = document.getElementById('date_hbv_1').value; if(d) { document.getElementById('date_hbv_2').value = addMonths(d, 1); document.getElementById('date_hbv_3').value = addMonths(d, 6); } }
 
@@ -269,22 +303,21 @@
         async function loginStudent() {
             const sid = document.getElementById('loginStudentId').value.trim();
             if(!sid) return alert("กรุณาระบุรหัส");
-            const btn = document.querySelector('#loginSection .btn-save');
+            const btn = document.querySelector('#loginSection .btn-main');
             btn.innerText = "⏳ กำลังค้นหา..."; btn.disabled = true;
 
             try {
                 const masterDoc = await db.collection('students_master').doc(sid).get();
-                if(!masterDoc.exists) { alert("❌ ไม่พบรหัสในระบบ"); btn.innerText = "🔍 เข้าสู่ระบบ"; btn.disabled = false; return; }
+                if(!masterDoc.exists) { alert("❌ ไม่พบรหัสในระบบ"); btn.innerText = "🔍 ค้นหาข้อมูล / เข้าสู่ระบบ"; btn.disabled = false; return; }
                 
                 document.getElementById('studentName').value = masterDoc.data().fullName;
                 currentId = sid;
+                currentStudentData = {}; // Initialize empty record
 
                 const recordDoc = await db.collection('student_health_records').doc(sid).get();
                 if(recordDoc.exists) {
                     const rec = recordDoc.data();
-                    
-                    if(rec.date_flu_1) { document.getElementById('last_flu_info').innerText = "ฉีดครั้งล่าสุดเมื่อ: " + rec.date_flu_1; document.getElementById('last_flu_info').style.display = 'block'; }
-                    if(rec.date_tb_1) { document.getElementById('last_tb_info').innerText = "X-ray ล่าสุดเมื่อ: " + rec.date_tb_1; document.getElementById('last_tb_info').style.display = 'block'; }
+                    currentStudentData = rec; // Save for printing
 
                     diseases.forEach(d => {
                         if(rec[`status_${d}`]) { document.getElementById(`status_${d}`).value = rec[`status_${d}`]; toggleDates(d); }
@@ -298,12 +331,11 @@
                         });
                     });
 
-                    // ระบบแจ้งเตือน (คงไว้เฉพาะ Rejection Alert ของอาจารย์ตีกลับ)
+                    // ระบบแจ้งเตือน Rejection
                     let alerts = "";
                     let rejected = [];
                     Object.keys(rec).forEach(k => { if(k.startsWith('verify_') && rec[k] === 'rejected') rejected.push(k.replace('verify_','')); });
-                    if(rejected.length > 0) alerts += `<div class="alert-box alert-red"><b>❌ หลักฐานไม่ผ่าน:</b> มีบางรายการถูกตีกลับ กรุณาแนบไฟล์ใหม่</div>`;
-                    
+                    if(rejected.length > 0) alerts += `<div class="alert-box alert-red">❌ หลักฐานไม่ผ่าน: มีบางรายการถูกอาจารย์ตีกลับ กรุณาแนบไฟล์แก้ไขใหม่</div>`;
                     document.getElementById('notificationArea').innerHTML = alerts;
                 }
                 document.getElementById('loginSection').style.display = 'none';
@@ -321,10 +353,8 @@
                         const maxWidth = 1200; let w = img.width; let h = img.height;
                         if (w > h && w > maxWidth) { h *= maxWidth / w; w = maxWidth; } else if (h > maxWidth) { w *= maxWidth / h; h = maxWidth; }
                         canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
-                        // เปลี่ยนจาก 'image/jpeg' เป็น 'image/webp'
-                        canvas.toBlob((blob) => {
-                            resolve(new File([blob], file.name.replace(/\.[^/.]+$/, ".webp"), { type: 'image/webp' }));
-                        }, 'image/webp', 0.7);
+                        // 🌟 แปลงเป็น .webp เพื่อประหยัดพื้นที่ 50%
+                        canvas.toBlob((b) => { resolve(new File([b], file.name.replace(/\.[^/.]+$/, ".webp"), { type: 'image/webp' })); }, 'image/webp', 0.7);
                     };
                 };
             });
@@ -333,7 +363,7 @@
         document.getElementById('vaccineRecordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn'); const msg = document.getElementById('statusMsg');
-            btn.disabled = true; msg.innerText = "⏳ กำลังบันทึกข้อมูลและไฟล์..."; msg.style.display = 'block';
+            btn.disabled = true; msg.innerText = "⏳ กำลังบีบอัดรูปภาพและบันทึกข้อมูล..."; msg.style.display = 'block';
 
             const payload = { studentId: currentId, fullName: document.getElementById('studentName').value, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() };
 
@@ -346,7 +376,7 @@
                         const input = document.getElementById(`file_${d}${suf}`);
                         if (input && input.files.length > 0) {
                             const finalFile = input.files[0].type.startsWith('image/') ? await compressImage(input.files[0]) : input.files[0];
-                            const ref = storage.ref(`vaccine_proofs/${currentId}_${d}${suf}_${Date.now()}.jpg`);
+                            const ref = storage.ref(`vaccine_proofs/${currentId}_${d}${suf}_${Date.now()}.webp`);
                             await ref.put(finalFile);
                             payload[`fileUrl_${d}${suf}`] = await ref.getDownloadURL();
                             payload[`verify_${d}${suf}`] = 'pending';
@@ -354,9 +384,92 @@
                     }
                 }
                 await db.collection('student_health_records').doc(currentId).set(payload, { merge: true });
-                alert("✅ อัปเดตข้อมูลสำเร็จ!"); location.reload();
+                alert("✅ อัปเดตข้อมูลสำเร็จ! (กรุณารอสักครู่เพื่อให้ระบบเตรียมข้อมูล PDF หากคุณต้องการพิมพ์)"); 
+                location.reload();
             } catch (err) { alert("❌ เกิดข้อผิดพลาด"); btn.disabled = false; }
         });
+
+        // =====================================
+        // 🖨️ ฟังก์ชันสร้างหน้า PDF แบบสวยงาม
+        // =====================================
+        function printMyRecord() {
+            if (!currentStudentData) {
+                alert("⚠️ ไม่พบข้อมูลประวัติ กรุณาบันทึกข้อมูลอย่างน้อย 1 ครั้งก่อนพิมพ์");
+                return;
+            }
+
+            const rec = currentStudentData;
+            const studentName = document.getElementById('studentName').value;
+
+            // สร้าง Header ของ PDF
+            let printHtml = `
+                <div class="print-header">
+                    <h1 style="margin:0; font-size: 26px; color:#000;">📋 สมุดพกวัคซีนออนไลน์ (Student Health Record)</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 18px; font-weight: 900; color:#000;">รหัสนักศึกษา: ${currentId} | ชื่อ-นามสกุล: ${studentName}</p>
+                </div>
+            `;
+
+            const dList = [
+                { code: 'vzv', name: '1. โรคสุกใส (Varicella)' }, { code: 'hbv', name: '2. ไวรัสตับอักเสบบี (Hepatitis B)' },
+                { code: 'mmr', name: '3. หัด-คางทูม-หัดเยอรมัน (MMR)' }, { code: 'tdap', name: '4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)' },
+                { code: 'flu', name: '5. ไข้หวัดใหญ่ (Influenza)' }, { code: 'tb', name: '6. วัณโรค (Tuberculosis)' }
+            ];
+
+            // ฟังก์ชันช่วยดึงรูปภาพมาแสดงใน PDF
+            function getPrintImage(url, label) {
+                if(!url) return `<p style="color:#666; font-size:14px; margin-top:5px;">- ไม่พบไฟล์หลักฐาน -</p>`;
+                return `
+                    <div style="margin-top: 10px;">
+                        <strong style="font-size:14px;">${label}</strong><br>
+                        <img src="${url}" class="print-img">
+                    </div>
+                `;
+            }
+
+            // วนลูปสร้างข้อมูลแต่ละโรค
+            dList.forEach(d => {
+                const status = rec[`status_${d.code}`] || "ยังไม่ดำเนินการ";
+                printHtml += `
+                    <div class="print-disease-box">
+                        <div class="print-title">${d.name}</div>
+                        <div style="font-size: 16px; font-weight: 900; margin-bottom: 10px;">สถานะ: <span style="color:var(--blue-dark);">${status}</span></div>
+                `;
+
+                // กรณีมีอัปโหลดรวม (ผลเลือด/ใบรับรองแพทย์)
+                if(rec[`fileUrl_${d.code}`]) {
+                    printHtml += getPrintImage(rec[`fileUrl_${d.code}`], '📌 ภาพหลักฐานรวม/ผลเลือด:');
+                }
+
+                // กรณีมีการกรอกวันที่เป็นเข็มๆ (Dose)
+                if (d.code === 'vzv') {
+                    if(rec.date_vzv_1 || rec.fileUrl_vzv_1) printHtml += `<p style="margin:5px 0; font-weight:bold;">📅 เข็ม 1: ${rec.date_vzv_1 || '-'}</p>` + getPrintImage(rec.fileUrl_vzv_1, 'ภาพหลักฐานเข็ม 1');
+                    if(rec.date_vzv_2 || rec.fileUrl_vzv_2) printHtml += `<p style="margin:5px 0; font-weight:bold; margin-top:15px;">📅 เข็ม 2: ${rec.date_vzv_2 || '-'}</p>` + getPrintImage(rec.fileUrl_vzv_2, 'ภาพหลักฐานเข็ม 2');
+                }
+                else if (d.code === 'hbv') {
+                    if(rec.date_hbv_1 || rec.fileUrl_hbv_1) printHtml += `<p style="margin:5px 0; font-weight:bold;">📅 เข็ม 1: ${rec.date_hbv_1 || '-'}</p>` + getPrintImage(rec.fileUrl_hbv_1, 'ภาพหลักฐานเข็ม 1');
+                    if(rec.date_hbv_2 || rec.fileUrl_hbv_2) printHtml += `<p style="margin:5px 0; font-weight:bold; margin-top:15px;">📅 เข็ม 2: ${rec.date_hbv_2 || '-'}</p>` + getPrintImage(rec.fileUrl_hbv_2, 'ภาพหลักฐานเข็ม 2');
+                    if(rec.date_hbv_3 || rec.fileUrl_hbv_3) printHtml += `<p style="margin:5px 0; font-weight:bold; margin-top:15px;">📅 เข็ม 3: ${rec.date_hbv_3 || '-'}</p>` + getPrintImage(rec.fileUrl_hbv_3, 'ภาพหลักฐานเข็ม 3');
+                }
+                else if (['mmr', 'tdap', 'flu', 'tb'].includes(d.code)) {
+                    if(rec[`date_${d.code}_1`] || rec[`fileUrl_${d.code}_1`]) {
+                        printHtml += `<p style="margin:5px 0; font-weight:bold;">📅 วันที่ดำเนินการล่าสุด: ${rec[`date_${d.code}_1`] || '-'}</p>` + getPrintImage(rec[`fileUrl_${d.code}_1`], 'ภาพหลักฐาน');
+                    }
+                }
+
+                printHtml += `</div>`; // ปิดกรอบ disease-box
+            });
+
+            // เอา HTML ยัดใส่ PrintArea
+            document.getElementById('printArea').style.display = 'block';
+            document.getElementById('printArea').innerHTML = printHtml;
+
+            // สั่ง Browser ให้พิมพ์
+            setTimeout(() => {
+                window.print();
+                // ซ่อนหลังจากพิมพ์เสร็จ
+                document.getElementById('printArea').style.display = 'none';
+            }, 500); // รอรูปโหลด 0.5 วิ
+        }
     </script>
 </body>
 </html>
