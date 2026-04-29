@@ -63,7 +63,7 @@
         #studentModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(2px); }
         .modal-content-box { background:#fff; width:95%; max-width:800px; max-height:85vh; overflow-y:auto; padding:30px; border: 4px solid var(--border-color); box-shadow: 16px 16px 0px var(--border-color); position:relative; }
         
-        /* สไตล์สำหรับ Print */
+        /* สไตล์สำหรับ Print PDF */
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
@@ -266,23 +266,35 @@
             tb: ["X-ray ปกติ", "ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)"]
         };
 
+        // 🛡️ เพิ่มความเสถียร (ดัก Error Data Type)
         async function loadDashboardData() {
             if (!currentAdminRole) return; 
-            document.getElementById('loadingDash').style.display = 'block'; document.getElementById('studentTableBody').innerHTML = '';
+            document.getElementById('loadingDash').style.display = 'block'; 
+            document.getElementById('studentTableBody').innerHTML = '';
             mergedDataList = [];
             try {
                 const masterSnap = await db.collection('students_master').get();
                 let studentsMap = {};
-                masterSnap.forEach(doc => { studentsMap[doc.data().studentId] = { ...doc.data(), records: {} }; });
+                masterSnap.forEach(doc => { 
+                    let data = doc.data();
+                    let sid = String(data.studentId || doc.id); // บังคับเป็น Text
+                    studentsMap[sid] = { ...data, studentId: sid, records: {} }; 
+                });
+                
                 const recordsSnap = await db.collection('student_health_records').get();
                 recordsSnap.forEach(doc => {
-                    const r = doc.data();
-                    if(studentsMap[r.studentId]) studentsMap[r.studentId].records = r;
-                    else studentsMap[r.studentId] = { studentId: r.studentId, fullName: r.fullName, year: 'ไม่ระบุ', records: r };
+                    let r = doc.data();
+                    let sid = String(r.studentId || doc.id); // บังคับเป็น Text
+                    if(studentsMap[sid]) studentsMap[sid].records = r;
+                    else studentsMap[sid] = { studentId: sid, fullName: r.fullName || 'ไม่ระบุ', year: 'ไม่ระบุ', records: r };
                 });
+                
                 mergedDataList = Object.values(studentsMap).sort((a,b) => String(a.studentId || "").localeCompare(String(b.studentId || "")));
                 renderTable();
-            } catch (error) {}
+            } catch (error) {
+                console.error("Load Error: ", error);
+                alert("เกิดข้อผิดพลาดในการดึงข้อมูล กรุณารีเฟรชหน้าเว็บ");
+            }
         }
 
         function getShortBadge(diseaseCode, recordObj) {
@@ -295,11 +307,13 @@
             return `<span class="badge badge-legacy">⏳</span>`;
         }
 
+        // 🛡️ บังคับให้รับค่าเป็น String ก่อนเช็ค .includes() เพื่อป้องกันเว็บค้าง
         function checkYearMatch(studentYear, filterYear) {
             if (!filterYear || filterYear === 'all') return true;
-            let sYear = String(studentYear || "").trim();
+            let sYear = String(studentYear || "ไม่ระบุ").trim();
             if (filterYear === "จบการศึกษา") return sYear.includes("จบ");
-            let fNum = filterYear.match(/\d+/); let sNum = sYear.match(/\d+/);      
+            let fNum = filterYear.match(/\d+/); 
+            let sNum = sYear.match(/\d+/);      
             if (fNum && sNum) return fNum[0] === sNum[0]; 
             return sYear === filterYear; 
         }
@@ -313,7 +327,8 @@
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
                 
-                let displayYear = student.year || '-';
+                // 🛡️ ป้องกันบั๊กตัวเลข
+                let displayYear = String(student.year || '-');
                 if(displayYear.includes("จบ")) displayYear = "🎓 จบ";
                 else { let ym = displayYear.match(/\d+/); displayYear = ym ? ym[0] : '-'; }
 
@@ -328,7 +343,7 @@
                     <td>${getShortBadge('tdap', student.records)}</td>
                     <td>${getShortBadge('flu', student.records)}</td>
                     <td>${getShortBadge('tb', student.records)}</td>
-                    <td><button class="btn-tiny" style="background:var(--blue); padding:8px 12px; border:2px solid #000;" onclick="openStudentModal('${student.studentId}')">🔍 ตรวจ</button></td>
+                    <td><button class="btn-tiny" style="background:var(--blue); padding:8px 12px; border:2px solid #000;" onclick="openStudentModal('${student.studentId}')">🔍 ตรวจสอบ</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -339,8 +354,7 @@
             if(!student) return;
             currentViewingStudentId = studentId; 
             
-            // แสดงสถานะปีการศึกษาที่ชัดเจน
-            let displayYear = student.year || 'ไม่ระบุ';
+            let displayYear = String(student.year || 'ไม่ระบุ');
             if(displayYear.includes("จบ")) displayYear = "🎓 จบการศึกษาแล้ว";
             
             document.getElementById('modalStudentName').innerHTML = `รหัส: ${student.studentId} | ชื่อ: ${student.fullName} <div style="font-size:16px; margin-top:5px; color:#555;">สถานะ: ${displayYear}</div>`;
@@ -411,7 +425,7 @@
         }
 
         // =====================================
-        // 🚀 ระบบจัดการข้อมูล: เลื่อนชั้นปีแบบบวกเลข, อนุมัติจบ, ลบไฟล์, โหลด JSON
+        // 🚀 ระบบจัดการข้อมูล (Admin Tools)
         // =====================================
         
         async function promoteAllStudents() {
@@ -419,10 +433,9 @@
             
             let count = 0;
             for (let student of mergedDataList) {
-                let currentYear = student.year || "";
+                let currentYear = String(student.year || "ไม่ระบุ");
                 let newYear = currentYear;
                 
-                // หาตัวเลขในข้อความชั้นปี
                 let match = currentYear.match(/\d+/);
                 if (match && !currentYear.includes("จบ")) {
                     let nextNum = parseInt(match[0]) + 1;
@@ -451,7 +464,6 @@
             }
         }
 
-        // ฟังก์ชันดาวน์โหลดเป็น JSON (API Format)
         function downloadJSON() {
             if(!currentViewingStudentId) return;
             const student = mergedDataList.find(s => s.studentId === currentViewingStudentId);
@@ -503,7 +515,15 @@
             mergedDataList.forEach(student => {
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
-                exportData.push({ "รหัส": student.studentId, "ชื่อ": student.fullName, "ปี": student.year });
+                
+                let isComplete = PASS_CRITERIA['vzv'].includes(student.records['status_vzv']) &&
+                                 PASS_CRITERIA['hbv'].includes(student.records['status_hbv']) &&
+                                 PASS_CRITERIA['mmr'].includes(student.records['status_mmr']) &&
+                                 PASS_CRITERIA['tdap'].includes(student.records['status_tdap']) &&
+                                 PASS_CRITERIA['flu'].includes(student.records['status_flu']) &&
+                                 PASS_CRITERIA['tb'].includes(student.records['status_tb']);
+                                 
+                exportData.push({ "รหัส": student.studentId, "ชื่อ": student.fullName, "ปี": student.year, "ภาพรวม": isComplete ? "พร้อมฝึก" : "ไม่ครบ" });
             });
             if(exportData.length === 0) { alert("ไม่มีข้อมูล!"); return; }
             const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
@@ -527,7 +547,7 @@
                 if (student.studentId) {
                     try {
                         await db.collection('students_master').doc(String(student.studentId)).set({
-                            studentId: String(student.studentId), fullName: student.fullName || "", year: student.year || "", faculty: student.faculty || "", updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            studentId: String(student.studentId), fullName: student.fullName || "", year: String(student.year) || "ไม่ระบุ", faculty: student.faculty || "", updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         }, { merge: true });
                         count++; status.innerText = `⏳ บันทึก: ${count} / ${total}`;
                     } catch (e) {}
