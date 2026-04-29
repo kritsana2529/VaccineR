@@ -5,153 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบตรวจสอบวัคซีน นศ. (Teacher Dashboard)</title>
     
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    <!-- SheetJS สำหรับอ่าน/ส่งออกไฟล์ Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     
     <style>
-        /* 🎨 ธีม Neo-Brutalism (Bold, High Contrast, Hard Shadows) */
-        :root { 
-            --bg-color: #e4e4e7; 
-            --apricot: #FFB347; 
-            --gold: #D4AF37;
-            --green: #a8e6cf;
-            --pink: #ff8b94;
-            --blue: #80c6ff;
-            --text-color: #000000; 
-            --border-color: #000000;
-            --border-width: 3px;
-            --shadow-size: 6px;
-        }
-        
+        /* 🎨 ธีม Neo-Brutalism */
+        :root { --bg-color: #e4e4e7; --apricot: #FFB347; --gold: #D4AF37; --green: #a8e6cf; --pink: #ff8b94; --blue: #80c6ff; --text-color: #000000; --border-color: #000000; --border-width: 3px; }
         * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; color: var(--text-color); }
+        body { background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(#bbb 1px, transparent 0); background-size: 20px 20px; }
         
-        body { 
-            background-color: var(--bg-color); 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            background-image: radial-gradient(#bbb 1px, transparent 0);
-            background-size: 20px 20px;
-        }
+        .container { width: 100%; max-width: 1350px; background: #ffffff; border: 4px solid var(--border-color); box-shadow: 12px 12px 0px var(--border-color); padding: 30px; margin-bottom: 30px; position: relative; }
+        h1 { font-size: 28px; font-weight: 900; text-align: center; margin-top: 0; background: var(--apricot); padding: 15px; border: var(--border-width) solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); text-transform: uppercase; }
         
-        .container { 
-            width: 100%; 
-            max-width: 1350px; 
-            background: #ffffff; 
-            border: 4px solid var(--border-color); 
-            border-radius: 0px; 
-            box-shadow: 12px 12px 0px var(--border-color); 
-            padding: 30px; 
-            margin-bottom: 30px; 
-            position: relative;
-        }
-
-        h1 { 
-            font-size: 28px; 
-            font-weight: 900;
-            text-align: center; 
-            margin-top: 0; 
-            background: var(--apricot); 
-            padding: 15px; 
-            border: var(--border-width) solid var(--border-color); 
-            box-shadow: 6px 6px 0px var(--border-color); 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        button, .btn-home, .btn-main, .btn-small, .view-file-btn {
-            font-family: 'Sarabun', sans-serif;
-            font-weight: 800;
-            border: var(--border-width) solid var(--border-color);
-            box-shadow: 4px 4px 0px var(--border-color);
-            cursor: pointer;
-            transition: all 0.1s ease-in-out;
-            color: #000;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        button:active, .btn-home:active, .btn-main:active, .btn-small:active, .view-file-btn:active {
-            box-shadow: 0px 0px 0px var(--border-color);
-            transform: translate(4px, 4px);
-        }
+        button, .btn-home, .btn-main, .btn-small, .view-file-btn { font-weight: 900; border: var(--border-width) solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); cursor: pointer; transition: all 0.1s ease-in-out; color: #000; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        button:active, .btn-home:active, .btn-main:active, .btn-small:active, .view-file-btn:active { box-shadow: 0px 0px 0px var(--border-color); transform: translate(4px, 4px); }
 
         .btn-home { background: #fff; padding: 10px 15px; margin-bottom: 20px; font-size: 16px; }
         .btn-main { width: 100%; background: var(--green); padding: 15px; font-size: 20px; margin-bottom: 15px; }
-        .btn-main:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: translate(4px, 4px); }
         .btn-small { background: var(--apricot); padding: 8px 15px; font-size: 14px; }
         .btn-tiny { padding: 4px 10px; font-size: 12px; background: #fff; white-space: nowrap; }
+        .btn-danger { background: var(--pink); color: #000; }
 
         .tabs { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
         .tab-btn { flex-grow: 1; background: #f0f0f0; padding: 15px 20px; font-size: 18px; }
-        .tab-btn.active { background: var(--blue); color: #000; transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-color); }
+        .tab-btn.active { background: var(--blue); transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-color); }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 800; margin-bottom: 8px; font-size: 16px; }
-        input[type="password"], select { 
-            width: 100%; padding: 12px; font-size: 16px; font-weight: 600;
-            border: var(--border-width) solid var(--border-color); background: #fff;
-            box-shadow: 4px 4px 0px var(--border-color);
-        }
-        input[type="password"]:focus, select:focus { outline: none; background: #fffbf0; }
+        label { display: block; font-weight: 900; margin-bottom: 8px; font-size: 16px; }
+        input[type="password"], select { width: 100%; padding: 12px; font-size: 16px; font-weight: 800; border: var(--border-width) solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); }
         
         .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; background: #fff; padding: 15px; border: var(--border-width) solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); }
-        .filter-bar select { width: auto; box-shadow: none; }
-        .filter-bar select:disabled { background: #ddd; }
-
-        .table-wrapper { overflow-x: auto; border: var(--border-width) solid var(--border-color); box-shadow: 8px 8px 0px var(--border-color); max-height: 70vh; background: #fff;}
+        .table-wrapper { overflow-x: auto; border: var(--border-width) solid var(--border-color); box-shadow: 8px 8px 0px var(--border-color); max-height: 70vh; background: #fff; }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th, td { border: 2px solid var(--border-color); padding: 12px 10px; text-align: center; font-size: 15px; font-weight: 600; vertical-align: middle;}
-        th { background: var(--apricot); font-weight: 900; position: sticky; top: 0; z-index: 1; text-transform: uppercase; border-bottom: 4px solid var(--border-color); }
-        td.text-left { text-align: left; }
+        th, td { border: 2px solid var(--border-color); padding: 12px 10px; text-align: center; font-size: 15px; font-weight: 600; vertical-align: middle; }
+        th { background: var(--apricot); font-weight: 900; position: sticky; top: 0; z-index: 1; border-bottom: 4px solid var(--border-color); }
         tr:nth-child(even) { background-color: #f9f9fa; }
-        tr:hover { background-color: #e6f7ff; }
         
-        .badge { display: inline-block; padding: 6px 10px; font-weight: 900; font-size: 13px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px var(--border-color); margin-bottom: 5px; letter-spacing: 0.5px; white-space: nowrap;}
-        .badge-green { background: var(--green); }
-        .badge-red { background: var(--pink); }
-        .badge-legacy { background: var(--gold); }
+        .badge { display: inline-block; padding: 6px 10px; font-weight: 900; font-size: 13px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px var(--border-color); margin-bottom: 5px; white-space: nowrap; }
+        .badge-green { background: var(--green); } .badge-red { background: var(--pink); } .badge-legacy { background: var(--gold); }
         
         .proof-box { background: #fff; border: 2px solid var(--border-color); padding: 10px; margin-top: 8px; text-align: left; box-shadow: 3px 3px 0px var(--border-color); }
         .view-file-btn { font-size: 12px; background: #fff; padding: 4px 8px; box-shadow: 2px 2px 0px var(--border-color); border-width: 2px; }
-        .view-file-btn:hover { background: var(--blue); }
-        
-        .btn-yes { background: var(--green); }
-        .btn-no { background: var(--pink); }
+        .btn-yes { background: var(--green); } .btn-no { background: var(--pink); }
 
-        .upload-zone { border: 4px dashed var(--border-color); padding: 50px; text-align: center; background: #fafafa; cursor: pointer; transition: 0.2s; font-weight: 900;}
+        .upload-zone { border: 4px dashed var(--border-color); padding: 50px; text-align: center; background: #fafafa; cursor: pointer; font-weight: 900; }
         .upload-zone:hover { background: var(--apricot); border-style: solid; }
         
-        .camp-card { border: var(--border-width) solid var(--border-color); padding: 20px; background: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 15px; }
-        .session-item { border: var(--border-width) solid var(--border-color); padding: 15px; background: #f0f0f0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; box-shadow: 4px 4px 0px var(--border-color);}
+        .camp-card, .session-item { border: var(--border-width) solid var(--border-color); padding: 20px; background: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 15px; }
 
-        #studentModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(2px);}
-        .modal-content-box { background:#fff; width:95%; max-width:700px; max-height:85vh; overflow-y:auto; padding:30px; border: 4px solid var(--border-color); box-shadow: 16px 16px 0px var(--border-color); position:relative;}
-        .modal-close-btn { position:absolute; top:15px; right:15px; background:var(--pink); font-size: 16px; padding:8px 15px;}
+        #studentModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(2px); }
+        .modal-content-box { background:#fff; width:95%; max-width:800px; max-height:85vh; overflow-y:auto; padding:30px; border: 4px solid var(--border-color); box-shadow: 16px 16px 0px var(--border-color); position:relative; }
+        
+        /* สไตล์สำหรับ Print */
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+            .modal-content-box { box-shadow: none; border: none; max-height: none; overflow: visible; padding: 0; }
+            .proof-box { box-shadow: none; break-inside: avoid; margin-bottom: 15px; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- 🔒 ล็อกอิน -->
     <div id="loginContainer" class="container" style="max-width: 450px; margin-top: 10vh; text-align:center;">
         <div style="font-size:60px; margin-bottom:10px; text-shadow: 4px 4px 0px #000;">👩‍🏫</div>
         <h1 style="font-size:26px; margin-bottom:20px; background:var(--blue); color:#fff;">เข้าสู่ระบบอาจารย์</h1>
-        <p style="font-size:16px; font-weight:800; margin-bottom:25px;">กรุณาใส่รหัสผ่านตามระดับสิทธิ์ของคุณ</p>
-        
-        <div class="form-group">
-            <input type="password" id="adminPassword" placeholder="ENTER PASSWORD..." onkeypress="if(event.key==='Enter') loginAdmin()">
-        </div>
+        <div class="form-group"><input type="password" id="adminPassword" placeholder="ENTER PASSWORD..." onkeypress="if(event.key==='Enter') loginAdmin()"></div>
         <button class="btn-main" onclick="loginAdmin()">🔐 ล็อกอิน (LOGIN)</button>
         <a href="index.html" class="btn-home" style="width:100%; justify-content:center; margin-bottom:0;">⬅️ กลับหน้าหลัก</a>
     </div>
 
+    <!-- 📊 กระดานหลัก -->
     <div id="mainDashboard" class="container" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap; gap:10px; border-bottom: 4px solid #000; padding-bottom: 20px; margin-bottom: 20px;">
             <a href="index.html" class="btn-home" style="margin:0;">🏠 กลับเมนูหลัก</a>
@@ -161,14 +95,15 @@
             </div>
         </div>
 
-        <h1 style="margin-bottom: 30px;">👩‍🏫 กระดานตรวจสอบข้อมูลสุขภาพ</h1>
+        <h1 style="margin-bottom: 30px;">👩‍🏫 กระดานตรวจสอบข้อมูลสุขภาพ (ADMIN)</h1>
         
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('dashboard', this)">📋 ตรวจสมุดพกวัคซีน</button>
             <button class="tab-btn" onclick="switchTab('bookings', this)">📅 ประวัติจองคิว</button>
-            <button class="tab-btn" id="btnTabImport" onclick="switchTab('import', this)">📥 นำเข้าข้อมูล นศ.</button>
+            <button class="tab-btn" id="btnTabImport" onclick="switchTab('import', this)">⚙️ จัดการระบบ & นำเข้า</button>
         </div>
 
+        <!-- TAB 1: ตรวจสมุดพก -->
         <div id="tab-dashboard" class="tab-content active">
             <div class="filter-bar">
                 <label style="margin:0;">กรองชั้นปี:</label>
@@ -178,27 +113,27 @@
                     <option value="ชั้นปีที่ 2">ปี 2</option>
                     <option value="ชั้นปีที่ 3">ปี 3</option>
                     <option value="ชั้นปีที่ 4">ปี 4</option>
+                    <option value="ชั้นปีที่ 5">ปี 5</option>
+                    <option value="ชั้นปีที่ 6">ปี 6</option>
+                    <option value="จบการศึกษา">จบการศึกษา</option>
                 </select>
                 <button onclick="loadDashboardData()" style="background:#fff;">🔄 โหลดข้อมูลใหม่</button>
                 <button onclick="exportDashboardToExcel()" style="margin-left:auto;">📊 EXCEL REPORT</button>
             </div>
-            
             <p id="loadingDash" style="text-align:center; font-weight:900; font-size:20px; display:none;">⏳ กำลังโหลดข้อมูล...</p>
-            
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
                             <th style="min-width:90px;">รหัส</th>
                             <th class="text-left" style="min-width:160px;">ชื่อ-นามสกุล</th>
-                            <th style="min-width:60px;">ปี</th>
+                            <th style="min-width:80px;">ปี</th>
                             <th style="min-width:80px;">สุกใส</th>
                             <th style="min-width:80px;">ตับอักเสบบี</th>
                             <th style="min-width:80px;">MMR</th>
                             <th style="min-width:80px;">Tdap</th>
                             <th style="min-width:80px;">ไข้หวัดใหญ่</th>
                             <th style="min-width:80px;">วัณโรค</th>
-                            <th style="min-width:110px;">สถานะรวม</th>
                             <th style="min-width:110px;">จัดการ</th>
                         </tr>
                     </thead>
@@ -207,10 +142,10 @@
             </div>
         </div>
 
+        <!-- TAB 2: จองคิว -->
         <div id="tab-bookings" class="tab-content">
             <div id="campaignListView">
                 <div class="filter-bar"><button onclick="loadAllBookings()">🔄 รีเฟรชข้อมูล</button></div>
-                <p id="loadingBookings" style="text-align:center; font-weight:900; font-size:20px; display:none;">⏳ กำลังดึงข้อมูล...</p>
                 <div id="campaignCardsContainer"></div>
             </div>
             <div id="campaignDetailView" style="display:none;">
@@ -221,12 +156,21 @@
             </div>
         </div>
 
+        <!-- TAB 3: จัดการระบบ (แสดงเฉพาะ Admin สูงสุด) -->
         <div id="tab-import" class="tab-content">
             <div style="max-width: 600px; margin: 0 auto;">
-                <h1 style="font-size:22px; background:var(--gold);">อัปโหลดรายชื่อตั้งต้น (Master Data)</h1>
+                
+                <!-- ส่วนเลื่อนชั้นปี -->
+                <div style="border: 4px solid #000; padding: 20px; margin-bottom: 30px; background: #fffbf0; box-shadow: 6px 6px 0px #000;">
+                    <h2 style="margin-top:0; font-size: 22px;">🎓 เลื่อนชั้นปีนักศึกษาประจำปี (1 ส.ค.)</h2>
+                    <p style="font-weight: 800; color: #555;">ระบบจะปรับเพิ่มชั้นปี (+1) ให้นักศึกษาทุกคนอัตโนมัติ (เช่น ปี 1 เป็น ปี 2, ปี 4 เป็น ปี 5)</p>
+                    <button class="btn-main" style="background: var(--blue); color:#fff;" onclick="promoteAllStudents()">⏩ ดำเนินการเลื่อนชั้นปีทั้งหมด</button>
+                </div>
+
+                <h1 style="font-size:22px; background:var(--gold);">📥 อัปโหลดรายชื่อตั้งต้น (Master Data)</h1>
                 <p style="font-weight: 800; text-align: center; font-size:16px;">คอลัมน์ A-D: studentId, fullName, year, faculty</p>
                 <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-                    <p id="fileNameDisplay" style="font-size: 20px;">📁 คลิกลากวาง / เลือกไฟล์ Excel (.xlsx)</p>
+                    <p id="fileNameDisplay" style="font-size: 20px;">📁 คลิกลากวาง / เลือกไฟล์ Excel</p>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFile(this)">
                 </div>
                 <p id="importStatus" style="text-align:center; font-weight:900; font-size:18px;"></p>
@@ -235,9 +179,19 @@
         </div>
     </div>
 
+    <!-- 📱 Modal ตรวจหลักฐาน -->
     <div id="studentModal">
-        <div class="modal-content-box">
-            <button class="modal-close-btn" onclick="closeStudentModal()">❌ ปิด</button>
+        <div class="modal-content-box" id="printArea">
+            <div class="no-print" style="display:flex; justify-content:space-between; margin-bottom: 20px; border-bottom: 3px solid #000; padding-bottom: 15px; flex-wrap:wrap; gap:10px;">
+                <button class="btn-tiny" style="background:#fff; border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="closeStudentModal()">❌ ปิดหน้าต่าง</button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-tiny" style="background:var(--blue); border: 3px solid #000; font-size:14px; padding: 6px 12px; color:#fff;" onclick="graduateStudent()">🎓 อนุมัติจบ</button>
+                    <button class="btn-tiny" style="background:#e0e0e0; border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="downloadJSON()">💾 โหลด JSON</button>
+                    <button class="btn-tiny" style="background:var(--gold); border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="window.print()">🖨️ พิมพ์ (PDF)</button>
+                    <button class="btn-tiny btn-danger" id="btnDeleteStudent" style="border: 3px solid #000; font-size:14px; padding: 6px 12px; display:none;" onclick="deleteStudentAndFiles()">🗑️ ลบข้อมูล</button>
+                </div>
+            </div>
+            
             <h1 id="modalStudentName" style="background:#fff; border-bottom: 4px solid #000; padding-bottom:15px; margin-bottom:20px; font-size:22px; text-align:left; box-shadow:none;">ชื่อ นศ</h1>
             <div id="modalContent"></div>
         </div>
@@ -254,11 +208,10 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
         let currentAdminRole = null; 
-
-        // ลบฟังก์ชันโหลดอัตโนมัติตอนเปิดเว็บออก เพื่อป้องกันบั๊กโหลดก่อนล็อกอิน
-        // window.onload = () => { loadDashboardData(); };
+        let currentViewingStudentId = null;
 
         function loginAdmin() {
             const pwd = document.getElementById('adminPassword').value;
@@ -277,48 +230,45 @@
 
             const filterDropdown = document.getElementById('filterYear');
             const importTabBtn = document.getElementById('btnTabImport');
+            const btnDelete = document.getElementById('btnDeleteStudent');
 
             if (currentAdminRole === 'ALL') {
-                filterDropdown.value = 'all'; filterDropdown.disabled = false; importTabBtn.style.display = ''; 
+                filterDropdown.value = 'all'; filterDropdown.disabled = false; 
+                importTabBtn.style.display = ''; btnDelete.style.display = 'block';
             } else {
-                filterDropdown.value = targetYear; filterDropdown.disabled = true; importTabBtn.style.display = 'none'; 
+                filterDropdown.value = targetYear; filterDropdown.disabled = true; 
+                importTabBtn.style.display = 'none'; btnDelete.style.display = 'none';
             }
-            
-            // โหลดข้อมูล "หลังจาก" เลือกระดับสิทธิ์เสร็จแล้วเท่านั้น
             switchTab('dashboard', document.querySelector('.tab-btn'));
         }
 
         function logoutAdmin() {
-            currentAdminRole = null;
-            document.getElementById('loginContainer').style.display = 'block';
-            document.getElementById('mainDashboard').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('studentTableBody').innerHTML = '';
+            currentAdminRole = null; document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('mainDashboard').style.display = 'none'; document.getElementById('adminPassword').value = '';
         }
 
-        function switchTab(tabId, btnElement) {
+        function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
-            if(btnElement) btnElement.classList.add('active');
+            if(btn) btn.classList.add('active');
             if(tabId === 'dashboard') loadDashboardData();
             if(tabId === 'bookings') loadAllBookings();
         }
 
         let mergedDataList = [];
         const PASS_CRITERIA = {
-            vzv: ["มีหลักฐานเคยป่วย", "IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส", "มีหลักฐานเคยป่วยเป็นสุกใส", "ผลตรวจ Varicella IgG Positive"], 
+            vzv: ["มีหลักฐานเคยป่วย", "IgG Positive", "รับวัคซีนสุกใสครบ 2 โด๊ส"], 
             hbv: ["IgG > 10", "ผลตรวจ Anti-HBs IgG > 10 unit", "รับวัคซีนตับอักเสบบีครบ 3 โด๊ส"],
             mmr: ["มีภูมิหรือฉีดครบแล้ว", "ผลตรวจ Measles IgG/IgM Positive", "รับวัคซีน MMR อย่างน้อย 1 โด๊ส"],
-            tdap: ["เคยฉีดภายใน10ปี", "รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)", "เคยฉีดมาแล้ว (ยังไม่เกิน 10 ปี)"],
+            tdap: ["เคยฉีดภายใน10ปี", "รับวัคซีน Tdap 1 โด๊ส (ภายใน 10 ปี)"],
             flu: ["รับวัคซีนแล้ว", "รับวัคซีนไข้หวัดใหญ่แล้ว (ภายใน 1 ปี)"],
-            tb: ["X-ray ปกติ", "ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)", "เข้ารับการ X-ray ปอดแล้ว (ผลปกติ)"]
+            tb: ["X-ray ปกติ", "ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)"]
         };
 
         async function loadDashboardData() {
-            if (!currentAdminRole) return; // หากยังไม่ล็อกอิน ให้ข้ามการโหลด
-            document.getElementById('loadingDash').style.display = 'block';
-            document.getElementById('studentTableBody').innerHTML = '';
+            if (!currentAdminRole) return; 
+            document.getElementById('loadingDash').style.display = 'block'; document.getElementById('studentTableBody').innerHTML = '';
             mergedDataList = [];
             try {
                 const masterSnap = await db.collection('students_master').get();
@@ -330,36 +280,26 @@
                     if(studentsMap[r.studentId]) studentsMap[r.studentId].records = r;
                     else studentsMap[r.studentId] = { studentId: r.studentId, fullName: r.fullName, year: 'ไม่ระบุ', records: r };
                 });
-                mergedDataList = Object.values(studentsMap);
-                
-                // ป้องกันบั๊กกรณีข้อมูลไม่มีรหัสนักศึกษา
-                mergedDataList.sort((a,b) => String(a.studentId || "").localeCompare(String(b.studentId || "")));
+                mergedDataList = Object.values(studentsMap).sort((a,b) => String(a.studentId || "").localeCompare(String(b.studentId || "")));
                 renderTable();
-            } catch (error) { 
-                console.error(error); 
-                document.getElementById('loadingDash').innerText = "❌ เกิดข้อผิดพลาดในการโหลดข้อมูล";
-            }
+            } catch (error) {}
         }
 
         function getShortBadge(diseaseCode, recordObj) {
             const status = recordObj[`status_${diseaseCode}`];
             if (!status || status === "ยังไม่ดำเนินการ") return `<span style="font-size:20px; font-weight:900; color:#ccc;">-</span>`;
             const isPass = PASS_CRITERIA[diseaseCode] ? PASS_CRITERIA[diseaseCode].includes(status) : false;
-            const isInProgress = status.includes("กำลัง") || status.includes("ไม่มีข้อมูล") || status.includes("หมดอายุ");
-            const hasRejectedFiles = Object.keys(recordObj).some(key => key.startsWith(`verify_${diseaseCode}`) && recordObj[key] === 'rejected');
-
-            if (hasRejectedFiles) return `<span class="badge badge-red" style="font-size:14px;">❌ แก้ไข</span>`;
-            if (isPass) return `<span class="badge badge-green" style="font-size:14px;">✅ ผ่าน</span>`;
-            if (isInProgress) return `<span class="badge badge-legacy" style="font-size:14px;">⏳ รอ</span>`;
-            return `<span class="badge badge-red" style="font-size:14px;">🔴</span>`;
+            const hasRejected = Object.keys(recordObj).some(key => key.startsWith(`verify_${diseaseCode}`) && recordObj[key] === 'rejected');
+            if (hasRejected) return `<span class="badge badge-red">❌</span>`;
+            if (isPass) return `<span class="badge badge-green">✅</span>`;
+            return `<span class="badge badge-legacy">⏳</span>`;
         }
 
-        // ตัวกรองชั้นปีแบบปลอดภัยต่อ Error
         function checkYearMatch(studentYear, filterYear) {
             if (!filterYear || filterYear === 'all') return true;
             let sYear = String(studentYear || "").trim();
-            let fNum = filterYear.match(/\d+/); 
-            let sNum = sYear.match(/\d+/);      
+            if (filterYear === "จบการศึกษา") return sYear.includes("จบ");
+            let fNum = filterYear.match(/\d+/); let sNum = sYear.match(/\d+/);      
             if (fNum && sNum) return fNum[0] === sNum[0]; 
             return sYear === filterYear; 
         }
@@ -372,33 +312,23 @@
             mergedDataList.forEach(student => {
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
-
-                const rec = student.records;
-                const hasRejectedFiles = Object.keys(rec).some(key => key.startsWith('verify_') && rec[key] === 'rejected');
-                const isPass = (code) => PASS_CRITERIA[code] ? PASS_CRITERIA[code].includes(rec[`status_${code}`]) : false;
-                const allPassed = isPass('vzv') && isPass('hbv') && isPass('mmr') && isPass('tdap') && isPass('flu') && isPass('tb');
-
-                let overallHtml = '';
-                if(hasRejectedFiles) { overallHtml = `<span class="badge badge-red">🔴 ต้องแก้ไข</span>`; student.overallPass = false; } 
-                else { overallHtml = allPassed ? `<span class="badge badge-green">🟢 สมบูรณ์</span>` : `<span class="badge badge-legacy">⏳ รอดำเนินการ</span>`; student.overallPass = allPassed; }
-
-                // แปลงชั้นปีให้แสดงแค่ตัวเลข
-                let yearMatch = student.year ? String(student.year).match(/\d+/) : null;
-                let displayYear = yearMatch ? yearMatch[0] : '-';
+                
+                let displayYear = student.year || '-';
+                if(displayYear.includes("จบ")) displayYear = "🎓 จบ";
+                else { let ym = displayYear.match(/\d+/); displayYear = ym ? ym[0] : '-'; }
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${student.studentId || '-'}</strong></td>
                     <td class="text-left">${student.fullName || '-'}</td>
                     <td><strong style="font-size:16px;">${displayYear}</strong></td>
-                    <td>${getShortBadge('vzv', rec)}</td>
-                    <td>${getShortBadge('hbv', rec)}</td>
-                    <td>${getShortBadge('mmr', rec)}</td>
-                    <td>${getShortBadge('tdap', rec)}</td>
-                    <td>${getShortBadge('flu', rec)}</td>
-                    <td>${getShortBadge('tb', rec)}</td>
-                    <td>${overallHtml}</td>
-                    <td><button class="btn-tiny" style="background:var(--blue); font-size:14px; padding:6px 10px;" onclick="openStudentModal('${student.studentId}')">🔍 ตรวจ</button></td>
+                    <td>${getShortBadge('vzv', student.records)}</td>
+                    <td>${getShortBadge('hbv', student.records)}</td>
+                    <td>${getShortBadge('mmr', student.records)}</td>
+                    <td>${getShortBadge('tdap', student.records)}</td>
+                    <td>${getShortBadge('flu', student.records)}</td>
+                    <td>${getShortBadge('tb', student.records)}</td>
+                    <td><button class="btn-tiny" style="background:var(--blue); padding:8px 12px; border:2px solid #000;" onclick="openStudentModal('${student.studentId}')">🔍 ตรวจ</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -407,23 +337,29 @@
         window.openStudentModal = function(studentId) {
             const student = mergedDataList.find(s => s.studentId === studentId);
             if(!student) return;
-            document.getElementById('modalStudentName').innerText = `📋 รหัส: ${student.studentId} | ชื่อ: ${student.fullName}`;
+            currentViewingStudentId = studentId; 
+            
+            // แสดงสถานะปีการศึกษาที่ชัดเจน
+            let displayYear = student.year || 'ไม่ระบุ';
+            if(displayYear.includes("จบ")) displayYear = "🎓 จบการศึกษาแล้ว";
+            
+            document.getElementById('modalStudentName').innerHTML = `รหัส: ${student.studentId} | ชื่อ: ${student.fullName} <div style="font-size:16px; margin-top:5px; color:#555;">สถานะ: ${displayYear}</div>`;
             const rec = student.records; const content = document.getElementById('modalContent'); content.innerHTML = '';
             
             const dList = [
-                { code: 'vzv', name: '1. โรคสุกใส (Varicella)' }, { code: 'hbv', name: '2. ไวรัสตับอักเสบบี (HBV)' },
-                { code: 'mmr', name: '3. หัด-คางทูม-หัดเยอรมัน (MMR)' }, { code: 'tdap', name: '4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)' },
-                { code: 'flu', name: '5. ไข้หวัดใหญ่ (Flu)' }, { code: 'tb', name: '6. วัณโรค (TB)' }
+                { code: 'vzv', name: 'โรคสุกใส' }, { code: 'hbv', name: 'ไวรัสตับอักเสบบี' },
+                { code: 'mmr', name: 'MMR' }, { code: 'tdap', name: 'Tdap' },
+                { code: 'flu', name: 'ไข้หวัดใหญ่' }, { code: 'tb', name: 'วัณโรค' }
             ];
             
             dList.forEach(d => {
                 const detailHtml = getDetailHtml(d.code, rec, studentId);
                 const status = rec[`status_${d.code}`] || "ยังไม่ดำเนินการ";
                 const div = document.createElement('div');
-                div.style.border = "3px solid #000"; div.style.padding = "15px"; div.style.marginBottom = "15px"; div.style.borderRadius = "8px"; div.style.boxShadow = "4px 4px 0px #000";
+                div.style.border = "3px solid #000"; div.style.padding = "15px"; div.style.marginBottom = "15px"; div.style.background = "#fafafa";
                 div.innerHTML = `
                     <div style="font-weight:900; font-size:18px; margin-bottom:10px; background:var(--apricot); display:inline-block; padding:4px 10px; border:2px solid #000;">${d.name}</div>
-                    <div style="font-size:15px; font-weight:800; margin-bottom:10px;">สถานะ นศ.: <span style="color:var(--blue);">${status}</span></div>
+                    <div style="font-size:15px; font-weight:800; margin-bottom:10px;">สถานะ: <span style="color:var(--blue);">${status}</span></div>
                     ${detailHtml}
                 `;
                 content.appendChild(div);
@@ -431,7 +367,7 @@
             document.getElementById('studentModal').style.display = 'flex';
         }
 
-        function closeStudentModal() { document.getElementById('studentModal').style.display = 'none'; }
+        function closeStudentModal() { document.getElementById('studentModal').style.display = 'none'; currentViewingStudentId = null; }
 
         window.setVerifyStatus = async function(studentId, fieldCode, status) {
             try {
@@ -448,130 +384,133 @@
             const vStatus = studentData ? studentData.records[`verify_${fieldCode}`] : undefined;
             
             let vBadge = '', vBtns = '';
-            if(vStatus === 'approved') {
-                vBadge = `<span class="badge badge-green">✅ อนุมัติแล้ว</span>`;
-                vBtns = `<button class="btn-tiny" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'pending')">🔄 แก้ไข</button>`;
-            } else if (vStatus === 'rejected') {
-                vBadge = `<span class="badge badge-red">❌ ปฏิเสธ</span>`;
-                vBtns = `<button class="btn-tiny" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'pending')">🔄 แก้ไข</button>`;
-            } else {
-                vBadge = `<span class="badge badge-legacy">⏳ รอยืนยัน</span>`;
-                vBtns = `<button class="btn-tiny btn-yes" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'approved')">✔️ ยอมรับ</button> 
-                         <button class="btn-tiny btn-no" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'rejected')">❌ ปฏิเสธ</button>`;
-            }
+            if(vStatus === 'approved') { vBadge = `<span class="badge badge-green no-print">✅</span>`; vBtns = `<button class="btn-tiny no-print" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'pending')">แก้</button>`; } 
+            else if (vStatus === 'rejected') { vBadge = `<span class="badge badge-red no-print">❌</span>`; vBtns = `<button class="btn-tiny no-print" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'pending')">แก้</button>`; } 
+            else { vBtns = `<button class="btn-tiny btn-yes no-print" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'approved')">✔️</button> <button class="btn-tiny btn-no no-print" onclick="setVerifyStatus('${studentId}', '${fieldCode}', 'rejected')">❌</button>`; }
+            
             return `
             <div class="proof-box">
                 <div style="font-size:14px; font-weight:800; margin-bottom:8px;">${labelText}</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                    <a href="${fileUrl}" target="_blank" class="view-file-btn">📄 เปิดดูรูปหลักฐาน</a>
-                    <div style="display:flex; gap:8px; align-items:center;">${vBadge} ${vBtns}</div>
+                <img src="${fileUrl}" style="max-width: 100%; height: auto; max-height: 200px; border: 2px solid #000; margin-bottom: 10px; display:block;">
+                <div class="no-print" style="display:flex; justify-content:space-between; align-items:center;">
+                    <a href="${fileUrl}" target="_blank" class="view-file-btn">ขยายรูป</a>
+                    <div style="display:flex; gap:5px;">${vBadge} ${vBtns}</div>
                 </div>
             </div>`;
         }
 
         function getDetailHtml(diseaseCode, recordObj, studentId) {
-            let linksHtml = '<div style="display:flex; flex-direction:column; gap:8px;">';
-            linksHtml += buildVerifyUI(studentId, diseaseCode, recordObj[`fileUrl_${diseaseCode}`], '📌 หลักฐานรวม/ผลเลือด');
-            if (diseaseCode === 'vzv') {
-                linksHtml += buildVerifyUI(studentId, 'vzv_1', recordObj.fileUrl_vzv_1, '💉 เข็ม 1: ' + (recordObj.date_vzv_1 || '-'));
-                linksHtml += buildVerifyUI(studentId, 'vzv_2', recordObj.fileUrl_vzv_2, '💉 เข็ม 2: ' + (recordObj.date_vzv_2 || '-'));
-            }
-            if (diseaseCode === 'hbv') {
-                linksHtml += buildVerifyUI(studentId, 'hbv_1', recordObj.fileUrl_hbv_1, '💉 เข็ม 1: ' + (recordObj.date_hbv_1 || '-'));
-                linksHtml += buildVerifyUI(studentId, 'hbv_2', recordObj.fileUrl_hbv_2, '💉 เข็ม 2: ' + (recordObj.date_hbv_2 || '-'));
-                linksHtml += buildVerifyUI(studentId, 'hbv_3', recordObj.fileUrl_hbv_3, '💉 เข็ม 3: ' + (recordObj.date_hbv_3 || '-'));
-            }
-            if (['mmr', 'tdap', 'flu', 'tb'].includes(diseaseCode)) {
-                let pfx = diseaseCode === 'tb' ? '🩺 X-ray:' : '💉 ฉีดล่าสุด:';
-                linksHtml += buildVerifyUI(studentId, `${diseaseCode}_1`, recordObj[`fileUrl_${diseaseCode}_1`], pfx + ' ' + (recordObj[`date_${diseaseCode}_1`] || '-'));
-            }
+            let linksHtml = '<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:10px;">';
+            linksHtml += buildVerifyUI(studentId, diseaseCode, recordObj[`fileUrl_${diseaseCode}`], '📌 หลักฐานรวม');
+            if (diseaseCode === 'vzv') { linksHtml += buildVerifyUI(studentId, 'vzv_1', recordObj.fileUrl_vzv_1, 'เข็ม 1: ' + (recordObj.date_vzv_1||'')); linksHtml += buildVerifyUI(studentId, 'vzv_2', recordObj.fileUrl_vzv_2, 'เข็ม 2: ' + (recordObj.date_vzv_2||'')); }
+            if (diseaseCode === 'hbv') { linksHtml += buildVerifyUI(studentId, 'hbv_1', recordObj.fileUrl_hbv_1, 'เข็ม 1: ' + (recordObj.date_hbv_1||'')); linksHtml += buildVerifyUI(studentId, 'hbv_2', recordObj.fileUrl_hbv_2, 'เข็ม 2: ' + (recordObj.date_hbv_2||'')); linksHtml += buildVerifyUI(studentId, 'hbv_3', recordObj.fileUrl_hbv_3, 'เข็ม 3: ' + (recordObj.date_hbv_3||'')); }
+            if (['mmr', 'tdap', 'flu', 'tb'].includes(diseaseCode)) { linksHtml += buildVerifyUI(studentId, `${diseaseCode}_1`, recordObj[`fileUrl_${diseaseCode}_1`], (recordObj[`date_${diseaseCode}_1`]||'')); }
             linksHtml += '</div>';
-            if (linksHtml === '<div style="display:flex; flex-direction:column; gap:8px;"></div>') return `<span style="font-size:14px; font-weight:800; color:#888;">(ยังไม่มีหลักฐานแนบมา)</span>`;
-            return linksHtml;
+            if (linksHtml.includes('<img')) return linksHtml;
+            return `<span style="font-size:14px; font-weight:800; color:#888;">(ไม่มีหลักฐาน)</span>`;
         }
 
-        function getVerText(status) { if(status === 'approved') return ' (✅)'; if(status === 'rejected') return ' (❌)'; return ''; }
+        // =====================================
+        // 🚀 ระบบจัดการข้อมูล: เลื่อนชั้นปีแบบบวกเลข, อนุมัติจบ, ลบไฟล์, โหลด JSON
+        // =====================================
+        
+        async function promoteAllStudents() {
+            if(!confirm("⚠️ ยืนยันการเลื่อนชั้นปีนักศึกษาทั้งหมด?\n\nระบบจะทำการ +1 ชั้นปีให้ทุกคนที่มีตัวเลข (เช่น ปี 1 -> ปี 2, ปี 4 -> ปี 5)\n*การอนุมัติจบการศึกษา ให้ทำรายบุคคลในหน้าตรวจหลักฐาน*")) return;
+            
+            let count = 0;
+            for (let student of mergedDataList) {
+                let currentYear = student.year || "";
+                let newYear = currentYear;
+                
+                // หาตัวเลขในข้อความชั้นปี
+                let match = currentYear.match(/\d+/);
+                if (match && !currentYear.includes("จบ")) {
+                    let nextNum = parseInt(match[0]) + 1;
+                    newYear = `ชั้นปีที่ ${nextNum}`;
+                    try {
+                        await db.collection('students_master').doc(student.studentId).update({ year: newYear });
+                        count++;
+                    } catch(e) {}
+                }
+            }
+            alert(`✅ เลื่อนชั้นปีเรียบร้อยแล้ว จำนวน ${count} คน`);
+            loadDashboardData();
+        }
+
+        async function graduateStudent() {
+            if(!currentViewingStudentId) return;
+            if(!confirm(`🎓 ยืนยันการอนุมัติ "จบการศึกษา" สำหรับรหัสนักศึกษา ${currentViewingStudentId} หรือไม่?`)) return;
+            
+            try {
+                await db.collection('students_master').doc(currentViewingStudentId).update({ year: "จบการศึกษา" });
+                alert("✅ เปลี่ยนสถานะเป็น จบการศึกษา เรียบร้อยแล้ว");
+                closeStudentModal();
+                loadDashboardData();
+            } catch(e) {
+                alert("❌ เกิดข้อผิดพลาด");
+            }
+        }
+
+        // ฟังก์ชันดาวน์โหลดเป็น JSON (API Format)
+        function downloadJSON() {
+            if(!currentViewingStudentId) return;
+            const student = mergedDataList.find(s => s.studentId === currentViewingStudentId);
+            if(!student) return;
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(student, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href",     dataStr);
+            downloadAnchorNode.setAttribute("download", `health_data_${student.studentId}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        async function deleteStudentAndFiles() {
+            if(!currentViewingStudentId) return;
+            if(!confirm(`🛑 อันตราย!\nคุณแน่ใจหรือไม่ที่จะลบ "ข้อมูลและรูปภาพหลักฐานทั้งหมด" ของรหัส ${currentViewingStudentId} ?\n\n(แนะนำให้โหลด JSON หรือ PDF เก็บไว้ก่อน)\n*การกระทำนี้ไม่สามารถกู้คืนได้*`)) return;
+
+            const student = mergedDataList.find(s => s.studentId === currentViewingStudentId);
+            const rec = student.records;
+            let filesToDelete = [];
+
+            const dList = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
+            const suffixes = ['', '_1', '_2', '_3'];
+            dList.forEach(d => {
+                suffixes.forEach(suf => {
+                    let url = rec[`fileUrl_${d}${suf}`];
+                    if (url) filesToDelete.push(url);
+                });
+            });
+
+            try {
+                for (let url of filesToDelete) {
+                    try { await firebase.storage().refFromURL(url).delete(); } catch(e) { console.log("ลบไฟล์ไม่ได้: " + url); }
+                }
+                await db.collection('student_health_records').doc(currentViewingStudentId).delete();
+                await db.collection('students_master').doc(currentViewingStudentId).delete();
+
+                alert("✅ ลบข้อมูลและคืนพื้นที่ Storage เรียบร้อยแล้ว");
+                closeStudentModal();
+                loadDashboardData();
+            } catch (err) {
+                alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล");
+            }
+        }
+
         function exportDashboardToExcel() {
             const filterYear = document.getElementById('filterYear').value; let exportData = [];
             mergedDataList.forEach(student => {
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
-                const rec = student.records;
-                exportData.push({
-                    "รหัส": student.studentId, "ชื่อ-นามสกุล": student.fullName, "ปี": student.year,
-                    "ภาพรวม": student.overallPass ? "พร้อมขึ้นฝึก" : "ยังไม่ครบ",
-                    "สุกใส(VZV)": (rec['status_vzv'] || "-") + getVerText(rec['verify_vzv']),
-                    "VZV เข็ม1": (rec['date_vzv_1'] || "-") + getVerText(rec['verify_vzv_1']), "VZV เข็ม2": (rec['date_vzv_2'] || "-") + getVerText(rec['verify_vzv_2']),
-                    "ตับอักเสบ(HBV)": (rec['status_hbv'] || "-") + getVerText(rec['verify_hbv']),
-                    "HBV เข็ม1": (rec['date_hbv_1'] || "-") + getVerText(rec['verify_hbv_1']), "HBV เข็ม2": (rec['date_hbv_2'] || "-") + getVerText(rec['verify_hbv_2']), "HBV เข็ม3": (rec['date_hbv_3'] || "-") + getVerText(rec['verify_hbv_3']),
-                    "MMR": (rec['status_mmr'] || "-") + getVerText(rec['verify_mmr']), "MMR ล่าสุด": (rec['date_mmr_1'] || "-") + getVerText(rec['verify_mmr_1']),
-                    "Tdap": (rec['status_tdap'] || "-") + getVerText(rec['verify_tdap']), "Tdap ล่าสุด": (rec['date_tdap_1'] || "-") + getVerText(rec['verify_tdap_1']),
-                    "Flu": (rec['status_flu'] || "-") + getVerText(rec['verify_flu']), "Flu ล่าสุด": (rec['date_flu_1'] || "-") + getVerText(rec['verify_flu_1']),
-                    "TB": (rec['status_tb'] || "-") + getVerText(rec['verify_tb']), "TB ล่าสุด": (rec['date_tb_1'] || "-") + getVerText(rec['verify_tb_1'])
-                });
+                exportData.push({ "รหัส": student.studentId, "ชื่อ": student.fullName, "ปี": student.year });
             });
             if(exportData.length === 0) { alert("ไม่มีข้อมูล!"); return; }
-            const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "HealthData");
-            XLSX.writeFile(wb, `รายงานสุขภาพ_${filterYear === 'all' ? 'ทั้งหมด' : filterYear}.xlsx`);
+            const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
+            XLSX.writeFile(wb, `รายงานข้อมูลนักศึกษา.xlsx`);
         }
 
-        let allBookingsRaw = []; let currentViewingCampaign = ""; 
-        async function loadAllBookings() {
-            const loadingEl = document.getElementById('loadingBookings'); if(loadingEl) loadingEl.style.display = 'block'; 
-            document.getElementById('campaignCardsContainer').innerHTML = ''; backToCampaignList(); allBookingsRaw = [];
-            try {
-                const snapshot = await db.collection('vaccine_responses').get(); let tempBookings = [];
-                snapshot.forEach(doc => tempBookings.push(doc.data()));
-                if (currentAdminRole !== 'ALL') {
-                    tempBookings = tempBookings.filter(booking => { const student = mergedDataList.find(s => s.studentId === booking.studentId); return student && checkYearMatch(student.year, currentAdminRole); });
-                }
-                allBookingsRaw = tempBookings;
-                allBookingsRaw.sort((a, b) => { let tA = (a.timestamp && a.timestamp.toMillis) ? a.timestamp.toMillis() : 0; let tB = (b.timestamp && b.timestamp.toMillis) ? b.timestamp.toMillis() : 0; return tB - tA; });
-                renderCampaignList();
-            } catch (error) {} finally { if(loadingEl) loadingEl.style.display = 'none'; }
-        }
-
-        function renderCampaignList() {
-            let groupedByCamp = {};
-            allBookingsRaw.forEach(row => { let campName = row.campaignName || "ข้อมูลเก่า"; if(!groupedByCamp[campName]) groupedByCamp[campName] = []; groupedByCamp[campName].push(row); });
-            const container = document.getElementById('campaignCardsContainer');
-            if(Object.keys(groupedByCamp).length === 0) { container.innerHTML = '<h2 style="text-align:center;">ไม่พบประวัติ</h2>'; return; }
-            for(let campName in groupedByCamp) {
-                let count = groupedByCamp[campName].length; let isLegacy = campName === "ข้อมูลเก่า";
-                let badge = isLegacy ? `<span class="badge badge-legacy">⚠️ เก่า</span>` : '';
-                const card = document.createElement('div'); card.className = 'camp-card';
-                card.innerHTML = `<div>${badge}<div style="font-weight:900; font-size:20px;">${campName}</div><div style="font-weight:800; margin-top:5px;">👥 ยอดจอง: ${count} คน</div></div><button class="btn-small" onclick="viewCampaignDetail('${campName}')">ดูข้อมูล ➔</button>`;
-                container.appendChild(card);
-            }
-        }
-
-        function viewCampaignDetail(campName) {
-            currentViewingCampaign = campName; document.getElementById('detailCampaignTitle').innerText = `📋 โครงการ: ${campName}`;
-            let campData = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า") === campName);
-            let groupedBySession = {};
-            campData.forEach(row => { let sessionName = row.sessionDatetime || row.vaccineDate || row.sessionName || "ไม่ระบุเวลา"; if(!groupedBySession[sessionName]) groupedBySession[sessionName] = []; groupedBySession[sessionName].push(row); });
-            const container = document.getElementById('sessionCardsContainer'); container.innerHTML = '';
-            for(let sesName in groupedBySession) {
-                let count = groupedBySession[sesName].length; const div = document.createElement('div'); div.className = 'session-item';
-                div.innerHTML = `<div><strong style="font-size:18px;">📅 รอบ: ${sesName}</strong><br><strong>จองแล้ว: ${count} คน</strong></div><button class="btn-small" onclick="exportSessionData('${sesName}')">📊 โหลด Excel</button>`;
-                container.appendChild(div);
-            }
-            document.getElementById('campaignListView').style.display = 'none'; document.getElementById('campaignDetailView').style.display = 'block';
-        }
-
-        function backToCampaignList() { document.getElementById('campaignListView').style.display = 'block'; document.getElementById('campaignDetailView').style.display = 'none'; }
-        
-        function exportSessionData(sessionName) {
-            let dataToExport = allBookingsRaw.filter(r => (r.campaignName || "ข้อมูลเก่า") === currentViewingCampaign);
-            if(sessionName !== 'all') dataToExport = dataToExport.filter(r => (r.sessionDatetime || r.vaccineDate || r.sessionName || "ไม่ระบุเวลา") === sessionName);
-            if(currentAdminRole !== 'ALL') { dataToExport = dataToExport.filter(booking => { const student = mergedDataList.find(s => s.studentId === booking.studentId); return student && checkYearMatch(student.year, currentAdminRole); }); }
-            if(dataToExport.length === 0) { alert("ไม่มีข้อมูล!"); return; }
-            const exportFormatted = dataToExport.map(row => ({ "วันที่ทำรายการ": row.timestamp ? row.timestamp.toDate().toLocaleString('th-TH') : "-", "โครงการ": row.campaignName || "ข้อมูลเก่า", "รหัส": row.studentId || "-", "ชื่อ": row.fullName || "-", "เบอร์": row.phone || "-", "รอบ": row.sessionDatetime || row.vaccineDate || row.sessionName || "-", "วัคซีน": row.sessionVaccines || row.vaccines || row.testProgram || "-" }));
-            const ws = XLSX.utils.json_to_sheet(exportFormatted); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Bookings");
-            let safeSessionName = sessionName === 'all' ? 'รวม' : sessionName.replace(/[<>:"/\\|?*]+/g, '_'); let safeCampName = currentViewingCampaign.replace(/[<>:"/\\|?*]+/g, '_');
-            XLSX.writeFile(wb, `จองคิว_${safeCampName}_${safeSessionName}.xlsx`);
-        }
-
+        // นำเข้าข้อมูล
         let excelData = [];
         function handleFile(input) {
             const file = input.files[0];
@@ -581,7 +520,6 @@
                 reader.readAsArrayBuffer(file);
             }
         }
-
         async function startImport() {
             const btn = document.getElementById('importBtn'); const status = document.getElementById('importStatus');
             btn.disabled = true; let count = 0; const total = excelData.length;
