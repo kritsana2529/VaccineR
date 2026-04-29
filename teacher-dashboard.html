@@ -67,10 +67,12 @@
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
-            #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+            #batchPrintArea, #batchPrintArea * { visibility: visible; }
+            #printArea, #batchPrintArea { position: absolute; left: 0; top: 0; width: 100%; }
             .no-print { display: none !important; }
             .modal-content-box { box-shadow: none; border: none; max-height: none; overflow: visible; padding: 0; }
-            .proof-box { box-shadow: none; break-inside: avoid; margin-bottom: 15px; }
+            .proof-box { box-shadow: none; break-inside: avoid; margin-bottom: 15px; border: 1px solid #ccc; }
+            .student-page { page-break-after: always; padding-top: 20px; }
         }
     </style>
 </head>
@@ -105,6 +107,8 @@
 
         <!-- TAB 1: ตรวจสมุดพก -->
         <div id="tab-dashboard" class="tab-content active">
+            
+            <!-- 🌟 แถบตัวกรอง -->
             <div class="filter-bar">
                 <label style="margin:0;">กรองชั้นปี:</label>
                 <select id="filterYear" onchange="renderTable()">
@@ -117,9 +121,17 @@
                     <option value="ชั้นปีที่ 6">ปี 6</option>
                     <option value="จบการศึกษา">จบการศึกษา</option>
                 </select>
-                <button onclick="loadDashboardData()" style="background:#fff;">🔄 โหลดข้อมูลใหม่</button>
-                <button onclick="exportDashboardToExcel()" style="margin-left:auto;">📊 EXCEL REPORT</button>
+                <button onclick="loadDashboardData()" style="background:#fff;">🔄 รีเฟรช</button>
             </div>
+
+            <!-- 🌟 แถบส่งออกข้อมูลแบบกลุ่ม (Batch Export) -->
+            <div class="filter-bar" style="background: #fffbf0; border-color: var(--gold);">
+                <strong style="margin:0; font-size: 16px;">📦 แบคอัพข้อมูล (ส่งออกแบบกลุ่ม):</strong>
+                <button onclick="exportDashboardToExcel()" style="background:#fff;">📊 EXCEL</button>
+                <button onclick="downloadAllJSON()" style="background:#fff;">💾 JSON (ทั้งหมด)</button>
+                <button onclick="printAllStudents()" style="background:var(--gold); margin-left:auto;">🖨️ พิมพ์ PDF (ทั้งหมด)</button>
+            </div>
+
             <p id="loadingDash" style="text-align:center; font-weight:900; font-size:20px; display:none;">⏳ กำลังโหลดข้อมูล...</p>
             <div class="table-wrapper">
                 <table>
@@ -159,11 +171,9 @@
         <!-- TAB 3: จัดการระบบ (แสดงเฉพาะ Admin สูงสุด) -->
         <div id="tab-import" class="tab-content">
             <div style="max-width: 600px; margin: 0 auto;">
-                
-                <!-- ส่วนเลื่อนชั้นปี -->
                 <div style="border: 4px solid #000; padding: 20px; margin-bottom: 30px; background: #fffbf0; box-shadow: 6px 6px 0px #000;">
                     <h2 style="margin-top:0; font-size: 22px;">🎓 เลื่อนชั้นปีนักศึกษาประจำปี (1 ส.ค.)</h2>
-                    <p style="font-weight: 800; color: #555;">ระบบจะปรับเพิ่มชั้นปี (+1) ให้นักศึกษาทุกคนอัตโนมัติ (เช่น ปี 1 เป็น ปี 2, ปี 4 เป็น ปี 5)</p>
+                    <p style="font-weight: 800; color: #555;">ระบบจะปรับเพิ่มชั้นปี (+1) ให้นักศึกษาทุกคนอัตโนมัติ</p>
                     <button class="btn-main" style="background: var(--blue); color:#fff;" onclick="promoteAllStudents()">⏩ ดำเนินการเลื่อนชั้นปีทั้งหมด</button>
                 </div>
 
@@ -179,14 +189,14 @@
         </div>
     </div>
 
-    <!-- 📱 Modal ตรวจหลักฐาน -->
+    <!-- 📱 Modal ตรวจหลักฐานรายคน -->
     <div id="studentModal">
         <div class="modal-content-box" id="printArea">
             <div class="no-print" style="display:flex; justify-content:space-between; margin-bottom: 20px; border-bottom: 3px solid #000; padding-bottom: 15px; flex-wrap:wrap; gap:10px;">
                 <button class="btn-tiny" style="background:#fff; border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="closeStudentModal()">❌ ปิดหน้าต่าง</button>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <button class="btn-tiny" style="background:var(--blue); border: 3px solid #000; font-size:14px; padding: 6px 12px; color:#fff;" onclick="graduateStudent()">🎓 อนุมัติจบ</button>
-                    <button class="btn-tiny" style="background:#e0e0e0; border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="downloadJSON()">💾 โหลด JSON</button>
+                    <button class="btn-tiny" style="background:#e0e0e0; border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="downloadSingleJSON()">💾 โหลด JSON</button>
                     <button class="btn-tiny" style="background:var(--gold); border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="window.print()">🖨️ พิมพ์ (PDF)</button>
                     <button class="btn-tiny btn-danger" id="btnDeleteStudent" style="border: 3px solid #000; font-size:14px; padding: 6px 12px; display:none;" onclick="deleteStudentAndFiles()">🗑️ ลบข้อมูล</button>
                 </div>
@@ -266,7 +276,6 @@
             tb: ["X-ray ปกติ", "ผล X-ray ปอดปกติ (ไม่เกิน 6 เดือน)"]
         };
 
-        // 🛡️ เพิ่มความเสถียร (ดัก Error Data Type)
         async function loadDashboardData() {
             if (!currentAdminRole) return; 
             document.getElementById('loadingDash').style.display = 'block'; 
@@ -277,24 +286,21 @@
                 let studentsMap = {};
                 masterSnap.forEach(doc => { 
                     let data = doc.data();
-                    let sid = String(data.studentId || doc.id); // บังคับเป็น Text
+                    let sid = String(data.studentId || doc.id);
                     studentsMap[sid] = { ...data, studentId: sid, records: {} }; 
                 });
                 
                 const recordsSnap = await db.collection('student_health_records').get();
                 recordsSnap.forEach(doc => {
                     let r = doc.data();
-                    let sid = String(r.studentId || doc.id); // บังคับเป็น Text
+                    let sid = String(r.studentId || doc.id);
                     if(studentsMap[sid]) studentsMap[sid].records = r;
                     else studentsMap[sid] = { studentId: sid, fullName: r.fullName || 'ไม่ระบุ', year: 'ไม่ระบุ', records: r };
                 });
                 
                 mergedDataList = Object.values(studentsMap).sort((a,b) => String(a.studentId || "").localeCompare(String(b.studentId || "")));
                 renderTable();
-            } catch (error) {
-                console.error("Load Error: ", error);
-                alert("เกิดข้อผิดพลาดในการดึงข้อมูล กรุณารีเฟรชหน้าเว็บ");
-            }
+            } catch (error) {}
         }
 
         function getShortBadge(diseaseCode, recordObj) {
@@ -307,13 +313,11 @@
             return `<span class="badge badge-legacy">⏳</span>`;
         }
 
-        // 🛡️ บังคับให้รับค่าเป็น String ก่อนเช็ค .includes() เพื่อป้องกันเว็บค้าง
         function checkYearMatch(studentYear, filterYear) {
             if (!filterYear || filterYear === 'all') return true;
             let sYear = String(studentYear || "ไม่ระบุ").trim();
             if (filterYear === "จบการศึกษา") return sYear.includes("จบ");
-            let fNum = filterYear.match(/\d+/); 
-            let sNum = sYear.match(/\d+/);      
+            let fNum = filterYear.match(/\d+/); let sNum = sYear.match(/\d+/);      
             if (fNum && sNum) return fNum[0] === sNum[0]; 
             return sYear === filterYear; 
         }
@@ -327,7 +331,6 @@
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
                 
-                // 🛡️ ป้องกันบั๊กตัวเลข
                 let displayYear = String(student.year || '-');
                 if(displayYear.includes("จบ")) displayYear = "🎓 จบ";
                 else { let ym = displayYear.match(/\d+/); displayYear = ym ? ym[0] : '-'; }
@@ -425,89 +428,140 @@
         }
 
         // =====================================
-        // 🚀 ระบบจัดการข้อมูล (Admin Tools)
+        // 🚀 ระบบจัดการข้อมูล (Batch Export & Admin Tools)
         // =====================================
-        
-        async function promoteAllStudents() {
-            if(!confirm("⚠️ ยืนยันการเลื่อนชั้นปีนักศึกษาทั้งหมด?\n\nระบบจะทำการ +1 ชั้นปีให้ทุกคนที่มีตัวเลข (เช่น ปี 1 -> ปี 2, ปี 4 -> ปี 5)\n*การอนุมัติจบการศึกษา ให้ทำรายบุคคลในหน้าตรวจหลักฐาน*")) return;
-            
-            let count = 0;
-            for (let student of mergedDataList) {
-                let currentYear = String(student.year || "ไม่ระบุ");
-                let newYear = currentYear;
-                
-                let match = currentYear.match(/\d+/);
-                if (match && !currentYear.includes("จบ")) {
-                    let nextNum = parseInt(match[0]) + 1;
-                    newYear = `ชั้นปีที่ ${nextNum}`;
-                    try {
-                        await db.collection('students_master').doc(student.studentId).update({ year: newYear });
-                        count++;
-                    } catch(e) {}
-                }
-            }
-            alert(`✅ เลื่อนชั้นปีเรียบร้อยแล้ว จำนวน ${count} คน`);
-            loadDashboardData();
+
+        // 1. ดาวน์โหลด JSON แบบกลุ่ม (คนที่มีชื่อในตารางปัจจุบัน)
+        function downloadAllJSON() {
+            const filterYear = document.getElementById('filterYear').value;
+            let dataToExport = mergedDataList.filter(s => {
+                if(!checkYearMatch(s.year, filterYear)) return false;
+                if(currentAdminRole !== 'ALL' && !checkYearMatch(s.year, currentAdminRole)) return false;
+                return true;
+            });
+
+            if(dataToExport.length === 0) return alert("ไม่มีข้อมูลที่สามารถส่งออกได้!");
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            let safeName = filterYear === 'all' ? 'All' : filterYear.replace(/\s+/g, '_');
+            a.setAttribute("download", `Health_Data_Batch_${safeName}.json`);
+            document.body.appendChild(a); a.click(); a.remove();
         }
 
-        async function graduateStudent() {
-            if(!currentViewingStudentId) return;
-            if(!confirm(`🎓 ยืนยันการอนุมัติ "จบการศึกษา" สำหรับรหัสนักศึกษา ${currentViewingStudentId} หรือไม่?`)) return;
-            
-            try {
-                await db.collection('students_master').doc(currentViewingStudentId).update({ year: "จบการศึกษา" });
-                alert("✅ เปลี่ยนสถานะเป็น จบการศึกษา เรียบร้อยแล้ว");
-                closeStudentModal();
-                loadDashboardData();
-            } catch(e) {
-                alert("❌ เกิดข้อผิดพลาด");
-            }
-        }
-
-        function downloadJSON() {
+        // 2. ดาวน์โหลด JSON เดี่ยว (ใน Pop-up)
+        function downloadSingleJSON() {
             if(!currentViewingStudentId) return;
             const student = mergedDataList.find(s => s.studentId === currentViewingStudentId);
             if(!student) return;
 
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(student, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href",     dataStr);
-            downloadAnchorNode.setAttribute("download", `health_data_${student.studentId}.json`);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", `Health_Data_${student.studentId}.json`);
+            document.body.appendChild(a); a.click(); a.remove();
+        }
+
+        // 3. พิมพ์แบบกลุ่ม (Batch Print PDF)
+        function printAllStudents() {
+            const filterYear = document.getElementById('filterYear').value;
+            let dataToExport = mergedDataList.filter(s => {
+                if(!checkYearMatch(s.year, filterYear)) return false;
+                if(currentAdminRole !== 'ALL' && !checkYearMatch(s.year, currentAdminRole)) return false;
+                return true;
+            });
+
+            if(dataToExport.length === 0) return alert("ไม่มีข้อมูลที่จะพิมพ์!");
+
+            // แจ้งเตือนหากคนเยอะเกินไป รูปภาพอาจโหลดไม่ทัน
+            if(dataToExport.length > 20) {
+                if(!confirm(`⚠️ ข้อมูลมีจำนวน ${dataToExport.length} คน (รูปภาพจำนวนมาก)\nเบราว์เซอร์อาจจะใช้เวลาโหลดนาน หรืออาจทำให้เครื่องค้างได้\nต้องการดำเนินการต่อหรือไม่?`)) return;
+            }
+
+            let container = document.getElementById('batchPrintArea');
+            if(!container) {
+                container = document.createElement('div');
+                container.id = 'batchPrintArea';
+                document.body.appendChild(container);
+            }
+            container.innerHTML = '';
+
+            const dList = [
+                { code: 'vzv', name: 'โรคสุกใส' }, { code: 'hbv', name: 'ไวรัสตับอักเสบบี' },
+                { code: 'mmr', name: 'MMR' }, { code: 'tdap', name: 'Tdap' },
+                { code: 'flu', name: 'ไข้หวัดใหญ่' }, { code: 'tb', name: 'วัณโรค' }
+            ];
+
+            dataToExport.forEach(student => {
+                let displayYear = String(student.year || 'ไม่ระบุ');
+                if(displayYear.includes("จบ")) displayYear = "🎓 จบการศึกษา";
+                
+                let page = document.createElement('div');
+                page.className = 'student-page';
+                page.innerHTML = `<h1 style="border-bottom:4px solid #000; padding-bottom:10px; font-size:24px; text-align:left; background:none; box-shadow:none;">📋 รหัส: ${student.studentId} | ชื่อ: ${student.fullName} <span style="font-size:16px;">(${displayYear})</span></h1>`;
+
+                dList.forEach(d => {
+                    const detailHtml = getDetailHtml(d.code, student.records, student.studentId);
+                    const status = student.records[`status_${d.code}`] || "ยังไม่ดำเนินการ";
+                    page.innerHTML += `
+                        <div style="margin-bottom:15px; border:2px solid #000; padding:10px; background:#fff;">
+                            <div style="font-weight:900; font-size:16px; margin-bottom:8px;">${d.name} <span style="color:#666;">(สถานะ: ${status})</span></div>
+                            ${detailHtml}
+                        </div>
+                    `;
+                });
+                container.appendChild(page);
+            });
+
+            // รอ 1.5 วินาที ให้ Browser ประมวลผลรูปภาพก่อนเปิดหน้า Print
+            alert("⏳ กำลังเตรียมหน้ากระดาษ (กรุณารอสักครู่...)");
+            setTimeout(() => {
+                window.print();
+                container.innerHTML = ''; // เคลียร์ขยะหลังพิมพ์เสร็จ
+            }, 1500);
+        }
+
+        async function promoteAllStudents() {
+            if(!confirm("⚠️ ยืนยันการเลื่อนชั้นปีนักศึกษาทั้งหมด?\n\nระบบจะทำการ +1 ชั้นปีให้ทุกคนที่มีตัวเลข (เช่น ปี 1 -> ปี 2, ปี 4 -> ปี 5)\n*การอนุมัติจบการศึกษา ให้ทำรายบุคคลในหน้าตรวจหลักฐาน*")) return;
+            let count = 0;
+            for (let student of mergedDataList) {
+                let currentYear = String(student.year || "ไม่ระบุ");
+                let newYear = currentYear;
+                let match = currentYear.match(/\d+/);
+                if (match && !currentYear.includes("จบ")) {
+                    let nextNum = parseInt(match[0]) + 1;
+                    newYear = `ชั้นปีที่ ${nextNum}`;
+                    try { await db.collection('students_master').doc(student.studentId).update({ year: newYear }); count++; } catch(e) {}
+                }
+            }
+            alert(`✅ เลื่อนชั้นปีเรียบร้อยแล้ว จำนวน ${count} คน`); loadDashboardData();
+        }
+
+        async function graduateStudent() {
+            if(!currentViewingStudentId) return;
+            if(!confirm(`🎓 ยืนยันการอนุมัติ "จบการศึกษา" สำหรับรหัสนักศึกษา ${currentViewingStudentId} หรือไม่?`)) return;
+            try {
+                await db.collection('students_master').doc(currentViewingStudentId).update({ year: "จบการศึกษา" });
+                alert("✅ เปลี่ยนสถานะเป็น จบการศึกษา เรียบร้อยแล้ว");
+                closeStudentModal(); loadDashboardData();
+            } catch(e) { alert("❌ เกิดข้อผิดพลาด"); }
         }
 
         async function deleteStudentAndFiles() {
             if(!currentViewingStudentId) return;
             if(!confirm(`🛑 อันตราย!\nคุณแน่ใจหรือไม่ที่จะลบ "ข้อมูลและรูปภาพหลักฐานทั้งหมด" ของรหัส ${currentViewingStudentId} ?\n\n(แนะนำให้โหลด JSON หรือ PDF เก็บไว้ก่อน)\n*การกระทำนี้ไม่สามารถกู้คืนได้*`)) return;
-
             const student = mergedDataList.find(s => s.studentId === currentViewingStudentId);
-            const rec = student.records;
-            let filesToDelete = [];
-
-            const dList = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
-            const suffixes = ['', '_1', '_2', '_3'];
-            dList.forEach(d => {
-                suffixes.forEach(suf => {
-                    let url = rec[`fileUrl_${d}${suf}`];
-                    if (url) filesToDelete.push(url);
-                });
-            });
-
+            const rec = student.records; let filesToDelete = [];
+            const dList = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb']; const suffixes = ['', '_1', '_2', '_3'];
+            dList.forEach(d => { suffixes.forEach(suf => { let url = rec[`fileUrl_${d}${suf}`]; if (url) filesToDelete.push(url); }); });
             try {
-                for (let url of filesToDelete) {
-                    try { await firebase.storage().refFromURL(url).delete(); } catch(e) { console.log("ลบไฟล์ไม่ได้: " + url); }
-                }
+                for (let url of filesToDelete) { try { await firebase.storage().refFromURL(url).delete(); } catch(e) {} }
                 await db.collection('student_health_records').doc(currentViewingStudentId).delete();
                 await db.collection('students_master').doc(currentViewingStudentId).delete();
-
                 alert("✅ ลบข้อมูลและคืนพื้นที่ Storage เรียบร้อยแล้ว");
-                closeStudentModal();
-                loadDashboardData();
-            } catch (err) {
-                alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล");
-            }
+                closeStudentModal(); loadDashboardData();
+            } catch (err) { alert("❌ เกิดข้อผิดพลาดในการลบข้อมูล"); }
         }
 
         function exportDashboardToExcel() {
@@ -515,22 +569,13 @@
             mergedDataList.forEach(student => {
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
-                
-                let isComplete = PASS_CRITERIA['vzv'].includes(student.records['status_vzv']) &&
-                                 PASS_CRITERIA['hbv'].includes(student.records['status_hbv']) &&
-                                 PASS_CRITERIA['mmr'].includes(student.records['status_mmr']) &&
-                                 PASS_CRITERIA['tdap'].includes(student.records['status_tdap']) &&
-                                 PASS_CRITERIA['flu'].includes(student.records['status_flu']) &&
-                                 PASS_CRITERIA['tb'].includes(student.records['status_tb']);
-                                 
-                exportData.push({ "รหัส": student.studentId, "ชื่อ": student.fullName, "ปี": student.year, "ภาพรวม": isComplete ? "พร้อมฝึก" : "ไม่ครบ" });
+                exportData.push({ "รหัส": student.studentId, "ชื่อ": student.fullName, "ปี": student.year });
             });
             if(exportData.length === 0) { alert("ไม่มีข้อมูล!"); return; }
             const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
             XLSX.writeFile(wb, `รายงานข้อมูลนักศึกษา.xlsx`);
         }
 
-        // นำเข้าข้อมูล
         let excelData = [];
         function handleFile(input) {
             const file = input.files[0];
