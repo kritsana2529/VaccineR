@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Student Health Services - คณะพยาบาลศาสตร์</title>
     
+    <!-- Google Fonts: Sarabun -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
 
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
@@ -34,7 +36,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             background-image: radial-gradient(#ccc 1px, transparent 0);
-            background-size: 20px 20px; /* ลายจุดพื้นหลังสไตล์ Brutalism */
+            background-size: 20px 20px; 
         }
         
         /* 🚀 หน้าต่างต้อนรับ (Welcome Screen) */
@@ -92,6 +94,7 @@
             margin-bottom: 40px;
         }
 
+        /* 🟢 ปุ่มเข้าสู่ระบบ (เพิ่ม Animation) */
         .btn-enter {
             font-size: 22px;
             font-weight: 800;
@@ -103,16 +106,33 @@
             cursor: pointer;
             box-shadow: 6px 6px 0px var(--border-color);
             transition: all 0.1s ease;
+            /* เรียกใช้ Animation */
+            animation: bounce 1.5s infinite; 
         }
 
         .btn-enter:active {
             box-shadow: 0px 0px 0px var(--border-color);
             transform: translate(6px, 6px);
+            /* หยุด Animation ชั่วคราวเวลากด */
+            animation: none; 
+        }
+
+        /* 🎞️ Keyframes สำหรับแอนิเมชันปุ่มเด้ง */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-15px); /* เด้งขึ้น */
+            }
+            60% {
+                transform: translateY(-7px);  /* เด้งลงมานิดหน่อยแล้วขึ้นอีก */
+            }
         }
 
         /* 📌 หน้าเมนูหลัก (Main Menu) */
         #mainMenu {
-            display: none; /* ซ่อนไว้ก่อนในตอนแรก */
+            display: none; 
             width: 100%;
             max-width: 600px;
         }
@@ -177,7 +197,7 @@
         }
 
         .menu-card:nth-child(3) .menu-icon {
-            background: var(--gold); /* ให้ไอคอนเมนูที่สองเป็นสีทอง */
+            background: var(--gold); 
         }
 
         .menu-text {
@@ -227,6 +247,7 @@
 </head>
 <body>
 
+    <!-- 🌟 1. หน้าต่างต้อนรับ (Welcome Screen) -->
     <div id="welcomeScreen">
         <div class="welcome-badge">🏥</div>
         <div class="title-eng">Student Health<br>Services</div>
@@ -235,11 +256,13 @@
         <button class="btn-enter" onclick="enterSystem()">🚀 เข้าสู่ระบบ (Enter)</button>
     </div>
 
+    <!-- 📌 2. หน้าเมนูหลัก (Main Menu) -->
     <div id="mainMenu">
         <div class="menu-header">
             <h2>🏥 Student Health Services</h2>
         </div>
 
+        <!-- เมนูที่ 1: จองคิววัคซีน -->
         <a href="booking.html" class="menu-card">
             <div class="menu-icon">💉</div>
             <div class="menu-text">
@@ -249,6 +272,7 @@
             <div class="arrow-icon">➔</div>
         </a>
 
+        <!-- เมนูที่ 2: สมุดพกสุขภาพ -->
         <a href="student-record.html" class="menu-card">
             <div class="menu-icon">📑</div>
             <div class="menu-text">
@@ -258,6 +282,7 @@
             <div class="arrow-icon">➔</div>
         </a>
 
+        <!-- เมนูที่ 3: กระดานอาจารย์ -->
         <a href="teacher-dashboard.html" class="admin-link">
             👩‍🏫 สำหรับอาจารย์ / ผู้ดูแลระบบ (Admin)
         </a>
@@ -277,9 +302,7 @@
 
         // --- ระบบตรวจสอบการเข้าใช้งานหน้าแรก ---
         document.addEventListener("DOMContentLoaded", function() {
-            // เช็คว่าในเซสชันนี้ เคยกด Enter ผ่านหน้าต้อนรับมาหรือยัง?
             if (sessionStorage.getItem('hasVisitedWelcome') === 'true') {
-                // ถ้าเคยแล้ว ให้ซ่อนหน้าต้อนรับ แล้วโชว์เมนูหลักทันที
                 document.getElementById('welcomeScreen').style.display = 'none';
                 document.getElementById('mainMenu').style.display = 'block';
             }
@@ -287,10 +310,7 @@
 
         // --- ฟังก์ชันเมื่อกดปุ่ม เข้าสู่ระบบ (Enter) ---
         function enterSystem() {
-            // บันทึกสถานะว่ากดเข้าใช้งานแล้ว (จำไว้จนกว่าจะปิดเบราว์เซอร์)
             sessionStorage.setItem('hasVisitedWelcome', 'true');
-            
-            // ซ่อนหน้าต้อนรับ และแสดงเมนูหลัก
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'block';
         }
