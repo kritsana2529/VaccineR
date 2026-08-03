@@ -44,11 +44,12 @@
         .bg-yellow { background: #fff3cd !important; color: #856404 !important; }
         .bg-green { background: #d4edda !important; color: #155724 !important; }
         
-        .accordion-header.active { border-bottom: 4px solid var(--border-color); box-shadow: none; transform: none; filter: brightness(0.9); }
+        .accordion-header.active { border-bottom: 4px solid var(--border-color); box-shadow: none; transform: none; filter: brightness(0.95); }
         .accordion-content { padding: 20px; display: none; background: #fff; }
         .accordion-content.show { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        .arrow { font-size: 14px; }
         .disease-title { font-size: 20px; font-weight: 900; background: var(--gold); padding: 8px 15px; border: 3px solid #000; display: inline-block; margin-bottom: 15px; box-shadow: 3px 3px 0px #000; }
         .guideline-box { background: #fff3cd; border: 3px solid #000; padding: 12px; font-size: 15px; font-weight: 600; margin-bottom: 20px; box-shadow: 4px 4px 0px #000; }
         .date-section { background: #f9f9fa; border: 3px dashed #000; padding: 15px; margin-top: 15px; display: none; }
@@ -97,11 +98,12 @@
                 
                 <!-- 1. โรคสุกใส (VZV) -->
                 <div class="accordion-item">
-                    <button type="button" class="accordion-header bg-red" id="btn-vzv" onclick="toggleAccordion('vzv')">1. โรคสุกใส (Varicella) <span>▼</span></button>
+                    <button type="button" class="accordion-header bg-red" id="btn-vzv" onclick="toggleAccordion('vzv')">1. โรคสุกใส (Varicella) <span class="arrow">▼</span></button>
                     <div id="acc-vzv" class="accordion-content">
                         <div class="form-group">
                             <label>สถานะปัจจุบัน:</label>
-                            <select id="status_vzv" onchange="toggleDates('vzv'); updateColors();">
+                            <!-- นำ onchange="updateColors()" ออก เพื่อให้เช็คสีจากข้อมูลที่เซฟแล้วเท่านั้น -->
+                            <select id="status_vzv" onchange="toggleDates('vzv');">
                                 <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
                                 <option value="มีหลักฐานเคยป่วย">✅ 1. มีหลักฐานเคยป่วยเป็นสุกใส</option>
                                 <option value="IgG Positive">✅ 2. ผลตรวจเลือด IgG Positive (+)</option>
@@ -123,11 +125,11 @@
 
                 <!-- 2. ไวรัสตับอักเสบบี (HBV) -->
                 <div class="accordion-item">
-                    <button type="button" class="accordion-header bg-red" id="btn-hbv" onclick="toggleAccordion('hbv')">2. ไวรัสตับอักเสบบี (Hepatitis B) <span>▼</span></button>
+                    <button type="button" class="accordion-header bg-red" id="btn-hbv" onclick="toggleAccordion('hbv')">2. ไวรัสตับอักเสบบี (Hepatitis B) <span class="arrow">▼</span></button>
                     <div id="acc-hbv" class="accordion-content">
                         <div class="form-group">
                             <label>สถานะปัจจุบัน:</label>
-                            <select id="status_hbv" onchange="toggleDates('hbv'); updateColors();">
+                            <select id="status_hbv" onchange="toggleDates('hbv');">
                                 <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
                                 <option value="IgG > 10">✅ 1. ผลตรวจ Anti-HBs IgG > 10 unit</option>
                                 <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ (อยู่ระหว่างฉีด 3 โด๊ส)</option>
@@ -149,11 +151,11 @@
 
                 <!-- 3. MMR -->
                 <div class="accordion-item">
-                    <button type="button" class="accordion-header bg-red" id="btn-mmr" onclick="toggleAccordion('mmr')">3. หัด-คางทูม-หัดเยอรมัน (MMR) <span>▼</span></button>
+                    <button type="button" class="accordion-header bg-red" id="btn-mmr" onclick="toggleAccordion('mmr')">3. หัด-คางทูม-หัดเยอรมัน (MMR) <span class="arrow">▼</span></button>
                     <div id="acc-mmr" class="accordion-content">
                         <div class="form-group">
                             <label>สถานะปัจจุบัน:</label>
-                            <select id="status_mmr" onchange="toggleDates('mmr'); updateColors();">
+                            <select id="status_mmr" onchange="toggleDates('mmr');">
                                 <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
                                 <option value="มีภูมิหรือฉีดครบแล้ว">✅ 1. มีภูมิคุ้มกันหรือเคยฉีดครบแล้ว</option>
                                 <option value="กำลังฉีดวัคซีน">❌ 2. ไม่มีภูมิ ต้องฉีดเพิ่ม</option>
@@ -165,7 +167,7 @@
                             <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
                         </div>
                         <div id="dates_mmr" class="date-section">
-                            <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_mmr_1" onchange="updateColors()">
+                            <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_mmr_1">
                             <input type="file" id="file_mmr_1" accept="image/*" style="margin-top:8px;">
                             <a id="link_mmr_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์เข็มล่าสุด</a>
                         </div>
@@ -174,11 +176,11 @@
 
                 <!-- 4. Tdap -->
                 <div class="accordion-item">
-                    <button type="button" class="accordion-header bg-red" id="btn-tdap" onclick="toggleAccordion('tdap')">4. บาดทะยัก-คอตีบ-ไอกรน (Tdap) <span>▼</span></button>
+                    <button type="button" class="accordion-header bg-red" id="btn-tdap" onclick="toggleAccordion('tdap')">4. บาดทะยัก-คอตีบ-ไอกรน (Tdap) <span class="arrow">▼</span></button>
                     <div id="acc-tdap" class="accordion-content">
                         <div class="form-group">
                             <label>สถานะปัจจุบัน:</label>
-                            <select id="status_tdap" onchange="toggleDates('tdap'); updateColors();">
+                            <select id="status_tdap" onchange="toggleDates('tdap');">
                                 <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
                                 <option value="เคยฉีดภายใน10ปี">✅ 1. เคยฉีดมาแล้ว (ยังไม่เกิน 10 ปี)</option>
                                 <option value="กำลังฉีดวัคซีน">❌ 2. หมดอายุ/ต้องฉีดใหม่</option>
@@ -190,7 +192,7 @@
                             <a id="link_tdap" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
                         </div>
                         <div id="dates_tdap" class="date-section">
-                            <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_tdap_1" onchange="updateColors()">
+                            <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_tdap_1">
                             <input type="file" id="file_tdap_1" accept="image/*" style="margin-top:8px;">
                             <a id="link_tdap_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์เข็มล่าสุด</a>
                         </div>
@@ -199,10 +201,10 @@
 
                 <!-- 5. ไข้หวัดใหญ่ (Flu) -->
                 <div class="accordion-item">
-                    <button type="button" class="accordion-header bg-red" id="btn-flu" onclick="toggleAccordion('flu')">5. ไข้หวัดใหญ่ (Influenza) <span>▼</span></button>
+                    <button type="button" class="accordion-header bg-red" id="btn-flu" onclick="toggleAccordion('flu')">5. ไข้หวัดใหญ่ (Influenza) <span class="arrow">▼</span></button>
                     <div id="acc-flu" class="accordion-content">
                         <div class="guideline-box">💉 หากฉีดครบ 1 ปีแล้ว สถานะจะกลับเป็นสีแดง ให้ระบุวันที่ใหม่และแนบไฟล์ใหม่ได้เลย (ประวัติเก่าจะถูกเก็บไว้)</div>
-                        <div class="form-group"><label>📅 วันที่ฉีด (รอบล่าสุด):</label><input type="date" id="date_flu_1" onchange="updateColors()"></div>
+                        <div class="form-group"><label>📅 วันที่ฉีด (รอบล่าสุด):</label><input type="date" id="date_flu_1"></div>
                         <div class="form-group">
                             <label>📸 อัปโหลดหลักฐานใหม่:</label><input type="file" id="file_flu_1" accept="image/*">
                             <a id="link_flu_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
@@ -215,7 +217,7 @@
 
                 <!-- 6. วัณโรค (TB) -->
                 <div class="accordion-item">
-                    <button type="button" class="accordion-header bg-red" id="btn-tb" onclick="toggleAccordion('tb')">6. วัณโรค (Tuberculosis) <span>▼</span></button>
+                    <button type="button" class="accordion-header bg-red" id="btn-tb" onclick="toggleAccordion('tb')">6. วัณโรค (Tuberculosis) <span class="arrow">▼</span></button>
                     <div id="acc-tb" class="accordion-content">
                         <div class="guideline-box">🩺 ผล X-ray ต้องไม่เกิน 6 เดือนก่อนวันขึ้นฝึก และสถานะจะกลับเป็นสีแดงเมื่อหลักฐานเก่าเกิน 2 เดือน</div>
                         <div class="form-group"><label>🏥 วันที่คาดว่าจะขึ้นฝึกปฏิบัติงาน:</label><input type="date" id="date_tb_practice" onchange="checkTBDates()"></div>
@@ -277,7 +279,6 @@
 
         function addMonths(dateStr, months) { if(!dateStr) return ""; let d = new Date(dateStr); d.setMonth(d.getMonth() + months); return d.toISOString().split('T')[0]; }
         
-        // 🚨 กฎวันที่ 1: สุกใส ห่าง 1 เดือน
         function calcVZV() { 
             let d1 = document.getElementById('date_vzv_1').value; 
             if(d1) {
@@ -289,10 +290,8 @@
                     d2Input.value = "";
                 }
             }
-            updateColors();
         }
 
-        // 🚨 กฎวันที่ 2: ตับอักเสบบี (1 เดือน และ 6 เดือน)
         function calcHBV() { 
             let d1 = document.getElementById('date_hbv_1').value; 
             if(d1) { 
@@ -305,10 +304,8 @@
                 if(d2Input.value && d2Input.value < minD2) { alert("⚠️ เข็มที่ 2 ต้องห่างจากเข็มแรก 1 เดือน"); d2Input.value = ""; }
                 if(d3Input.value && d3Input.value < minD3) { alert("⚠️ เข็มที่ 3 ต้องห่างจากเข็มแรก 6 เดือน"); d3Input.value = ""; }
             }
-            updateColors();
         }
 
-        // 🚨 กฎวันที่ 3: วัณโรค (X-ray ไม่เกิน 6 เดือนก่อนขึ้นฝึก)
         function checkTBDates() {
             let pDateStr = document.getElementById('date_tb_practice').value;
             let xDateStr = document.getElementById('date_tb_1').value;
@@ -328,58 +325,86 @@
                     document.getElementById('date_tb_1').value = "";
                 }
             }
-            updateColors();
         }
 
         function isExpired(dateStr, monthsToExpire) {
             if(!dateStr) return true;
             let d = new Date(dateStr); d.setMonth(d.getMonth() + monthsToExpire);
-            return new Date() > d; // ถ้าวันปัจจุบัน มากกว่าวันหมดอายุ = Expired
+            return new Date() > d; 
         }
 
-        // 🎨 ระบบสีกำกับแท็บ (Color Coding)
+        // 🎨 ระบบสีกำกับแท็บ (พิจารณาจากข้อมูลที่บันทึกแล้วและไฟล์แนบ)
         function updateColors() {
-            // VZV
-            let stVZV = document.getElementById('status_vzv').value;
-            let btnVZV = document.getElementById('btn-vzv');
-            btnVZV.className = 'accordion-header';
-            if(stVZV === 'ยังไม่ดำเนินการ') btnVZV.classList.add('bg-red');
-            else if(stVZV === 'กำลังฉีดวัคซีน') btnVZV.classList.add('bg-yellow');
-            else btnVZV.classList.add('bg-green');
+            if (!currentStudentData) return;
 
-            // HBV
-            let stHBV = document.getElementById('status_hbv').value;
-            let btnHBV = document.getElementById('btn-hbv');
-            btnHBV.className = 'accordion-header';
-            if(stHBV === 'ยังไม่ดำเนินการ') btnHBV.classList.add('bg-red');
-            else if(stHBV === 'กำลังฉีดวัคซีน') btnHBV.classList.add('bg-yellow');
-            else btnHBV.classList.add('bg-green');
+            const checkHasFile = (d) => {
+                if (currentStudentData[`fileUrl_${d}`]) return true;
+                for (let i = 1; i <= 3; i++) {
+                    if (currentStudentData[`fileUrl_${d}_${i}`]) return true;
+                }
+                return false;
+            };
 
-            // MMR & Tdap (มีแค่ แดง กับ เขียว)
-            let stMMR = document.getElementById('status_mmr').value;
-            let btnMMR = document.getElementById('btn-mmr');
-            btnMMR.className = 'accordion-header ' + (stMMR === 'มีภูมิหรือฉีดครบแล้ว' ? 'bg-green' : 'bg-red');
+            diseases.forEach(d => {
+                const btn = document.getElementById(`btn-${d}`);
+                const status = currentStudentData[`status_${d}`] || "ยังไม่ดำเนินการ";
+                const hasFile = checkHasFile(d);
+                
+                let targetColor = 'bg-red'; // ค่าเริ่มต้นสีแดง
 
-            let stTdap = document.getElementById('status_tdap').value;
-            let btnTdap = document.getElementById('btn-tdap');
-            btnTdap.className = 'accordion-header ' + (stTdap === 'เคยฉีดภายใน10ปี' ? 'bg-green' : 'bg-red');
+                // จะพิจารณาเปลี่ยนสีก็ต่อเมื่อมีการแนบไฟล์ไว้ในฐานข้อมูลแล้วเท่านั้น
+                if (hasFile && status !== 'ยังไม่ดำเนินการ') {
+                    if (d === 'mmr' || d === 'tdap') {
+                        // MMR และ Tdap จะมีแค่สีแดง กับ สีเขียว
+                        targetColor = 'bg-green';
+                    } else {
+                        if (status.includes('กำลังฉีด')) {
+                            targetColor = 'bg-yellow'; // อยู่ระหว่างดำเนินการ
+                        } else {
+                            targetColor = 'bg-green';
+                            
+                            // เงื่อนไขหมดอายุสำหรับวัคซีนไข้หวัดใหญ่ (1 ปี / 12 เดือน)
+                            if (d === 'flu') {
+                                let dDate = currentStudentData[`date_flu_1`];
+                                if (!dDate || isExpired(dDate, 12)) targetColor = 'bg-red';
+                            }
+                            // เงื่อนไขหมดอายุสำหรับวัณโรค (2 เดือนหลังวันที่อัปโหลดในระบบ)
+                            else if (d === 'tb') {
+                                let dDate = currentStudentData[`date_tb_1`];
+                                if (!dDate || isExpired(dDate, 2)) targetColor = 'bg-red';
+                            }
+                        }
+                    }
+                }
 
-            // Flu (หมดอายุใน 1 ปี / 12 เดือน)
-            let dFlu = document.getElementById('date_flu_1').value;
-            let btnFlu = document.getElementById('btn-flu');
-            btnFlu.className = 'accordion-header ' + ((dFlu && !isExpired(dFlu, 12)) ? 'bg-green' : 'bg-red');
-
-            // TB (กลับเป็นสีแดง หลังแนบ 2 เดือน)
-            let dTB = document.getElementById('date_tb_1').value;
-            let btnTB = document.getElementById('btn-tb');
-            btnTB.className = 'accordion-header ' + ((dTB && !isExpired(dTB, 2)) ? 'bg-green' : 'bg-red');
+                // รีเซ็ตคลาสเก่าแล้วใส่คลาสใหม่
+                btn.classList.remove('bg-red', 'bg-yellow', 'bg-green');
+                btn.classList.add(targetColor);
+            });
         }
 
+        // 🔻 ระบบ Accordion คลิกเปิด-หุบ ทีละแท็บ
         function toggleAccordion(id) {
             const content = document.getElementById(`acc-${id}`);
             const btn = document.getElementById(`btn-${id}`);
-            if (content.classList.contains('show')) { content.classList.remove('show'); } 
-            else { content.classList.add('show'); }
+            const arrow = btn.querySelector('.arrow');
+            
+            const isCurrentlyOpen = content.classList.contains('show');
+
+            // ปิดเนื้อหาทั้งหมดและปรับลูกศรให้ชี้ลง
+            document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('show'));
+            document.querySelectorAll('.accordion-header').forEach(b => {
+                b.classList.remove('active');
+                let arr = b.querySelector('.arrow');
+                if (arr) arr.innerText = '▼';
+            });
+
+            // ถ้าแท็บที่ถูกคลิกยังไม่เปิด ให้เปิดมันและเปลี่ยนลูกศรให้ชี้ขึ้น
+            if (!isCurrentlyOpen) {
+                content.classList.add('show');
+                btn.classList.add('active');
+                if (arrow) arrow.innerText = '▲';
+            }
         }
 
         function toggleDates(disease) {
@@ -444,7 +469,9 @@
                     if(rec.historyLog) renderHistory(rec.historyLog);
                 }
                 
+                // คำนวณสีของปุ่มแท็บหลังจากดึงข้อมูลขึ้นมาแล้วเท่านั้น
                 updateColors();
+                
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('recordSection').style.display = 'block';
             } catch (e) { console.error(e); }
@@ -475,7 +502,7 @@
             let historyLog = currentStudentData.historyLog || [];
             payload.date_tb_practice = document.getElementById('date_tb_practice').value;
 
-            // 💾 ระบบเก็บ Log: ถ้าวันที่ของ Flu หรือ TB เปลี่ยนไป ให้เก็บของเก่าเข้า History
+            // 💾 ระบบเก็บ Log
             ['flu', 'tb'].forEach(d => {
                 let oldDate = currentStudentData[`date_${d}_1`];
                 let newDate = document.getElementById(`date_${d}_1`) ? document.getElementById(`date_${d}_1`).value : null;
@@ -502,7 +529,8 @@
                     }
                 }
                 await db.collection('student_health_records').doc(currentId).set(payload, { merge: true });
-                alert("✅ อัปเดตข้อมูลสำเร็จ!"); location.reload();
+                alert("✅ อัปเดตข้อมูลสำเร็จ!"); 
+                location.reload(); // รีเฟรชเพื่อดึงข้อมูลใหม่มาคำนวณสีของแท็บ
             } catch (err) { alert("❌ เกิดข้อผิดพลาด"); btn.disabled = false; }
         });
 
