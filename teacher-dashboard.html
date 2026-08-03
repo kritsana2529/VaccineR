@@ -39,7 +39,7 @@
 
         .form-group { margin-bottom: 20px; }
         label { display: block; font-weight: 900; margin-bottom: 8px; font-size: 16px; }
-        input[type="password"], select { width: 100%; padding: 12px; font-size: 16px; font-weight: 800; border: var(--border-width) solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); }
+        input[type="password"], input[type="text"], select { width: 100%; padding: 12px; font-size: 16px; font-weight: 800; border: var(--border-width) solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); }
         
         .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; background: #fff; padding: 15px; border: var(--border-width) solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); }
         .table-wrapper { overflow-x: auto; border: var(--border-width) solid var(--border-color); box-shadow: 8px 8px 0px var(--border-color); max-height: 70vh; background: #fff; }
@@ -60,7 +60,7 @@
         
         .camp-card, .session-item { border: var(--border-width) solid var(--border-color); padding: 20px; background: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 15px; }
 
-        #studentModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(2px); }
+        #studentModal, #pwdModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; backdrop-filter: blur(2px); }
         .modal-content-box { background:#fff; width:95%; max-width:800px; max-height:85vh; overflow-y:auto; padding:30px; border: 4px solid var(--border-color); box-shadow: 16px 16px 0px var(--border-color); position:relative; }
         
         /* สไตล์สำหรับ Print PDF */
@@ -240,6 +240,9 @@
             <div class="no-print" style="display:flex; justify-content:space-between; margin-bottom: 20px; border-bottom: 3px solid #000; padding-bottom: 15px; flex-wrap:wrap; gap:10px;">
                 <button class="btn-tiny" style="background:#fff; border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="closeStudentModal()">❌ ปิดหน้าต่าง</button>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <!-- ปุ่มแก้ไขรหัสผ่าน เฉพาะแอดมินสูงสุด -->
+                    <button class="btn-tiny" id="btnChangePwd" style="background:var(--blue); color:#fff; border: 3px solid #000; font-size:14px; padding: 6px 12px; display:none;" onclick="openPwdModal()">🔑 แก้ไขรหัสผ่าน</button>
+                    
                     <button class="btn-tiny" style="background:#e0e0e0; border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="downloadSingleJSON()">💾 โหลด JSON</button>
                     <button class="btn-tiny" style="background:var(--gold); border: 3px solid #000; font-size:14px; padding: 6px 12px;" onclick="window.print()">🖨️ พิมพ์ (PDF)</button>
                     <button class="btn-tiny btn-danger" id="btnDeleteStudent" style="border: 3px solid #000; font-size:14px; padding: 6px 12px; display:none;" onclick="deleteStudentAndFiles()">🗑️ ลบข้อมูล (Archive)</button>
@@ -248,6 +251,22 @@
             
             <h1 id="modalStudentName" style="background:#fff; border-bottom: 4px solid #000; padding-bottom:15px; margin-bottom:20px; font-size:22px; text-align:left; box-shadow:none;">ชื่อ นศ</h1>
             <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- 🔑 Modal สำหรับเปลี่ยนรหัสผ่าน (แอดมิน) -->
+    <div id="pwdModal" style="z-index: 2000;">
+        <div class="modal-content-box" style="max-width: 400px; padding: 20px;">
+            <h2 style="background:var(--blue); color:#fff; margin-top:0;">🔑 แก้ไขรหัสผ่านนักศึกษา</h2>
+            <p id="pwdStudentName" style="font-weight: 800; font-size: 16px; margin-bottom: 15px;"></p>
+            <div class="form-group">
+                <label>รหัสผ่านใหม่:</label>
+                <input type="text" id="newPasswordInput" placeholder="ระบุรหัสผ่านใหม่...">
+            </div>
+            <div style="display:flex; justify-content:space-between; gap:10px;">
+                <button class="btn-home" style="margin:0; flex-grow:1;" onclick="closePwdModal()">❌ ยกเลิก</button>
+                <button class="btn-main" style="margin:0; flex-grow:1; background:var(--apricot);" onclick="saveNewPassword()">💾 บันทึกรหัสใหม่</button>
+            </div>
         </div>
     </div>
 
@@ -286,15 +305,16 @@
             const manageFilterDropdown = document.getElementById('manageFilterYear');
             const importTabBtn = document.getElementById('btnTabImport');
             const btnDelete = document.getElementById('btnDeleteStudent');
+            const btnChangePwd = document.getElementById('btnChangePwd');
 
             if (currentAdminRole === 'ALL') {
                 filterDropdown.value = 'all'; filterDropdown.disabled = false; 
                 manageFilterDropdown.value = 'all'; manageFilterDropdown.disabled = false;
-                importTabBtn.style.display = ''; btnDelete.style.display = 'block';
+                importTabBtn.style.display = ''; btnDelete.style.display = 'block'; btnChangePwd.style.display = 'block';
             } else {
                 filterDropdown.value = targetYear; filterDropdown.disabled = true; 
                 manageFilterDropdown.value = targetYear; manageFilterDropdown.disabled = true;
-                importTabBtn.style.display = 'none'; btnDelete.style.display = 'none';
+                importTabBtn.style.display = 'none'; btnDelete.style.display = 'none'; btnChangePwd.style.display = 'none';
             }
             switchTab('dashboard', document.querySelector('.tab-btn'));
         }
@@ -477,6 +497,41 @@
             loadDashboardData(); 
         }
 
+        // =====================================
+        // 🔑 ระบบรีเซ็ตรหัสผ่าน (Admin)
+        // =====================================
+        function openPwdModal() {
+            const student = mergedDataList.find(s => s.studentId === currentViewingStudentId);
+            if(!student) return;
+            document.getElementById('pwdStudentName').innerText = `รหัสนักศึกษา: ${student.studentId} | ชื่อ: ${student.fullName}`;
+            document.getElementById('newPasswordInput').value = '';
+            document.getElementById('pwdModal').style.display = 'flex';
+        }
+
+        function closePwdModal() {
+            document.getElementById('pwdModal').style.display = 'none';
+        }
+
+        async function saveNewPassword() {
+            const newPwd = document.getElementById('newPasswordInput').value.trim();
+            if(!newPwd) return alert("⚠️ กรุณาระบุรหัสผ่านใหม่");
+            if(!confirm(`ยืนยันการเปลี่ยนรหัสผ่านเป็น "${newPwd}" สำหรับนักศึกษาคนนี้หรือไม่?`)) return;
+
+            try {
+                // อัปเดตไปยัง Collection students_master
+                await db.collection('students_master').doc(currentViewingStudentId).set({
+                    password: String(newPwd)
+                }, { merge: true });
+
+                alert("✅ เปลี่ยนรหัสผ่านสำเร็จ ให้นักศึกษาใช้รหัสผ่านใหม่เข้าสู่ระบบได้เลย");
+                closePwdModal();
+                loadDashboardData();
+            } catch (err) {
+                alert("❌ เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน");
+                console.error(err);
+            }
+        }
+
         window.openStudentModal = function(studentId) {
             const student = mergedDataList.find(s => s.studentId === studentId);
             if(!student) return;
@@ -486,7 +541,11 @@
             if(displayYear === "จบการศึกษา") displayYear = "🎓 จบการศึกษาแล้ว";
             else if (displayYear === "ลาออก/พ้นสภาพ") displayYear = "⚠️ พ้นสภาพการเป็นนักศึกษา";
             
-            document.getElementById('modalStudentName').innerHTML = `รหัส: ${student.studentId} | ชื่อ: ${student.fullName} <div style="font-size:16px; margin-top:5px; color:#555;">สถานะ: ${displayYear}</div>`;
+            // แสดงรหัสผ่านปัจจุบัน (เผื่อแอดมินดู)
+            let currentPwd = student.password ? student.password : "ไม่ได้ตั้ง (ค่าเริ่มต้นคือ รหัสนักศึกษา)";
+            let pwdHtml = currentAdminRole === 'ALL' ? `<div style="font-size:14px; margin-top:5px; color:var(--pink);">🔑 รหัสผ่านปัจจุบัน: ${currentPwd}</div>` : '';
+
+            document.getElementById('modalStudentName').innerHTML = `รหัส: ${student.studentId} | ชื่อ: ${student.fullName} <div style="font-size:16px; margin-top:5px; color:#555;">สถานะ: ${displayYear}</div>${pwdHtml}`;
             const rec = student.records; const content = document.getElementById('modalContent'); content.innerHTML = '';
             
             const dList = [
@@ -635,7 +694,7 @@
             mergedDataList.forEach(student => {
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
-                exportData.push({ "รหัส": student.studentId, "ชื่อ": student.fullName, "ปี": student.year });
+                exportData.push({ "รหัส": student.studentId, "ชื่อ": student.fullName, "ปี": student.year, "รหัสผ่าน": student.password || "-" });
             });
             if(exportData.length === 0) { alert("ไม่มีข้อมูล!"); return; }
             const ws = XLSX.utils.json_to_sheet(exportData); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
@@ -748,22 +807,6 @@
                 }
             }
             status.innerHTML = `<span style="color:var(--green);">✅ เสร็จสิ้น ${count} รายการ</span>`; btn.innerText = "เรียบร้อย"; loadDashboardData(); 
-        }
-        
-        async function promoteAllStudents() {
-            if(!confirm("⚠️ ยืนยันการเลื่อนชั้นปีนักศึกษาทั้งหมด?\n\nระบบจะทำการ +1 ชั้นปีให้ทุกคนที่มีตัวเลข (เช่น ปี 1 -> ปี 2, ปี 4 -> ปี 5)\n*การอนุมัติจบการศึกษา ให้ทำรายบุคคลในหน้าตรวจหลักฐาน*")) return;
-            let count = 0;
-            for (let student of mergedDataList) {
-                let currentYear = String(student.year || "ไม่ระบุ");
-                let newYear = currentYear;
-                let match = currentYear.match(/\d+/);
-                if (match && !currentYear.includes("จบ")) {
-                    let nextNum = parseInt(match[0]) + 1;
-                    newYear = `ชั้นปีที่ ${nextNum}`;
-                    try { await db.collection('students_master').doc(student.studentId).update({ year: newYear }); count++; } catch(e) {}
-                }
-            }
-            alert(`✅ เลื่อนชั้นปีเรียบร้อยแล้ว จำนวน ${count} คน`); loadDashboardData();
         }
     </script>
 </body>
