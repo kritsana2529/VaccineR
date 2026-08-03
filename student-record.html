@@ -68,12 +68,25 @@
         }
         input:focus, select:focus { background: #fffbf0; outline: none; }
         
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; border-bottom: 4px solid var(--border-color); padding-bottom: 15px; }
-        .tab-btn { background: #f0f0f0; padding: 10px 15px; font-size: 15px; flex-grow: 1; }
-        .tab-btn.active { background: var(--blue); transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-color); }
-        .tab-content { display: none; background: #fff; border: 4px solid var(--border-color); padding: 20px; margin-bottom: 20px; box-shadow: 6px 6px 0px var(--border-color); }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .tabs { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            border-bottom: 4px solid var(--border-color); 
+            padding-bottom: 15px; 
+        }
+
+        .tab-btn { 
+            background: #f0f0f0; 
+            padding: 10px 15px; 
+            font-size: 15px; 
+            width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .tabs { grid-template-columns: repeat(2, 1fr); }
+        }
 
         .disease-title { font-size: 20px; font-weight: 900; background: var(--gold); padding: 8px 15px; border: 3px solid #000; display: inline-block; margin-bottom: 15px; box-shadow: 3px 3px 0px #000; }
         .guideline-box { background: #fff3cd; border: 3px solid #000; padding: 12px; font-size: 15px; font-weight: 600; margin-bottom: 20px; box-shadow: 4px 4px 0px #000; }
@@ -205,6 +218,14 @@
                             <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องฉีดเพิ่ม</option>
                         </select>
                     </div>
+                    
+                    <!-- 🟢 เพิ่มช่องอัปโหลดหลักฐานรวมตรงนี้ครับ -->
+                    <div class="form-group" id="general_upload_mmr" style="display:none;">
+                        <label>📸 อัปโหลดหลักฐาน (ผลเลือด/สมุดวัคซีนเดิม):</label>
+                        <input type="file" id="file_mmr" accept="image/*">
+                        <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                    </div>
+
                     <div id="dates_mmr" class="date-section">
                         <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_mmr_1">
                         <input type="file" id="file_mmr_1" accept="image/*" style="margin-top:8px;">
