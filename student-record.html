@@ -11,49 +11,21 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
     
     <style>
-        /* 🎨 ธีม Neo-Brutalism (Apricot + Blue + Gold) */
+        /* 🎨 ธีม Neo-Brutalism */
         :root { 
-            --bg-color: #e4e4e7; 
-            --apricot: #FFB347; 
-            --gold: #D4AF37;
-            --green: #a8e6cf;
-            --pink: #ff8b94;
-            --blue: #80c6ff;
-            --blue-dark: #0056b3;
-            --text-color: #000000; 
-            --border-color: #000000;
-            --border-width: 3px;
+            --bg-color: #e4e4e7; --apricot: #FFB347; --gold: #D4AF37;
+            --green: #a8e6cf; --pink: #ff8b94; --blue: #80c6ff; --blue-dark: #0056b3;
+            --text-color: #000000; --border-color: #000000; --border-width: 3px;
         }
         
         * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; color: var(--text-color); }
+        body { background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(#bbb 1px, transparent 0); background-size: 20px 20px; }
         
-        body { 
-            background-color: var(--bg-color); 
-            margin: 0; padding: 20px; 
-            display: flex; flex-direction: column; align-items: center; 
-            background-image: radial-gradient(#bbb 1px, transparent 0); background-size: 20px 20px; 
-        }
+        .container { width: 100%; max-width: 750px; background: #ffffff; border: 4px solid var(--border-color); box-shadow: 10px 10px 0px var(--border-color); padding: 25px; margin-bottom: 24px; position: relative; }
+        h1, h2 { font-size: 24px; text-align: center; margin-top: 0; margin-bottom: 20px; background: var(--apricot); padding: 12px; border: var(--border-width) solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); text-transform: uppercase; font-weight: 900; }
         
-        .container { 
-            width: 100%; max-width: 750px; background: #ffffff; 
-            border: 4px solid var(--border-color); box-shadow: 10px 10px 0px var(--border-color); 
-            padding: 25px; margin-bottom: 24px; position: relative;
-        }
-
-        h1, h2 { 
-            font-size: 24px; text-align: center; margin-top: 0; margin-bottom: 20px; 
-            background: var(--apricot); padding: 12px; border: var(--border-width) solid var(--border-color); 
-            box-shadow: 4px 4px 0px var(--border-color); text-transform: uppercase; font-weight: 900;
-        }
-        
-        button, .btn-home, .btn-main, .view-file-btn, .tab-btn { 
-            font-weight: 900; border: var(--border-width) solid var(--border-color); 
-            box-shadow: 4px 4px 0px var(--border-color); cursor: pointer; transition: all 0.1s ease-in-out; 
-            color: #000; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; 
-        }
-        button:active, .btn-home:active, .btn-main:active, .view-file-btn:active, .tab-btn:active { 
-            box-shadow: 0px 0px 0px var(--border-color); transform: translate(4px, 4px); 
-        }
+        button, .btn-home, .btn-main, .view-file-btn { font-weight: 900; border: var(--border-width) solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); cursor: pointer; transition: all 0.1s ease-in-out; color: #000; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        button:active, .btn-home:active, .btn-main:active, .view-file-btn:active { box-shadow: 0px 0px 0px var(--border-color); transform: translate(4px, 4px); }
 
         .btn-home { background: #fff; padding: 10px 15px; margin-bottom: 20px; font-size: 16px; }
         .btn-main { width: 100%; background: var(--green); padding: 15px; font-size: 20px; margin-top: 15px; }
@@ -61,49 +33,37 @@
 
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 900; margin-bottom: 8px; font-size: 16px; }
-        input[type="text"], input[type="date"], select, input[type="file"] { 
-            width: 100%; padding: 12px; font-size: 16px; font-weight: 600; 
-            border: var(--border-width) solid var(--border-color); background: #fff; 
-            box-shadow: 4px 4px 0px var(--border-color); transition: 0.1s;
-        }
+        input[type="text"], input[type="date"], select, input[type="file"] { width: 100%; padding: 12px; font-size: 16px; font-weight: 600; border: var(--border-width) solid var(--border-color); background: #fff; box-shadow: 4px 4px 0px var(--border-color); transition: 0.1s; }
         input:focus, select:focus { background: #fffbf0; outline: none; }
         
-        .tabs { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 10px; 
-            margin-bottom: 20px; 
-            border-bottom: 4px solid var(--border-color); 
-            padding-bottom: 15px; 
-        }
-
-        .tab-btn { 
-            background: #f0f0f0; 
-            padding: 10px 15px; 
-            font-size: 15px; 
-            width: 100%;
-        }
-
-        @media (max-width: 500px) {
-            .tabs { grid-template-columns: repeat(2, 1fr); }
-        }
+        /* 🔻 Accordion Style (แบบคลิกเปิดทีละอัน) */
+        .accordion-item { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 15px; background: #fff; }
+        .accordion-header { width: 100%; text-align: left; background: #f0f0f0; padding: 15px 20px; font-size: 18px; font-weight: 900; border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .accordion-header:hover { background: var(--apricot); }
+        .accordion-header.active { background: var(--blue-dark); color: #fff; border-bottom: 4px solid var(--border-color); box-shadow: none; transform: none; }
+        .accordion-content { padding: 20px; display: none; background: #fff; }
+        .accordion-content.show { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .disease-title { font-size: 20px; font-weight: 900; background: var(--gold); padding: 8px 15px; border: 3px solid #000; display: inline-block; margin-bottom: 15px; box-shadow: 3px 3px 0px #000; }
         .guideline-box { background: #fff3cd; border: 3px solid #000; padding: 12px; font-size: 15px; font-weight: 600; margin-bottom: 20px; box-shadow: 4px 4px 0px #000; }
         .date-section { background: #f9f9fa; border: 3px dashed #000; padding: 15px; margin-top: 15px; display: none; }
         .dose-group { background: #fff; border: 2px solid #000; padding: 12px; margin-bottom: 10px; box-shadow: 2px 2px 0px #000; }
-
         .current-file-link { margin-top: 10px; font-size: 14px; background: #fff; padding: 6px 12px; border: 2px solid #000; font-weight: 900; display: inline-block; box-shadow: 2px 2px 0px #000; text-decoration: none; color: var(--blue-dark); }
-        
         .alert-box { border: 4px solid #000; padding: 15px; font-weight: 800; margin-bottom: 20px; box-shadow: 6px 6px 0px #000; }
         .alert-red { background: var(--pink); }
         
-        /* 🖨️ สไตล์สำหรับการ Print PDF (เฉพาะส่วน PrintArea) */
+        /* 🖨️ สไตล์สำหรับการ Print PDF */
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
             #printArea { position: absolute; left: 0; top: 0; width: 100%; background: #fff; }
-            .container, .btn-home { display: none !important; }
+            .container, .btn-home, #pdfPrintModal { display: none !important; }
+            
+            /* คำสั่งให้ขึ้นหน้าใหม่ */
+            .print-page { page-break-after: always; padding-top: 20px; }
+            .print-page:last-child { page-break-after: auto; }
+            
             .print-header { border: 4px solid #000; padding: 20px; background: var(--apricot) !important; margin-bottom: 20px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-disease-box { border: 3px solid #000; padding: 15px; margin-bottom: 20px; page-break-inside: avoid; }
             .print-title { background: var(--blue-dark) !important; color: #fff !important; padding: 8px 12px; font-weight: 900; font-size: 18px; border: 2px solid #000; display: inline-block; margin-bottom: 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -116,7 +76,6 @@
     <div class="container" id="mainContainer">
         <a href="index.html" class="btn-home">⬅️ กลับหน้าหลัก</a>
 
-        <!-- 🔒 ส่วนล็อกอิน -->
         <div id="loginSection">
             <h1 style="background: var(--blue); color: #fff;">📑 สมุดพกสุขภาพ (นศ.)</h1>
             <div class="form-group">
@@ -126,158 +85,176 @@
             </div>
         </div>
 
-        <!-- 📋 ส่วนบันทึกประวัติ -->
         <div id="recordSection" style="display:none;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 4px solid #000; padding-bottom: 15px; margin-bottom: 20px; flex-wrap:wrap; gap:10px;">
-                <div>
-                    <h2 style="margin:0; background:#fff; border:none; box-shadow:none; text-align:left; font-size:22px; padding:0;">👤 ข้อมูลของคุณ</h2>
+                <div style="flex-grow:1;">
+                    <h2 style="margin:0; background:#fff; border:none; box-shadow:none; text-align:left; font-size:20px; padding:0;">👤 ข้อมูลของคุณ</h2>
                     <input type="text" id="studentName" readonly style="background:#f0f0f0; border:none; box-shadow:none; padding:5px 0; font-size:18px;">
                 </div>
-                <button class="btn-home" style="background:var(--gold); margin:0;" onclick="printMyRecord()">🖨️ Save เป็น PDF</button>
+                <button class="btn-home" style="background:var(--gold); margin:0;" onclick="openPdfModal()">🖨️ Save เป็น PDF</button>
             </div>
 
             <div id="notificationArea"></div>
 
             <form id="vaccineRecordForm">
                 
-                <div class="tabs">
-                    <button type="button" class="tab-btn active" onclick="switchTab('vzv', this)">1. สุกใส</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('hbv', this)">2. ตับอักเสบบี</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('mmr', this)">3. MMR</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('tdap', this)">4. Tdap</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('flu', this)">5. ไข้หวัดใหญ่</button>
-                    <button type="button" class="tab-btn" onclick="switchTab('tb', this)">6. วัณโรค</button>
-                </div>
-
                 <!-- 1. โรคสุกใส (VZV) -->
-                <div id="tab-vzv" class="tab-content active">
-                    <div class="disease-title">1. โรคสุกใส (Varicella)</div>
-                    <div class="guideline-box">📌 มีภูมิ/เคยป่วย (จบ) หรือ ⚠️ ไม่มีภูมิ: ต้องฉีด 2 เข็ม ห่างกัน 1 เดือน</div>
-                    <div class="form-group">
-                        <label>สถานะปัจจุบัน:</label>
-                        <select id="status_vzv" onchange="toggleDates('vzv')">
-                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="มีหลักฐานเคยป่วย">✅ 1. มีหลักฐานเคยป่วยเป็นสุกใส</option>
-                            <option value="IgG Positive">✅ 2. ผลตรวจเลือด IgG Positive (+)</option>
-                            <option value="กำลังฉีดวัคซีน">⚠️ 3. ไม่มีภูมิ (อยู่ระหว่างฉีด 2 โด๊ส)</option>
-                            <option value="รับวัคซีนสุกใสครบ 2 โด๊ส">✅ 4. ฉีดครบ 2 โด๊สแล้ว</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="general_upload_vzv">
-                        <label>📸 อัปโหลดผลเลือด/ใบรับรองแพทย์:</label>
-                        <input type="file" id="file_vzv" accept="image/*">
-                        <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
-                    </div>
-                    <div id="dates_vzv" class="date-section">
-                        <div class="dose-group">
-                            <label>📅 วันที่ฉีด โด๊ส 1:</label><input type="date" id="date_vzv_1" onchange="calcVZV()">
-                            <input type="file" id="file_vzv_1" accept="image/*" style="margin-top:8px;">
-                            <a id="link_vzv_1" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 1</a>
+                <div class="accordion-item">
+                    <button type="button" class="accordion-header" id="btn-vzv" onclick="toggleAccordion('vzv')">1. โรคสุกใส (Varicella) <span>▼</span></button>
+                    <div id="acc-vzv" class="accordion-content">
+                        <div class="guideline-box">📌 มีภูมิ/เคยป่วย (จบ) หรือ ⚠️ ไม่มีภูมิ: ต้องฉีด 2 เข็ม ห่างกัน 1 เดือน</div>
+                        <div class="form-group">
+                            <label>สถานะปัจจุบัน:</label>
+                            <select id="status_vzv" onchange="toggleDates('vzv')">
+                                <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                                <option value="มีหลักฐานเคยป่วย">✅ 1. มีหลักฐานเคยป่วยเป็นสุกใส</option>
+                                <option value="IgG Positive">✅ 2. ผลตรวจเลือด IgG Positive (+)</option>
+                                <option value="กำลังฉีดวัคซีน">⚠️ 3. ไม่มีภูมิ (อยู่ระหว่างฉีด 2 โด๊ส)</option>
+                                <option value="รับวัคซีนสุกใสครบ 2 โด๊ส">✅ 4. ฉีดครบ 2 โด๊สแล้ว</option>
+                            </select>
                         </div>
-                        <div class="dose-group">
-                            <label>📅 วันที่ฉีด โด๊ส 2:</label><input type="date" id="date_vzv_2">
-                            <input type="file" id="file_vzv_2" accept="image/*" style="margin-top:8px;">
-                            <a id="link_vzv_2" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 2</a>
+                        <div class="form-group" id="general_upload_vzv" style="display:none;">
+                            <label>📸 อัปโหลดผลเลือด/ใบรับรองแพทย์:</label>
+                            <input type="file" id="file_vzv" accept="image/*">
+                            <a id="link_vzv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                        </div>
+                        <div id="dates_vzv" class="date-section">
+                            <div class="dose-group"><label>📅 วันที่ฉีด โด๊ส 1:</label><input type="date" id="date_vzv_1" onchange="calcVZV()"><input type="file" id="file_vzv_1" accept="image/*" style="margin-top:8px;"><a id="link_vzv_1" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 1</a></div>
+                            <div class="dose-group"><label>📅 วันที่ฉีด โด๊ส 2:</label><input type="date" id="date_vzv_2"><input type="file" id="file_vzv_2" accept="image/*" style="margin-top:8px;"><a id="link_vzv_2" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 2</a></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 2. ไวรัสตับอักเสบบี (HBV) -->
-                <div id="tab-hbv" class="tab-content">
-                    <div class="disease-title">2. ไวรัสตับอักเสบบี (Hepatitis B)</div>
-                    <div class="guideline-box">📌 ภูมิคุ้มกัน > 10 unit (จบ) หรือ ⚠️ ไม่มีภูมิ: ฉีด 3 เข็ม (0, 1, 6 เดือน)</div>
-                    <div class="form-group">
-                        <label>สถานะปัจจุบัน:</label>
-                        <select id="status_hbv" onchange="toggleDates('hbv')">
-                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="IgG > 10">✅ 1. ผลตรวจ Anti-HBs IgG > 10 unit</option>
-                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ (อยู่ระหว่างฉีด 3 โด๊ส)</option>
-                            <option value="รับวัคซีนตับอักเสบบีครบ 3 โด๊ส">✅ 3. ฉีดครบ 3 โด๊สแล้ว</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="general_upload_hbv">
-                        <label>📸 อัปโหลดผลตรวจเลือด:</label>
-                        <input type="file" id="file_hbv" accept="image/*">
-                        <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
-                    </div>
-                    <div id="dates_hbv" class="date-section">
-                        <div class="dose-group"><label>เข็ม 1:</label><input type="date" id="date_hbv_1" onchange="calcHBV()"><input type="file" id="file_hbv_1" accept="image/*" style="margin-top:5px;"><a id="link_hbv_1" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 1</a></div>
-                        <div class="dose-group"><label>เข็ม 2:</label><input type="date" id="date_hbv_2"><input type="file" id="file_hbv_2" accept="image/*" style="margin-top:5px;"><a id="link_hbv_2" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 2</a></div>
-                        <div class="dose-group"><label>เข็ม 3:</label><input type="date" id="date_hbv_3"><input type="file" id="file_hbv_3" accept="image/*" style="margin-top:5px;"><a id="link_hbv_3" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 3</a></div>
+                <div class="accordion-item">
+                    <button type="button" class="accordion-header" id="btn-hbv" onclick="toggleAccordion('hbv')">2. ไวรัสตับอักเสบบี (Hepatitis B) <span>▼</span></button>
+                    <div id="acc-hbv" class="accordion-content">
+                        <div class="guideline-box">📌 ภูมิคุ้มกัน > 10 unit (จบ) หรือ ⚠️ ไม่มีภูมิ: ฉีด 3 เข็ม (0, 1, 6 เดือน)</div>
+                        <div class="form-group">
+                            <label>สถานะปัจจุบัน:</label>
+                            <select id="status_hbv" onchange="toggleDates('hbv')">
+                                <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                                <option value="IgG > 10">✅ 1. ผลตรวจ Anti-HBs IgG > 10 unit</option>
+                                <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ (อยู่ระหว่างฉีด 3 โด๊ส)</option>
+                                <option value="รับวัคซีนตับอักเสบบีครบ 3 โด๊ส">✅ 3. ฉีดครบ 3 โด๊สแล้ว</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="general_upload_hbv" style="display:none;">
+                            <label>📸 อัปโหลดผลตรวจเลือด:</label>
+                            <input type="file" id="file_hbv" accept="image/*">
+                            <a id="link_hbv" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                        </div>
+                        <div id="dates_hbv" class="date-section">
+                            <div class="dose-group"><label>เข็ม 1:</label><input type="date" id="date_hbv_1" onchange="calcHBV()"><input type="file" id="file_hbv_1" accept="image/*" style="margin-top:5px;"><a id="link_hbv_1" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 1</a></div>
+                            <div class="dose-group"><label>เข็ม 2:</label><input type="date" id="date_hbv_2"><input type="file" id="file_hbv_2" accept="image/*" style="margin-top:5px;"><a id="link_hbv_2" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 2</a></div>
+                            <div class="dose-group"><label>เข็ม 3:</label><input type="date" id="date_hbv_3"><input type="file" id="file_hbv_3" accept="image/*" style="margin-top:5px;"><a id="link_hbv_3" class="current-file-link" target="_blank" style="display:none;">📄 ไฟล์เข็ม 3</a></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 3. MMR -->
-                <div id="tab-mmr" class="tab-content">
-                    <div class="disease-title">3. หัด-คางทูม-หัดเยอรมัน (MMR)</div>
-                    <div class="form-group">
-                        <label>สถานะปัจจุบัน:</label>
-                        <select id="status_mmr" onchange="toggleDates('mmr')">
-                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="มีภูมิหรือฉีดครบแล้ว">✅ 1. มีภูมิคุ้มกันหรือเคยฉีดครบแล้ว</option>
-                            <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องฉีดเพิ่ม</option>
-                        </select>
-                    </div>
-                    
-                    <!-- 🟢 เพิ่มช่องอัปโหลดหลักฐานรวมตรงนี้ครับ -->
-                    <div class="form-group" id="general_upload_mmr" style="display:none;">
-                        <label>📸 อัปโหลดหลักฐาน (ผลเลือด/สมุดวัคซีนเดิม):</label>
-                        <input type="file" id="file_mmr" accept="image/*">
-                        <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
-                    </div>
-
-                    <div id="dates_mmr" class="date-section">
-                        <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_mmr_1">
-                        <input type="file" id="file_mmr_1" accept="image/*" style="margin-top:8px;">
-                        <a id="link_mmr_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์เข็มล่าสุด</a>
+                <div class="accordion-item">
+                    <button type="button" class="accordion-header" id="btn-mmr" onclick="toggleAccordion('mmr')">3. หัด-คางทูม-หัดเยอรมัน (MMR) <span>▼</span></button>
+                    <div id="acc-mmr" class="accordion-content">
+                        <div class="form-group">
+                            <label>สถานะปัจจุบัน:</label>
+                            <select id="status_mmr" onchange="toggleDates('mmr')">
+                                <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                                <option value="มีภูมิหรือฉีดครบแล้ว">✅ 1. มีภูมิคุ้มกันหรือเคยฉีดครบแล้ว</option>
+                                <option value="กำลังฉีดวัคซีน">⚠️ 2. ไม่มีภูมิ ต้องฉีดเพิ่ม</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="general_upload_mmr" style="display:none;">
+                            <label>📸 อัปโหลดหลักฐาน (ผลเลือด/สมุดวัคซีนเดิม):</label>
+                            <input type="file" id="file_mmr" accept="image/*">
+                            <a id="link_mmr" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                        </div>
+                        <div id="dates_mmr" class="date-section">
+                            <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_mmr_1">
+                            <input type="file" id="file_mmr_1" accept="image/*" style="margin-top:8px;">
+                            <a id="link_mmr_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์เข็มล่าสุด</a>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 4. Tdap -->
-                <div id="tab-tdap" class="tab-content">
-                    <div class="disease-title">4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)</div>
-                    <div class="form-group">
-                        <label>สถานะปัจจุบัน:</label>
-                        <select id="status_tdap" onchange="toggleDates('tdap')">
-                            <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
-                            <option value="เคยฉีดภายใน10ปี">✅ 1. เคยฉีดมาแล้ว (ยังไม่เกิน 10 ปี)</option>
-                            <option value="กำลังฉีดวัคซีน">⚠️ 2. หมดอายุ/ต้องฉีดใหม่</option>
-                        </select>
-                    </div>
-                    <div id="dates_tdap" class="date-section">
-                        <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_tdap_1">
-                        <input type="file" id="file_tdap_1" accept="image/*" style="margin-top:8px;">
-                        <a id="link_tdap_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์เข็มล่าสุด</a>
+                <div class="accordion-item">
+                    <button type="button" class="accordion-header" id="btn-tdap" onclick="toggleAccordion('tdap')">4. บาดทะยัก-คอตีบ-ไอกรน (Tdap) <span>▼</span></button>
+                    <div id="acc-tdap" class="accordion-content">
+                        <div class="form-group">
+                            <label>สถานะปัจจุบัน:</label>
+                            <select id="status_tdap" onchange="toggleDates('tdap')">
+                                <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
+                                <option value="เคยฉีดภายใน10ปี">✅ 1. เคยฉีดมาแล้ว (ยังไม่เกิน 10 ปี)</option>
+                                <option value="กำลังฉีดวัคซีน">⚠️ 2. หมดอายุ/ต้องฉีดใหม่</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="general_upload_tdap" style="display:none;">
+                            <label>📸 อัปโหลดหลักฐานเดิม (ถ้ามี):</label>
+                            <input type="file" id="file_tdap" accept="image/*">
+                            <a id="link_tdap" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                        </div>
+                        <div id="dates_tdap" class="date-section">
+                            <label>📅 วันที่ฉีดล่าสุด:</label><input type="date" id="date_tdap_1">
+                            <input type="file" id="file_tdap_1" accept="image/*" style="margin-top:8px;">
+                            <a id="link_tdap_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์เข็มล่าสุด</a>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 5. ไข้หวัดใหญ่ (Flu) -->
-                <div id="tab-flu" class="tab-content">
-                    <div class="disease-title">5. ไข้หวัดใหญ่ (Influenza)</div>
-                    <div class="guideline-box">💉 ต้องฉีดและอัปเดตหลักฐานเป็นประจำทุกปี</div>
-                    <div class="form-group"><label>📅 วันที่ฉีด (รอบล่าสุด):</label><input type="date" id="date_flu_1"></div>
-                    <div class="form-group">
-                        <label>📸 อัปโหลดหลักฐานใหม่ (ปีปัจจุบัน):</label><input type="file" id="file_flu_1" accept="image/*">
-                        <a id="link_flu_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                <div class="accordion-item">
+                    <button type="button" class="accordion-header" id="btn-flu" onclick="toggleAccordion('flu')">5. ไข้หวัดใหญ่ (Influenza) <span>▼</span></button>
+                    <div id="acc-flu" class="accordion-content">
+                        <div class="guideline-box">💉 ต้องฉีดและอัปเดตหลักฐานเป็นประจำทุกปี</div>
+                        <div class="form-group"><label>📅 วันที่ฉีด (รอบล่าสุด):</label><input type="date" id="date_flu_1"></div>
+                        <div class="form-group">
+                            <label>📸 อัปโหลดหลักฐานใหม่ (ปีปัจจุบัน):</label><input type="file" id="file_flu_1" accept="image/*">
+                            <a id="link_flu_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูไฟล์ปัจจุบัน</a>
+                        </div>
+                        <input type="hidden" id="status_flu" value="รับวัคซีนแล้ว">
                     </div>
-                    <input type="hidden" id="status_flu" value="รับวัคซีนแล้ว">
                 </div>
 
                 <!-- 6. วัณโรค (TB) -->
-                <div id="tab-tb" class="tab-content">
-                    <div class="disease-title">6. วัณโรค (Tuberculosis)</div>
-                    <div class="guideline-box">🩺 ผล X-ray ปอดต้องปกติ และตรวจมาไม่เกิน 6 เดือนก่อนขึ้นฝึก</div>
-                    <div class="form-group"><label>📅 วันที่เข้ารับการ X-ray:</label><input type="date" id="date_tb_1"></div>
-                    <div class="form-group">
-                        <label>📸 อัปโหลดใบรายงานผล (CXR):</label><input type="file" id="file_tb_1" accept="image/*">
-                        <a id="link_tb_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูผล X-ray ปัจจุบัน</a>
+                <div class="accordion-item">
+                    <button type="button" class="accordion-header" id="btn-tb" onclick="toggleAccordion('tb')">6. วัณโรค (Tuberculosis) <span>▼</span></button>
+                    <div id="acc-tb" class="accordion-content">
+                        <div class="guideline-box">🩺 ผล X-ray ปอดต้องปกติ และตรวจมาไม่เกิน 6 เดือนก่อนขึ้นฝึก</div>
+                        <div class="form-group"><label>📅 วันที่เข้ารับการ X-ray:</label><input type="date" id="date_tb_1"></div>
+                        <div class="form-group">
+                            <label>📸 อัปโหลดใบรายงานผล (CXR):</label><input type="file" id="file_tb_1" accept="image/*">
+                            <a id="link_tb_1" class="current-file-link" target="_blank" style="display:none;">📄 ดูผล X-ray ปัจจุบัน</a>
+                        </div>
+                        <input type="hidden" id="status_tb" value="X-ray ปกติ">
                     </div>
-                    <input type="hidden" id="status_tb" value="X-ray ปกติ">
                 </div>
 
                 <button type="submit" class="btn-main" id="saveBtn">💾 บันทึกและส่งหลักฐาน</button>
                 <p id="statusMsg" style="text-align:center; font-weight:900; display:none; margin-top:15px; color:var(--blue-dark);"></p>
             </form>
+        </div>
+    </div>
+
+    <!-- 🌟 Modal สำหรับเลือกวัคซีนที่จะ Print PDF -->
+    <div id="pdfPrintModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; justify-content:center; align-items:center; backdrop-filter: blur(2px);">
+        <div class="modal-content-box" style="background:#fff; padding:25px; border:4px solid #000; max-width:450px; width:90%; box-shadow:8px 8px 0px #000;">
+            <h2 style="background:var(--apricot); margin-top:0; border:3px solid #000;">🖨️ เลือกข้อมูลเพื่อสร้าง PDF</h2>
+            <p style="font-weight:600; margin-bottom:15px;">*ระบบจะแยกวัคซีนแต่ละชนิดขึ้นหน้าใหม่ให้อัตโนมัติ</p>
+            
+            <div style="text-align:left; font-size:18px; margin-bottom:20px; font-weight:800; background:#f9f9fa; padding:15px; border:2px solid #000;">
+                <label style="display:block; margin-bottom:10px; cursor:pointer;"><input type="checkbox" class="pdf-cb" value="vzv" checked style="width:20px; height:20px;"> 1. โรคสุกใส (Varicella)</label>
+                <label style="display:block; margin-bottom:10px; cursor:pointer;"><input type="checkbox" class="pdf-cb" value="hbv" checked style="width:20px; height:20px;"> 2. ไวรัสตับอักเสบบี (Hepatitis B)</label>
+                <label style="display:block; margin-bottom:10px; cursor:pointer;"><input type="checkbox" class="pdf-cb" value="mmr" checked style="width:20px; height:20px;"> 3. หัด-คางทูม-หัดเยอรมัน (MMR)</label>
+                <label style="display:block; margin-bottom:10px; cursor:pointer;"><input type="checkbox" class="pdf-cb" value="tdap" checked style="width:20px; height:20px;"> 4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)</label>
+                <label style="display:block; margin-bottom:10px; cursor:pointer;"><input type="checkbox" class="pdf-cb" value="flu" checked style="width:20px; height:20px;"> 5. ไข้หวัดใหญ่ (Influenza)</label>
+                <label style="display:block; cursor:pointer;"><input type="checkbox" class="pdf-cb" value="tb" checked style="width:20px; height:20px;"> 6. วัณโรค (Tuberculosis)</label>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; gap:10px;">
+                <button class="btn-home" style="margin:0; flex-grow:1;" onclick="document.getElementById('pdfPrintModal').style.display='none'">❌ ยกเลิก</button>
+                <button class="btn-main" style="margin:0; flex-grow:1;" onclick="generateSelectedPDF()">✅ สร้าง PDF</button>
+            </div>
         </div>
     </div>
 
@@ -300,17 +277,30 @@
         const diseases = ['vzv', 'hbv', 'mmr', 'tdap', 'flu', 'tb'];
         const fileSuffixes = ['', '_1', '_2', '_3']; 
         let currentId = "";
-        let currentStudentData = null; // เก็บข้อมูลไว้ใช้ตอน Print
+        let currentStudentData = null;
 
         function addMonths(dateStr, months) { if(!dateStr) return ""; let d = new Date(dateStr); d.setMonth(d.getMonth() + months); return d.toISOString().split('T')[0]; }
         function calcVZV() { let d = document.getElementById('date_vzv_1').value; if(d) document.getElementById('date_vzv_2').value = addMonths(d, 1); }
         function calcHBV() { let d = document.getElementById('date_hbv_1').value; if(d) { document.getElementById('date_hbv_2').value = addMonths(d, 1); document.getElementById('date_hbv_3').value = addMonths(d, 6); } }
 
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            btn.classList.add('active');
+        // ==========================================
+        // ระบบ Accordion (คลิกเปิดทีละรายการ)
+        // ==========================================
+        function toggleAccordion(id) {
+            const content = document.getElementById(`acc-${id}`);
+            const btn = document.getElementById(`btn-${id}`);
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                btn.classList.remove('active');
+            } else {
+                // ถ้าอยากให้เปิดได้ทีละหัวข้อ ให้ Uncomment สองบรรทัดล่างนี้ครับ
+                // document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('show'));
+                // document.querySelectorAll('.accordion-header').forEach(b => b.classList.remove('active'));
+                
+                content.classList.add('show');
+                btn.classList.add('active');
+            }
         }
 
         function toggleDates(disease) {
@@ -318,17 +308,13 @@
             const dateBox = document.getElementById(`dates_${disease}`);
             const generalUpload = document.getElementById(`general_upload_${disease}`);
             
-            // รีเซ็ต ปิดกล่องทั้งหมดไว้ก่อน
             if(dateBox) dateBox.style.display = 'none';
             if(generalUpload) generalUpload.style.display = 'none';
 
-            // ตรวจสอบสถานะการแสดงผล
             if (status !== "ยังไม่ดำเนินการ") {
                 if (status.includes("กำลัง") || status.includes("ภายใน")) {
-                    // กรณีต้องฉีดวัคซีน หรือ Tdap ที่ฉีดภายใน 10 ปี (ให้กรอกวันที่ + แนบรูปรายเข็ม)
                     if(dateBox) dateBox.style.display = 'block';
                 } else {
-                    // กรณีมีภูมิแล้ว, เคยป่วย, ฉีดครบแล้ว (ให้อัปโหลดใบรับรองรวม)
                     if(generalUpload) generalUpload.style.display = 'block';
                 }
             }
@@ -346,12 +332,12 @@
                 
                 document.getElementById('studentName').value = masterDoc.data().fullName;
                 currentId = sid;
-                currentStudentData = {}; // Initialize empty record
+                currentStudentData = {}; 
 
                 const recordDoc = await db.collection('student_health_records').doc(sid).get();
                 if(recordDoc.exists) {
                     const rec = recordDoc.data();
-                    currentStudentData = rec; // Save for printing
+                    currentStudentData = rec; 
 
                     diseases.forEach(d => {
                         if(rec[`status_${d}`]) { document.getElementById(`status_${d}`).value = rec[`status_${d}`]; toggleDates(d); }
@@ -365,7 +351,6 @@
                         });
                     });
 
-                    // ระบบแจ้งเตือน Rejection
                     let alerts = "";
                     let rejected = [];
                     Object.keys(rec).forEach(k => { if(k.startsWith('verify_') && rec[k] === 'rejected') rejected.push(k.replace('verify_','')); });
@@ -387,7 +372,6 @@
                         const maxWidth = 1200; let w = img.width; let h = img.height;
                         if (w > h && w > maxWidth) { h *= maxWidth / w; w = maxWidth; } else if (h > maxWidth) { w *= maxWidth / h; h = maxWidth; }
                         canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
-                        // 🌟 แปลงเป็น .webp เพื่อประหยัดพื้นที่ 50%
                         canvas.toBlob((b) => { resolve(new File([b], file.name.replace(/\.[^/.]+$/, ".webp"), { type: 'image/webp' })); }, 'image/webp', 0.7);
                     };
                 };
@@ -424,57 +408,62 @@
         });
 
         // =====================================
-        // 🖨️ ฟังก์ชันสร้างหน้า PDF แบบสวยงาม
+        // 🖨️ ระบบเลือกและสร้าง PDF (หน้าใหม่)
         // =====================================
-        function printMyRecord() {
+        function openPdfModal() {
             if (!currentStudentData) {
                 alert("⚠️ ไม่พบข้อมูลประวัติ กรุณาบันทึกข้อมูลอย่างน้อย 1 ครั้งก่อนพิมพ์");
+                return;
+            }
+            document.getElementById('pdfPrintModal').style.display = 'flex';
+        }
+
+        function generateSelectedPDF() {
+            // ซ่อน Modal
+            document.getElementById('pdfPrintModal').style.display = 'none';
+
+            // ตรวจสอบว่าเลือกวัคซีนไหนบ้าง
+            const selectedDiseases = Array.from(document.querySelectorAll('.pdf-cb:checked')).map(cb => cb.value);
+            if(selectedDiseases.length === 0) {
+                alert("⚠️ กรุณาเลือกวัคซีนอย่างน้อย 1 ชนิดเพื่อสร้าง PDF");
                 return;
             }
 
             const rec = currentStudentData;
             const studentName = document.getElementById('studentName').value;
 
-            // สร้าง Header ของ PDF
-            let printHtml = `
-                <div class="print-header">
-                    <h1 style="margin:0; font-size: 26px; color:#000;">📋 สมุดพกวัคซีนออนไลน์ (Student Health Record)</h1>
-                    <p style="margin: 10px 0 0 0; font-size: 18px; font-weight: 900; color:#000;">รหัสนักศึกษา: ${currentId} | ชื่อ-นามสกุล: ${studentName}</p>
-                </div>
-            `;
-
-            const dList = [
+            const allDList = [
                 { code: 'vzv', name: '1. โรคสุกใส (Varicella)' }, { code: 'hbv', name: '2. ไวรัสตับอักเสบบี (Hepatitis B)' },
                 { code: 'mmr', name: '3. หัด-คางทูม-หัดเยอรมัน (MMR)' }, { code: 'tdap', name: '4. บาดทะยัก-คอตีบ-ไอกรน (Tdap)' },
                 { code: 'flu', name: '5. ไข้หวัดใหญ่ (Influenza)' }, { code: 'tb', name: '6. วัณโรค (Tuberculosis)' }
             ];
 
-            // ฟังก์ชันช่วยดึงรูปภาพมาแสดงใน PDF
+            // กรองเอาเฉพาะวัคซีนที่ถูกติ๊กเลือก
+            const dListToPrint = allDList.filter(d => selectedDiseases.includes(d.code));
+
             function getPrintImage(url, label) {
                 if(!url) return `<p style="color:#666; font-size:14px; margin-top:5px;">- ไม่พบไฟล์หลักฐาน -</p>`;
-                return `
-                    <div style="margin-top: 10px;">
-                        <strong style="font-size:14px;">${label}</strong><br>
-                        <img src="${url}" class="print-img">
-                    </div>
-                `;
+                return `<div style="margin-top: 10px;"><strong style="font-size:14px;">${label}</strong><br><img src="${url}" class="print-img"></div>`;
             }
 
-            // วนลูปสร้างข้อมูลแต่ละโรค
-            dList.forEach(d => {
+            let printHtml = '';
+
+            // สร้าง HTML โดยบังคับขึ้นหน้าใหม่ให้แต่ละวัคซีน (.print-page)
+            dListToPrint.forEach((d, index) => {
                 const status = rec[`status_${d.code}`] || "ยังไม่ดำเนินการ";
                 printHtml += `
-                    <div class="print-disease-box">
-                        <div class="print-title">${d.name}</div>
-                        <div style="font-size: 16px; font-weight: 900; margin-bottom: 10px;">สถานะ: <span style="color:var(--blue-dark);">${status}</span></div>
+                    <div class="print-page">
+                        <div class="print-header">
+                            <h1 style="margin:0; font-size: 26px; color:#000;">📋 สมุดพกวัคซีนออนไลน์</h1>
+                            <p style="margin: 10px 0 0 0; font-size: 18px; font-weight: 900; color:#000;">รหัส: ${currentId} | ชื่อ: ${studentName}</p>
+                        </div>
+                        <div class="print-disease-box">
+                            <div class="print-title">${d.name}</div>
+                            <div style="font-size: 16px; font-weight: 900; margin-bottom: 10px;">สถานะ: <span style="color:var(--blue-dark);">${status}</span></div>
                 `;
 
-                // กรณีมีอัปโหลดรวม (ผลเลือด/ใบรับรองแพทย์)
-                if(rec[`fileUrl_${d.code}`]) {
-                    printHtml += getPrintImage(rec[`fileUrl_${d.code}`], '📌 ภาพหลักฐานรวม/ผลเลือด:');
-                }
+                if(rec[`fileUrl_${d.code}`]) printHtml += getPrintImage(rec[`fileUrl_${d.code}`], '📌 ภาพหลักฐานรวม/ผลเลือด:');
 
-                // กรณีมีการกรอกวันที่เป็นเข็มๆ (Dose)
                 if (d.code === 'vzv') {
                     if(rec.date_vzv_1 || rec.fileUrl_vzv_1) printHtml += `<p style="margin:5px 0; font-weight:bold;">📅 เข็ม 1: ${rec.date_vzv_1 || '-'}</p>` + getPrintImage(rec.fileUrl_vzv_1, 'ภาพหลักฐานเข็ม 1');
                     if(rec.date_vzv_2 || rec.fileUrl_vzv_2) printHtml += `<p style="margin:5px 0; font-weight:bold; margin-top:15px;">📅 เข็ม 2: ${rec.date_vzv_2 || '-'}</p>` + getPrintImage(rec.fileUrl_vzv_2, 'ภาพหลักฐานเข็ม 2');
@@ -490,19 +479,16 @@
                     }
                 }
 
-                printHtml += `</div>`; // ปิดกรอบ disease-box
+                printHtml += `</div></div>`; // ปิดกล่อง
             });
 
-            // เอา HTML ยัดใส่ PrintArea
             document.getElementById('printArea').style.display = 'block';
             document.getElementById('printArea').innerHTML = printHtml;
 
-            // สั่ง Browser ให้พิมพ์
             setTimeout(() => {
                 window.print();
-                // ซ่อนหลังจากพิมพ์เสร็จ
                 document.getElementById('printArea').style.display = 'none';
-            }, 500); // รอรูปโหลด 0.5 วิ
+            }, 500);
         }
     </script>
 </body>
