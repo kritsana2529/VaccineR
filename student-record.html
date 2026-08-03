@@ -33,7 +33,7 @@
 
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 900; margin-bottom: 8px; font-size: 16px; }
-        input[type="text"], input[type="date"], select, input[type="file"] { width: 100%; padding: 12px; font-size: 16px; font-weight: 600; border: var(--border-width) solid var(--border-color); background: #fff; box-shadow: 4px 4px 0px var(--border-color); transition: 0.1s; }
+        input[type="text"], input[type="password"], input[type="date"], select, input[type="file"] { width: 100%; padding: 12px; font-size: 16px; font-weight: 600; border: var(--border-width) solid var(--border-color); background: #fff; box-shadow: 4px 4px 0px var(--border-color); transition: 0.1s; }
         
         /* 🔻 Accordion Style & Colors */
         .accordion-item { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 15px; background: #fff; }
@@ -80,8 +80,12 @@
             <h1 style="background: var(--blue); color: #fff;">📑 สมุดพกสุขภาพ (นศ.)</h1>
             <div class="form-group">
                 <label>รหัสนักศึกษา (Student ID):</label>
-                <input type="text" id="loginStudentId" placeholder="กรอกรหัสนักศึกษาของคุณ" onkeypress="if(event.key==='Enter') loginStudent()">
-                <button type="button" class="btn-main" style="background: var(--apricot);" onclick="loginStudent()">🔍 ค้นหาข้อมูล / เข้าสู่ระบบ</button>
+                <input type="text" id="loginStudentId" placeholder="กรอกรหัสนักศึกษาของคุณ" onkeypress="if(event.key==='Enter') document.getElementById('loginPassword').focus()">
+                
+                <label style="margin-top: 15px;">รหัสผ่าน (Password):</label>
+                <input type="password" id="loginPassword" placeholder="กรอกรหัสผ่าน (ค่าเริ่มต้นคือ รหัสนักศึกษา)" onkeypress="if(event.key==='Enter') loginStudent()">
+                
+                <button type="button" class="btn-main" style="background: var(--apricot);" onclick="loginStudent()">🔍 เข้าสู่ระบบ</button>
             </div>
         </div>
 
@@ -102,7 +106,6 @@
                     <div id="acc-vzv" class="accordion-content">
                         <div class="form-group">
                             <label>สถานะปัจจุบัน:</label>
-                            <!-- นำ onchange="updateColors()" ออก เพื่อให้เช็คสีจากข้อมูลที่เซฟแล้วเท่านั้น -->
                             <select id="status_vzv" onchange="toggleDates('vzv');">
                                 <option value="ยังไม่ดำเนินการ">❌ ยังไม่ดำเนินการ</option>
                                 <option value="มีหลักฐานเคยป่วย">✅ 1. มีหลักฐานเคยป่วยเป็นสุกใส</option>
@@ -333,7 +336,7 @@
             return new Date() > d; 
         }
 
-        // 🎨 ระบบสีกำกับแท็บ (พิจารณาจากข้อมูลที่บันทึกแล้วและไฟล์แนบ)
+        // 🎨 ระบบสีกำกับแท็บ
         function updateColors() {
             if (!currentStudentData) return;
 
@@ -350,25 +353,20 @@
                 const status = currentStudentData[`status_${d}`] || "ยังไม่ดำเนินการ";
                 const hasFile = checkHasFile(d);
                 
-                let targetColor = 'bg-red'; // ค่าเริ่มต้นสีแดง
+                let targetColor = 'bg-red'; 
 
-                // จะพิจารณาเปลี่ยนสีก็ต่อเมื่อมีการแนบไฟล์ไว้ในฐานข้อมูลแล้วเท่านั้น
                 if (hasFile && status !== 'ยังไม่ดำเนินการ') {
                     if (d === 'mmr' || d === 'tdap') {
-                        // MMR และ Tdap จะมีแค่สีแดง กับ สีเขียว
                         targetColor = 'bg-green';
                     } else {
                         if (status.includes('กำลังฉีด')) {
-                            targetColor = 'bg-yellow'; // อยู่ระหว่างดำเนินการ
+                            targetColor = 'bg-yellow'; 
                         } else {
                             targetColor = 'bg-green';
-                            
-                            // เงื่อนไขหมดอายุสำหรับวัคซีนไข้หวัดใหญ่ (1 ปี / 12 เดือน)
                             if (d === 'flu') {
                                 let dDate = currentStudentData[`date_flu_1`];
                                 if (!dDate || isExpired(dDate, 12)) targetColor = 'bg-red';
                             }
-                            // เงื่อนไขหมดอายุสำหรับวัณโรค (2 เดือนหลังวันที่อัปโหลดในระบบ)
                             else if (d === 'tb') {
                                 let dDate = currentStudentData[`date_tb_1`];
                                 if (!dDate || isExpired(dDate, 2)) targetColor = 'bg-red';
@@ -377,13 +375,12 @@
                     }
                 }
 
-                // รีเซ็ตคลาสเก่าแล้วใส่คลาสใหม่
                 btn.classList.remove('bg-red', 'bg-yellow', 'bg-green');
                 btn.classList.add(targetColor);
             });
         }
 
-        // 🔻 ระบบ Accordion คลิกเปิด-หุบ ทีละแท็บ
+        // 🔻 ระบบ Accordion
         function toggleAccordion(id) {
             const content = document.getElementById(`acc-${id}`);
             const btn = document.getElementById(`btn-${id}`);
@@ -391,7 +388,6 @@
             
             const isCurrentlyOpen = content.classList.contains('show');
 
-            // ปิดเนื้อหาทั้งหมดและปรับลูกศรให้ชี้ลง
             document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('show'));
             document.querySelectorAll('.accordion-header').forEach(b => {
                 b.classList.remove('active');
@@ -399,7 +395,6 @@
                 if (arr) arr.innerText = '▼';
             });
 
-            // ถ้าแท็บที่ถูกคลิกยังไม่เปิด ให้เปิดมันและเปลี่ยนลูกศรให้ชี้ขึ้น
             if (!isCurrentlyOpen) {
                 content.classList.add('show');
                 btn.classList.add('active');
@@ -435,15 +430,27 @@
 
         async function loginStudent() {
             const sid = document.getElementById('loginStudentId').value.trim();
-            if(!sid) return;
+            const pwd = document.getElementById('loginPassword').value.trim();
+            if(!sid || !pwd) return alert("⚠️ กรุณาระบุรหัสประจำตัวและรหัสผ่านให้ครบถ้วน");
             const btn = document.querySelector('#loginSection .btn-main');
-            btn.innerText = "⏳ กำลังค้นหา..."; btn.disabled = true;
+            btn.innerText = "⏳ กำลังตรวจสอบ..."; btn.disabled = true;
 
             try {
                 const masterDoc = await db.collection('students_master').doc(sid).get();
-                if(!masterDoc.exists) { alert("❌ ไม่พบรหัสในระบบ"); btn.innerText = "🔍 ค้นหาข้อมูล / เข้าสู่ระบบ"; btn.disabled = false; return; }
+                if(!masterDoc.exists) { alert("❌ ไม่พบรหัสนักศึกษานี้ในระบบ"); btn.innerText = "🔍 เข้าสู่ระบบ"; btn.disabled = false; return; }
                 
-                document.getElementById('studentName').value = masterDoc.data().fullName;
+                const studentData = masterDoc.data();
+                
+                // 🔒 ตรวจสอบรหัสผ่าน 
+                const correctPassword = studentData.password ? String(studentData.password) : sid;
+                if(pwd !== correctPassword) {
+                    alert("❌ รหัสผ่านไม่ถูกต้อง!"); 
+                    btn.innerText = "🔍 เข้าสู่ระบบ"; 
+                    btn.disabled = false; 
+                    return;
+                }
+
+                document.getElementById('studentName').value = studentData.fullName;
                 currentId = sid;
                 currentStudentData = {}; 
 
@@ -469,7 +476,6 @@
                     if(rec.historyLog) renderHistory(rec.historyLog);
                 }
                 
-                // คำนวณสีของปุ่มแท็บหลังจากดึงข้อมูลขึ้นมาแล้วเท่านั้น
                 updateColors();
                 
                 document.getElementById('loginSection').style.display = 'none';
@@ -496,15 +502,15 @@
         document.getElementById('vaccineRecordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn'); const msg = document.getElementById('statusMsg');
-            btn.disabled = true; msg.innerText = "⏳ กำลังบันทึกข้อมูล..."; msg.style.display = 'block';
+            btn.disabled = true; msg.innerText = "⏳ กำลังบันทึกข้อมูลและอัปโหลดหลักฐาน..."; msg.style.display = 'block';
 
             const payload = { studentId: currentId, fullName: document.getElementById('studentName').value, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() };
-            let historyLog = currentStudentData.historyLog || [];
+            let historyLog = (currentStudentData && currentStudentData.historyLog) ? currentStudentData.historyLog : [];
             payload.date_tb_practice = document.getElementById('date_tb_practice').value;
 
             // 💾 ระบบเก็บ Log
             ['flu', 'tb'].forEach(d => {
-                let oldDate = currentStudentData[`date_${d}_1`];
+                let oldDate = currentStudentData ? currentStudentData[`date_${d}_1`] : null;
                 let newDate = document.getElementById(`date_${d}_1`) ? document.getElementById(`date_${d}_1`).value : null;
                 if (oldDate && newDate && oldDate !== newDate) {
                     historyLog.push({ disease: d, date: oldDate, fileUrl: currentStudentData[`fileUrl_${d}_1`] || null });
@@ -529,9 +535,14 @@
                     }
                 }
                 await db.collection('student_health_records').doc(currentId).set(payload, { merge: true });
-                alert("✅ อัปเดตข้อมูลสำเร็จ!"); 
-                location.reload(); // รีเฟรชเพื่อดึงข้อมูลใหม่มาคำนวณสีของแท็บ
-            } catch (err) { alert("❌ เกิดข้อผิดพลาด"); btn.disabled = false; }
+                alert("✅ อัปเดตข้อมูลและหลักฐานสำเร็จ!"); 
+                location.reload(); 
+            } catch (err) { 
+                console.error("Upload Error:", err);
+                alert("❌ เกิดข้อผิดพลาดในการบันทึก: " + err.message); 
+                btn.disabled = false; 
+                document.getElementById('statusMsg').style.display = 'none';
+            }
         });
 
         // 🖨️ PDF Logic
