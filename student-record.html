@@ -317,8 +317,21 @@
             const status = document.getElementById(`status_${disease}`).value;
             const dateBox = document.getElementById(`dates_${disease}`);
             const generalUpload = document.getElementById(`general_upload_${disease}`);
-            if(dateBox) dateBox.style.display = (status.includes("กำลัง") || status.includes("ภายใน")) ? 'block' : 'none';
-            if(generalUpload) generalUpload.style.display = (status.includes("กำลัง")) ? 'none' : 'block';
+            
+            // รีเซ็ต ปิดกล่องทั้งหมดไว้ก่อน
+            if(dateBox) dateBox.style.display = 'none';
+            if(generalUpload) generalUpload.style.display = 'none';
+
+            // ตรวจสอบสถานะการแสดงผล
+            if (status !== "ยังไม่ดำเนินการ") {
+                if (status.includes("กำลัง") || status.includes("ภายใน")) {
+                    // กรณีต้องฉีดวัคซีน หรือ Tdap ที่ฉีดภายใน 10 ปี (ให้กรอกวันที่ + แนบรูปรายเข็ม)
+                    if(dateBox) dateBox.style.display = 'block';
+                } else {
+                    // กรณีมีภูมิแล้ว, เคยป่วย, ฉีดครบแล้ว (ให้อัปโหลดใบรับรองรวม)
+                    if(generalUpload) generalUpload.style.display = 'block';
+                }
+            }
         }
 
         async function loginStudent() {
