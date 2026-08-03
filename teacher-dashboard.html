@@ -157,7 +157,7 @@
             </div>
         </div>
 
-        <!-- NEW TAB: จัดการสถานะ/เลื่อนชั้นปี -->
+        <!-- TAB 2: จัดการสถานะ/เลื่อนชั้นปี -->
         <div id="tab-statusManage" class="tab-content">
              <div class="filter-bar">
                 <label style="margin:0;">เลือกชั้นปีที่ต้องการจัดการ:</label>
@@ -198,7 +198,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: จองคิว (แก้ไขบั๊กการแสดงผล) -->
+        <!-- TAB 3: จองคิว -->
         <div id="tab-bookings" class="tab-content">
             <div id="campaignListView">
                 <div class="filter-bar"><button onclick="loadAllBookings()">🔄 รีเฟรชข้อมูลจองคิว</button></div>
@@ -216,8 +216,14 @@
         <!-- TAB 4: นำเข้า Master Data (เฉพาะ Admin สูงสุด) -->
         <div id="tab-import" class="tab-content">
             <div style="max-width: 600px; margin: 0 auto;">
+                <div style="border: 4px solid #000; padding: 20px; margin-bottom: 30px; background: #fffbf0; box-shadow: 6px 6px 0px #000;">
+                    <h2 style="margin-top:0; font-size: 22px;">🎓 เลื่อนชั้นปีนักศึกษาประจำปี (1 ส.ค.)</h2>
+                    <p style="font-weight: 800; color: #555;">ระบบจะปรับเพิ่มชั้นปี (+1) ให้นักศึกษาทุกคนอัตโนมัติ</p>
+                    <button class="btn-main" style="background: var(--blue); color:#fff;" onclick="promoteAllStudents()">⏩ ดำเนินการเลื่อนชั้นปีทั้งหมด</button>
+                </div>
+
                 <h1 style="font-size:22px; background:var(--gold);">📥 อัปโหลดรายชื่อตั้งต้น (Master Data)</h1>
-                <p style="font-weight: 800; text-align: center; font-size:16px;">คอลัมน์ A-D: studentId, fullName, year, faculty</p>
+                <p style="font-weight: 800; text-align: center; font-size:16px;">คอลัมน์ A-E: studentId, fullName, year, faculty, <span style="color:var(--pink);">password</span></p>
                 <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
                     <p id="fileNameDisplay" style="font-size: 20px;">📁 คลิกลากวาง / เลือกไฟล์ Excel</p>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleFile(this)">
@@ -397,9 +403,6 @@
             });
         }
 
-        // =====================================
-        // 🚀 ระบบจัดการสถานะนักศึกษาแบบกลุ่ม (Group Action)
-        // =====================================
         function renderStatusManageTable() {
             const filterYear = document.getElementById('manageFilterYear').value;
             const tbody = document.getElementById('statusManageTableBody');
@@ -410,7 +413,6 @@
                 if(!checkYearMatch(student.year, filterYear)) return;
                 if(currentAdminRole !== 'ALL' && !checkYearMatch(student.year, currentAdminRole)) return;
                 
-                // ไม่นำเด็กที่จบ หรือพ้นสภาพแล้วมาแสดงให้เปลี่ยนชั้นปีอีก
                 let currentStatus = String(student.year || 'ไม่ระบุ');
                 if(currentStatus === "จบการศึกษา" || currentStatus === "ลาออก/พ้นสภาพ") return;
 
@@ -460,7 +462,7 @@
                             newYear = `ชั้นปีที่ ${nextNum}`;
                         }
                     } else {
-                        newYear = action; // จบการศึกษา หรือ ลาออก
+                        newYear = action; 
                     }
 
                     try {
@@ -472,12 +474,9 @@
             
             alert(`✅ ดำเนินการอัปเดตสถานะสำเร็จ ${count} คน`);
             btn.innerText = "ดำเนินการ"; btn.disabled = false;
-            loadDashboardData(); // โหลดใหม่ทั้งระบบ
+            loadDashboardData(); 
         }
 
-        // =====================================
-        // ระบบเดิม (Modal, Verify, Export, Booking)
-        // =====================================
         window.openStudentModal = function(studentId) {
             const student = mergedDataList.find(s => s.studentId === studentId);
             if(!student) return;
@@ -643,9 +642,6 @@
             XLSX.writeFile(wb, `รายงานข้อมูลนักศึกษา.xlsx`);
         }
 
-        // =====================================
-        // จองคิว (Bookings) - แก้บั๊กการแสดงผล
-        // =====================================
         let allBookingsRaw = []; let currentViewingCampaign = ""; 
         
         async function loadAllBookings() {
@@ -661,7 +657,6 @@
                 let tempBookings = [];
                 snapshot.forEach(doc => tempBookings.push(doc.data()));
                 
-                // กรองข้อมูลจองคิวตามสิทธิ์แอดมิน 
                 if (currentAdminRole !== 'ALL') {
                     tempBookings = tempBookings.filter(booking => {
                         const student = mergedDataList.find(s => s.studentId === booking.studentId);
@@ -741,13 +736,34 @@
                 if (student.studentId) {
                     try {
                         await db.collection('students_master').doc(String(student.studentId)).set({
-                            studentId: String(student.studentId), fullName: student.fullName || "", year: String(student.year) || "ไม่ระบุ", faculty: student.faculty || "", updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            studentId: String(student.studentId), 
+                            fullName: student.fullName || "", 
+                            year: String(student.year) || "ไม่ระบุ", 
+                            faculty: student.faculty || "", 
+                            password: student.password ? String(student.password) : String(student.studentId),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         }, { merge: true });
                         count++; status.innerText = `⏳ บันทึก: ${count} / ${total}`;
                     } catch (e) {}
                 }
             }
             status.innerHTML = `<span style="color:var(--green);">✅ เสร็จสิ้น ${count} รายการ</span>`; btn.innerText = "เรียบร้อย"; loadDashboardData(); 
+        }
+        
+        async function promoteAllStudents() {
+            if(!confirm("⚠️ ยืนยันการเลื่อนชั้นปีนักศึกษาทั้งหมด?\n\nระบบจะทำการ +1 ชั้นปีให้ทุกคนที่มีตัวเลข (เช่น ปี 1 -> ปี 2, ปี 4 -> ปี 5)\n*การอนุมัติจบการศึกษา ให้ทำรายบุคคลในหน้าตรวจหลักฐาน*")) return;
+            let count = 0;
+            for (let student of mergedDataList) {
+                let currentYear = String(student.year || "ไม่ระบุ");
+                let newYear = currentYear;
+                let match = currentYear.match(/\d+/);
+                if (match && !currentYear.includes("จบ")) {
+                    let nextNum = parseInt(match[0]) + 1;
+                    newYear = `ชั้นปีที่ ${nextNum}`;
+                    try { await db.collection('students_master').doc(student.studentId).update({ year: newYear }); count++; } catch(e) {}
+                }
+            }
+            alert(`✅ เลื่อนชั้นปีเรียบร้อยแล้ว จำนวน ${count} คน`); loadDashboardData();
         }
     </script>
 </body>
