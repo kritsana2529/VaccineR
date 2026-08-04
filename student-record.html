@@ -585,7 +585,7 @@
                     for (const suf of fileSuffixes) {
                         const input = document.getElementById(`file_${d}${suf}`);
                         if (input && input.files.length > 0) {
-                            const finalFile = input.files[0].type.startsWith('image/') ? await compressImage(input.files[0]) : input.files[0];
+                            const finalFile = input.files[0];
                             const ref = storage.ref(`vaccine_proofs/${currentId}_${d}${suf}_${Date.now()}.webp`);
                             await ref.put(finalFile);
                             payload[`fileUrl_${d}${suf}`] = await ref.getDownloadURL();
