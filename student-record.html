@@ -585,8 +585,12 @@
                     for (const suf of fileSuffixes) {
                         const input = document.getElementById(`file_${d}${suf}`);
                         if (input && input.files.length > 0) {
+                            
+                            // 🚀 [อัปเดตใหม่]: อัปโหลดไฟล์สดๆ ข้ามระบบบีบอัดไปเลย เพื่อป้องกันการค้าง
                             const finalFile = input.files[0];
-                            const ref = storage.ref(`vaccine_proofs/${currentId}_${d}${suf}_${Date.now()}.webp`);
+                            const fileExtension = finalFile.name.split('.').pop(); // ดึงนามสกุลไฟล์เดิมมาใช้
+                            
+                            const ref = storage.ref(`vaccine_proofs/${currentId}_${d}${suf}_${Date.now()}.${fileExtension}`);
                             await ref.put(finalFile);
                             payload[`fileUrl_${d}${suf}`] = await ref.getDownloadURL();
                             payload[`verify_${d}${suf}`] = 'pending';
@@ -594,7 +598,7 @@
                     }
                 }
                 await db.collection('student_health_records').doc(currentId).set(payload, { merge: true });
-                alert("✅ อัปเดตข้อมูลสำเร็จ!"); 
+                alert("✅ อัปเดตข้อมูลและส่งหลักฐานสำเร็จ!"); 
                 location.reload(); 
             } catch (err) { 
                 console.error("Upload Error:", err);
